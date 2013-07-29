@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define pow2(x)         ( (x)*(x) )
+
 #define DBLEPS     1.0e-16
 #define BCPPDB_DBL_PRECISION   1.0e-03 /* we read only 6 digids in PDB */
 

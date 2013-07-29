@@ -20,9 +20,11 @@
 #if !defined ( __HAVE_ATOM_H__ )
 #  define __HAVE_ATOM_H__
 
-//#include <stdio.h>
+#include <stdio.h>
 #include <iostream> 
 #include <fstream>
+
+#include <coord3D.h>
 
 typedef enum {
 
@@ -40,19 +42,31 @@ class Bonds;
 class Atom 
 {
 	public:
-		Atom (char * name, int serial, double radius, double charge);
-		Atom (char * string); // get prom PDB HETATM or ATOM string
-
+		Atom (const char * name, int serial, double radius, double charge);
+		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string
 		~Atom ();
 
-		void setPosition (double X, double Y, double Z) { x=X; y=Y; z=Z;};
+		// FIXME: friend/Attorney for Molecule/Residue/Bond ?
+		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z); };
+		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
+		void setPosition (Coord3D& R) { r = new Coord3D (R);};
+
 		void addBond () {};
 
 		char * getType () const;
-		bool setType (AtomType T) {type = T; return true;};
 
-		void print (char*) const;
-		void print (std::ofstream *) const;
+		// FIXME: friend/Attorney for Molecule/Residue/Bond ?
+		bool setType (AtomType T) {type = T; return true;};
+		
+		//
+		// Print
+		//
+		// print general info
+		void printInfo (char*) const;
+		void printInfo (std::ostream *) const;
+		
+		// Output BD_BOX str line
+		void printBBStr (std::ostream *) const;
 
 	private:
 		char * name;
@@ -60,9 +74,9 @@ class Atom
 
 		double radius; /* atom is a spherical core */
 		double charge;
-		AtomType type;
+		Coord3D * r; // position might not ne known or needed (make 0,0,0 ?)
 
-		double x,y,z;
+		AtomType type;
 
 		unsigned int nneighbours; /* atoms connected via bonds (FIXME: do we need it?) */
 		Atom ** neighbours;

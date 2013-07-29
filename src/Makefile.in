@@ -54,7 +54,7 @@ host_triplet = @host@
 bin_PROGRAMS = pdb2str$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/depcomp
+	$(top_srcdir)/depcomp ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -66,17 +66,15 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libMol_a_AR = $(AR) $(ARFLAGS)
-libMol_a_LIBADD =
-am_libMol_a_OBJECTS = atom.$(OBJEXT)
-libMol_a_OBJECTS = $(am_libMol_a_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libMol_la_LIBADD =
+am_libMol_la_OBJECTS = coord3D.lo atom.lo
+libMol_la_OBJECTS = $(am_libMol_la_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_pdb2str_OBJECTS = pdb2str.$(OBJEXT)
 pdb2str_OBJECTS = $(am_pdb2str_OBJECTS)
-pdb2str_DEPENDENCIES = libMol.a
+pdb2str_DEPENDENCIES = libMol.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -99,8 +97,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libMol_a_SOURCES) $(pdb2str_SOURCES)
-DIST_SOURCES = $(libMol_a_SOURCES) $(pdb2str_SOURCES)
+SOURCES = $(libMol_la_SOURCES) $(pdb2str_SOURCES)
+DIST_SOURCES = $(libMol_la_SOURCES) $(pdb2str_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -267,13 +265,13 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = tests
-noinst_LIBRARIES = libMol.a 
-libMol_a_SOURCES = atom.cc atom.h
-#coord3D.cc coord3D.h 
+noinst_LTLIBRARIES = libMol.la
+libMol_la_SOURCES = coord3D.cc coord3D.h  atom.cc atom.h
+#
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/src/
 AM_LDFLAGS = -pedantic -ansi -fwritable-strings
 pdb2str_SOURCES = pdb2str.cc
-pdb2str_LDADD = libMol.a 
+pdb2str_LDADD = libMol.la
 EXTRA_DIST = defines.h 
 all: all-recursive
 
@@ -310,12 +308,18 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libMol.a: $(libMol_a_OBJECTS) $(libMol_a_DEPENDENCIES) $(EXTRA_libMol_a_DEPENDENCIES) 
-	-rm -f libMol.a
-	$(libMol_a_AR) libMol.a $(libMol_a_OBJECTS) $(libMol_a_LIBADD)
-	$(RANLIB) libMol.a
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
+libMol.la: $(libMol_la_OBJECTS) $(libMol_la_DEPENDENCIES) $(EXTRA_libMol_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libMol_la_OBJECTS) $(libMol_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -372,7 +376,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atom.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/coord3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdb2str.Po@am__quote@
 
 .cc.o:
@@ -585,7 +590,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(PROGRAMS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)"; do \
@@ -624,7 +629,7 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES mostlyclean-am
+	clean-noinstLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
@@ -698,7 +703,7 @@ uninstall-am: uninstall-binPROGRAMS
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool clean-noinstLIBRARIES cscopelist \
+	clean-generic clean-libtool clean-noinstLTLIBRARIES cscopelist \
 	cscopelist-recursive ctags ctags-recursive distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \

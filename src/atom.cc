@@ -23,28 +23,36 @@
 
 #include<atom.h>
 
-Atom::Atom (char * name, int serial, double radius, double charge) 
-	: name(name), serial(serial), radius(radius), charge(charge), 
+#include "defines.h"
+
+Atom::Atom (const char * name, int serial, double radius, double charge) 
+	: serial(serial), radius(radius), charge(charge), r(NULL), 
 	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
-	{};
+{ 
+	Atom::name = strdup (name);
+};
 
-Atom::~Atom () {};
-
+Atom::~Atom () 
+{
+	delete name;
+	if (r) delete r;
+	if (neighbours) delete neighbours;
+	if (bonds) delete bonds;
+};
 
 char * Atom::getType () const
 {
 	char * t = NULL;
 	switch (type)
 	{
-		case ATOM_FREE: strdup("free"); break;
+		case ATOM_FREE: t = strdup("free"); break;
 
-		case ATOM_BONDED: strdup("bonded"); break;
+		case ATOM_BONDED: t = strdup("bonded"); break;
 		
-		case ATOM_HEAD: strdup("head"); break;
+		case ATOM_HEAD: t = strdup("head"); break;
 
-		default: strdup("unknown") ;
-
+		default: t = strdup("unknown") ;
 	}
 	return t;
 }
@@ -52,19 +60,28 @@ char * Atom::getType () const
 //
 // print Atom's info
 //
-void Atom::print (char * name) const
+void Atom::printInfo (char * name) const
 {
-	std::ofstream file;
-	file.open(name);
-
-	print (&file);
-
-	file.close();
+	std::ostream * stream = new std::ofstream (name);
+	printInfo (stream);
+	delete stream;
 }
 
-
-void Atom::print (std::ofstream * file) const
+void Atom::printInfo (std::ostream * stream) const
 {
-	*file << name << ": " << getType() << " # " << serial << " has " << nneighbours << " and " << nbonds << "nbonds" << std::endl ;
+	*stream << name << " (serial " << serial << ") is "  << getType() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
+}
+
+void Atom::printBBStr (std::ostream * stream) const
+{
+	*stream << "sub " << name << " " << serial;
+	if (r)
+		r->print(stream);
+	else
+	{
+		BCPT_WARNING ("atom %s (%i): no coordinates, setting to zeros!", name, serial);
+		*stream << " 0.0 0.0 0.0 " ;
+	}
+	*stream << charge << " " << radius << std::endl ;
 }
 
