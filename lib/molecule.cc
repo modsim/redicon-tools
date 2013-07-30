@@ -43,7 +43,6 @@ Molecule::~Molecule ()
 	if (bonds) delete bonds;
 };
 
-
 bool Molecule::setPosition (Coord3D& R) 
 {
 	AtomAttorney::setPosition (head, R);

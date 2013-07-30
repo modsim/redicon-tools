@@ -2,12 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([bcp-tools], [0.0.4], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.0.5], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_CONFIG_SRCDIR([src/defines.h])
+AC_CONFIG_SRCDIR([lib/defines.h])
 AC_CONFIG_HEADERS([config.h])
 
 AC_SUBST(BCPT_MAINTAINER)
@@ -36,6 +36,7 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile
-                 src/tests/Makefile])
+                 lib/Makefile
+                 lib/tests/Makefile
+                 tools/Makefile])
 AC_OUTPUT

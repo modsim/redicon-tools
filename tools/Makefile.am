@@ -1,0 +1,7 @@
+bin_PROGRAMS = pdb2str
+
+AM_CPPFLAGS= -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
+AM_LDFLAGS = -pedantic -ansi -fwritable-strings
+
+pdb2str_SOURCES = pdb2str.cc
+pdb2str_LDADD = $(top_srcdir)/lib/libMol.la

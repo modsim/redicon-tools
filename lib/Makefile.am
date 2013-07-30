@@ -1,0 +1,12 @@
+SUBDIRS = tests
+
+noinst_LTLIBRARIES = libMol.la
+libMol_la_SOURCES = coord3D.cc coord3D.h \
+	atom.cc atom.h \
+	molecule.h molecule.cc
+
+AM_CPPFLAGS= -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
+AM_LDFLAGS = -pedantic -ansi -fwritable-strings
+
+EXTRA_DIST = defines.h 
+#BUGS TODO FIXMES

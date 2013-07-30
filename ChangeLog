@@ -1,3 +1,9 @@
+2013-07-30 3:25 CEST  version 0.0.5  <s.kondrat@fz-juelich.de>
+
+	* tools/:
+
+	* src->lib: noinst libMol library 
+
 2013-07-26  Svyatoslav Kondrat  <s.kondrat@fz-juelich.de>
 
-	Initial version.
+	* src: Initial version.
