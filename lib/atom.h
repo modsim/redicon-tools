@@ -59,6 +59,8 @@ class Atom
 		double getRadius () const {return radius;};
 		double getCharge () const {return charge;};
 
+		Coord3D * getPosition () const { return r;};
+
 		//
 		// Print
 		//
@@ -77,7 +79,6 @@ class Atom
 		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
 		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
 		void setPosition (Coord3D& R) { r = new Coord3D (R);};
-		Coord3D * getPosition () { return r;};
 
 		friend class AtomAttorney; 
 	
@@ -112,7 +113,7 @@ class AtomAttorney
 		static void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
 		static void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
 		static void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
-		static Coord3D * getPosition (Atom &a)  { return a.getPosition(); };
+		//static Coord3D * getPosition (const Atom &a)  { return a.getPosition(); };
 
 		friend class Molecule;
 		friend class Bond;

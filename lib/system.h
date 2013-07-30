@@ -32,7 +32,7 @@ class System
 		System (Coord3D & R0, Coord3D & size); // Box of size size with the center at R0
 		~System ();
 
-		bool addMolecule (Molecule &) {return true;};
+		bool addMolecule (Molecule &);
 
 		//
 		// Get methods
