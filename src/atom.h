@@ -37,7 +37,9 @@ typedef enum {
 
 } AtomType;
 
-class Bonds;
+class Bond;
+class Molecule;
+class AtomAttorney;
 
 class Atom 
 {
@@ -46,18 +48,12 @@ class Atom
 		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string
 		~Atom ();
 
-		// FIXME: friend/Attorney for Molecule/Residue/Bond ?
-		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z); };
-		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
-		void setPosition (Coord3D& R) { r = new Coord3D (R);};
+		char * getTypeString () const;
+		AtomType getType () const {return type;};
 
-		void addBond () {};
+		double getRadius () const {return radius;};
+		double getCharge () const {return charge;};
 
-		char * getType () const;
-
-		// FIXME: friend/Attorney for Molecule/Residue/Bond ?
-		bool setType (AtomType T) {type = T; return true;};
-		
 		//
 		// Print
 		//
@@ -69,6 +65,16 @@ class Atom
 		void printBBStr (std::ostream *) const;
 
 	private:
+
+		bool addBond (Bond &b) { return true;};
+		bool setType (AtomType T) {type = T; return true;};
+
+		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
+		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
+		void setPosition (Coord3D& R) { r = new Coord3D (R);};
+
+		friend class AtomAttorney; 
+	
 		char * name;
 		int serial; /* reference number from the PDB file */
 
@@ -82,9 +88,22 @@ class Atom
 		Atom ** neighbours;
 
 		unsigned int nbonds; /* pointers to bonds */
-		Bonds ** bonds;
+		Bond ** bonds;
 
 		void * userData;
+};
+
+class AtomAttorney
+{
+	private:
+		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
+		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
+		void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
+		void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
+		void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
+
+		friend class Molecule;
+		friend class Bond;
 };
 
 #endif /* __HAVE_ATOM_H__ */

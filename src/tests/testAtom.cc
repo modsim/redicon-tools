@@ -1,4 +1,4 @@
-/*  testAtom.cc  2013-07-29 test Coord3D class
+/*  testAtom.cc  2013-07-29 test Atom class
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *

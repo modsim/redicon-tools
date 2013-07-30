@@ -41,7 +41,7 @@ Atom::~Atom ()
 	if (bonds) delete bonds;
 };
 
-char * Atom::getType () const
+char * Atom::getTypeString () const
 {
 	char * t = NULL;
 	switch (type)
@@ -69,7 +69,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << name << " (serial " << serial << ") is "  << getType() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
+	*stream << name << " (serial " << serial << ") is "  << getTypeString() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const
