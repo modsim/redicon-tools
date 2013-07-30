@@ -49,7 +49,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = test-coord$(EXEEXT) test-atom$(EXEEXT)
+check_PROGRAMS = test-coord$(EXEEXT) test-atom$(EXEEXT) \
+	test-molecule$(EXEEXT)
 subdir = src/tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/depcomp
@@ -70,6 +71,9 @@ test_atom_DEPENDENCIES = $(top_srcdir)/src/libMol.la
 am_test_coord_OBJECTS = testCoord.$(OBJEXT)
 test_coord_OBJECTS = $(am_test_coord_OBJECTS)
 test_coord_DEPENDENCIES = $(top_srcdir)/src/libMol.la
+am_test_molecule_OBJECTS = testMolecule.$(OBJEXT)
+test_molecule_OBJECTS = $(am_test_molecule_OBJECTS)
+test_molecule_DEPENDENCIES = $(top_srcdir)/src/libMol.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -83,8 +87,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(test_atom_SOURCES) $(test_coord_SOURCES)
-DIST_SOURCES = $(test_atom_SOURCES) $(test_coord_SOURCES)
+SOURCES = $(test_atom_SOURCES) $(test_coord_SOURCES) \
+	$(test_molecule_SOURCES)
+DIST_SOURCES = $(test_atom_SOURCES) $(test_coord_SOURCES) \
+	$(test_molecule_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -218,6 +224,8 @@ test_coord_SOURCES = testCoord.cc
 test_coord_LDADD = $(top_srcdir)/src/libMol.la
 test_atom_SOURCES = testAtom.cc 
 test_atom_LDADD = $(top_srcdir)/src/libMol.la
+test_molecule_SOURCES = testMolecule.cc 
+test_molecule_LDADD = $(top_srcdir)/src/libMol.la
 all: all-am
 
 .SUFFIXES:
@@ -267,6 +275,9 @@ test-atom$(EXEEXT): $(test_atom_OBJECTS) $(test_atom_DEPENDENCIES) $(EXTRA_test_
 test-coord$(EXEEXT): $(test_coord_OBJECTS) $(test_coord_DEPENDENCIES) $(EXTRA_test_coord_DEPENDENCIES) 
 	@rm -f test-coord$(EXEEXT)
 	$(CXXLINK) $(test_coord_OBJECTS) $(test_coord_LDADD) $(LIBS)
+test-molecule$(EXEEXT): $(test_molecule_OBJECTS) $(test_molecule_DEPENDENCIES) $(EXTRA_test_molecule_DEPENDENCIES) 
+	@rm -f test-molecule$(EXEEXT)
+	$(CXXLINK) $(test_molecule_OBJECTS) $(test_molecule_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -276,6 +287,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testAtom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testCoord.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testMolecule.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

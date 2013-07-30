@@ -1,6 +1,6 @@
 /*  atom.cc 2013-07-29 valiska@gmail.com
  *
- * Copyright (C) 2007 Svyatoslav Kondrat (Valiska)
+ * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << name << " (serial " << serial << ") is "  << getTypeString() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << getTypeString() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const

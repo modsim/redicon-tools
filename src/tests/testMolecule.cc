@@ -17,21 +17,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "atom.h"
+#include "molecule.h"
 
 int main (int argc, char ** argv) 
 {
 
 	Atom A ("A", 1, 10, 1);
-	Atom B ("B", 2, 10, 1);
+	Molecule M ("M", A);
+
+  	Coord3D P1 (10.,10.,10.);
+	M.setPosition (P1);
 
 	A.printInfo (&std::cout);
-	B.printInfo (&std::cout); 
+	M.printInfo (&std::cout); 
 
 	std::cout << std::endl;
 
 	A.printBBStr (&std::cout);
-	B.printBBStr (&std::cout); 
+	M.printBBStr (&std::cout); 
 
 	return 1;
 }

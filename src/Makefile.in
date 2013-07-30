@@ -68,7 +68,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libMol_la_LIBADD =
-am_libMol_la_OBJECTS = coord3D.lo atom.lo
+am_libMol_la_OBJECTS = coord3D.lo atom.lo molecule.lo
 libMol_la_OBJECTS = $(am_libMol_la_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -266,7 +266,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = tests
 noinst_LTLIBRARIES = libMol.la
-libMol_la_SOURCES = coord3D.cc coord3D.h  atom.cc atom.h
+libMol_la_SOURCES = coord3D.cc coord3D.h \
+	atom.cc atom.h \
+	molecule.h molecule.cc
+
 #
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/src/
 AM_LDFLAGS = -pedantic -ansi -fwritable-strings
@@ -378,6 +381,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/coord3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molecule.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdb2str.Po@am__quote@
 
 .cc.o:

@@ -1,6 +1,6 @@
 /*  atom.h  2013-07-29 Atom for BD-CA-PDE tools
  *
- * Copyright (C) 2007 Svyatoslav Kondrat (Valiska)
+ * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,9 +48,14 @@ class Atom
 		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string
 		~Atom ();
 
+		//
+		// Get methods
+		//
 		char * getTypeString () const;
 		AtomType getType () const {return type;};
 
+		char * getName () const {return name;};
+		int getSerial () const {return serial;};
 		double getRadius () const {return radius;};
 		double getCharge () const {return charge;};
 
@@ -93,18 +98,18 @@ class Atom
 		void * userData;
 };
 
+// Fixme Different Attorney for different classes
 class AtomAttorney
 {
 	private:
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
-		void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
-		void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
-		void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
+		static void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
+		static void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
+		static void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
 
 		friend class Molecule;
 		friend class Bond;
 };
 
 #endif /* __HAVE_ATOM_H__ */
-
