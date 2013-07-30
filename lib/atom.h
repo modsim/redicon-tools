@@ -51,7 +51,7 @@ class Atom
 		//
 		// Get methods
 		//
-		char * getTypeString () const;
+		char * getTypeName () const {return typeName;} ;
 		AtomType getType () const {return type;};
 
 		char * getName () const {return name;};
@@ -72,11 +72,12 @@ class Atom
 	private:
 
 		bool addBond (Bond &b) { return true;};
-		bool setType (AtomType T) {type = T; return true;};
+		bool setType (AtomType T);
 
 		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
 		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
 		void setPosition (Coord3D& R) { r = new Coord3D (R);};
+		Coord3D * getPosition () { return r;};
 
 		friend class AtomAttorney; 
 	
@@ -88,6 +89,8 @@ class Atom
 		Coord3D * r; // position might not ne known or needed (make 0,0,0 ?)
 
 		AtomType type;
+		char * type2name () const;
+		char * typeName;
 
 		unsigned int nneighbours; /* atoms connected via bonds (FIXME: do we need it?) */
 		Atom ** neighbours;
@@ -98,6 +101,8 @@ class Atom
 		void * userData;
 };
 
+typedef bool (AtomFunction) (const Atom &, void * user_data);
+
 // Fixme Different Attorney for different classes
 class AtomAttorney
 {
@@ -107,6 +112,7 @@ class AtomAttorney
 		static void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
 		static void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
 		static void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
+		static Coord3D * getPosition (Atom &a)  { return a.getPosition(); };
 
 		friend class Molecule;
 		friend class Bond;

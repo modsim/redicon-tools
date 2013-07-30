@@ -29,7 +29,7 @@ Molecule::Molecule (const char * name, Atom & a) : head(a), nBonds(0), bonds(NUL
 { 
 	Molecule::name = strdup (name);
 	nAtoms = 1;
-	atoms = new Atom*[nAtoms];
+	atoms = new Atom* [nAtoms];
 	atoms[0] = &head;
 
 	charge = atoms[0]->getCharge();
@@ -38,15 +38,23 @@ Molecule::Molecule (const char * name, Atom & a) : head(a), nBonds(0), bonds(NUL
 
 Molecule::~Molecule () 
 {
-	delete name;
-	if (atoms) delete atoms;
-	if (bonds) delete bonds;
+	free (name);
+	if (nAtoms) delete [] atoms;
+	if (bonds) delete [] bonds;
 };
 
 bool Molecule::setPosition (Coord3D& R) 
 {
 	AtomAttorney::setPosition (head, R);
 	return true;
+}
+
+// For each loop
+void Molecule::foreachAtom (AtomFunction func, void * data) const
+{
+	for (unsigned int i = 0; i < nAtoms; i++)
+		if (!func(*(atoms[i]), data))
+			throw "Molecule::foreachAtom(): User provided function failed." ;
 }
 
 //

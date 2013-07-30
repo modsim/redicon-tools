@@ -1,4 +1,4 @@
-/*  testAtom.cc  2013-07-29 test Atom class
+/*  testMolecule.cc  2013-07-29 test Molecule class
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
@@ -19,6 +19,17 @@
 
 #include "molecule.h"
 
+bool PrintAtom (const Atom & a, void * data)
+{
+	double x = *((double*) data);
+	a.printInfo (&std::cout);
+	
+	if (x < a.getRadius())
+		return false;
+	else
+		return true;
+}
+
 int main (int argc, char ** argv) 
 {
 
@@ -35,6 +46,13 @@ int main (int argc, char ** argv)
 
 	A.printBBStr (&std::cout);
 	M.printBBStr (&std::cout); 
+
+	try {
+		double x = 2.;
+		M.foreachAtom (PrintAtom, (void*) &x);
+	} catch (const char* msg) {
+		std::cerr << msg << std::endl;
+	}
 
 	return 1;
 }

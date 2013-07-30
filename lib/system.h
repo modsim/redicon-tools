@@ -1,4 +1,4 @@
-/*  molecule.h  2013-07-30 Molecule for BD-CA-PDE tools
+/*  system.h  2013-07-30  System (of Molecules) for BD-CA-PDE tools
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
@@ -17,33 +17,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#if !defined ( __HAVE_MOLECULE_H__ )
-#  define __HAVE_MOLECULE_H__
+#if !defined ( __HAVE_SYSTEM_H__ )
+#  define __HAVE_SYSTEM_H__
 
 #include <stdio.h>
 #include <iostream> 
 #include <fstream>
 
-#include <atom.h>
+#include <molecule.h>
 
-class Molecule
+class System
 {
 	public:
-		Molecule (const char * name, Atom &head);
-		//Molecule (const char * name, Atom & head, unsigned int nbonds, Bond&, ...) : head (head) {};
-		~Molecule ();
+		System (Coord3D & R0, Coord3D & size); // Box of size size with the center at R0
+		~System ();
 
-		bool addBond (Bond &) {return true;};
-
-		// bool setPosition (double x, double y, double z);
-		// bool setPosition (double R[3]) {return true;};
-		bool setPosition (Coord3D& R);
+		bool addMolecule (Molecule &) {return true;};
 
 		//
 		// Get methods
 		//
-		int getNAtoms () const {return 0;};
-		int getNBonds () const {return 0;};
+		int getNMolecules () const {return 0;};
 
 		//
 		// Print
@@ -55,24 +49,19 @@ class Molecule
 		// Output BD_BOX str line
 		void printBBStr (std::ostream *) const;
 
-		void foreachAtom (AtomFunction, void * user_data) const;
-
 	private:
 
-		char * name;
+		bool moleculeInBox (Molecule & M);
 
-		double radius[3]; // circumferent ellipsoid
+		Coord3D & R0; // box center
+		Coord3D & H;  // box size
+
 		double charge;    // total charge
 
-		Atom & head;
-
-		unsigned int nAtoms;  // atoms connected via bonds (FIXME: do we need it?)
-		Atom ** atoms;
-
-		unsigned int nBonds; // pointers to bonds 
-		Bond ** bonds;
+		unsigned int nMolecules; 
+		Molecule ** molecules;
 
 		void * userData;
 };
 
-#endif /* __HAVE_MOLECULE_H__ */
+#endif /* __HAVE_SYSTEM_H__ */

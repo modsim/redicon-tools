@@ -31,17 +31,20 @@ Atom::Atom (const char * name, int serial, double radius, double charge)
 	userData(NULL)
 { 
 	Atom::name = strdup (name);
+	typeName = type2name ();
 };
 
 Atom::~Atom () 
 {
-	delete name;
+	free (name);
+	if (typeName) free (typeName);
+
 	if (r) delete r;
 	if (neighbours) delete neighbours;
 	if (bonds) delete bonds;
 };
 
-char * Atom::getTypeString () const
+char * Atom::type2name () const
 {
 	char * t = NULL;
 	switch (type)
@@ -57,6 +60,14 @@ char * Atom::getTypeString () const
 	return t;
 }
 
+bool Atom::setType (AtomType T) 
+{
+	type = T; 
+	free (typeName);
+	typeName = type2name();
+	return true;
+}
+
 //
 // print Atom's info
 //
@@ -69,7 +80,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << getTypeString() << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const
