@@ -26,7 +26,7 @@
 #include "defines.h"
 
 Atom::Atom (const char * name, int serial, double radius, double charge) 
-	: serial(serial), radius(radius), charge(charge), r(NULL), 
+	: owned(0), serial(serial), radius(radius), charge(charge), r(NULL), 
 	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 

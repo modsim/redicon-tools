@@ -60,6 +60,7 @@ class Atom
 		double getCharge () const {return charge;};
 
 		Coord3D * getPosition () const { return r;};
+        bool inUse () { if (owned) return true; else return false;};
 
 		//
 		// Print
@@ -80,8 +81,13 @@ class Atom
 		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
 		void setPosition (Coord3D& R) { r = new Coord3D (R);};
 
+        unsigned int owned;
+        void block () { if (owned == 0) owned++;};
+        void unblock () { if (owned != 0) owned--;};
+
 		friend class AtomAttorney; 
 	
+        // Data
 		char * name;
 		int serial; /* reference number from the PDB file */
 
@@ -108,6 +114,11 @@ typedef bool (AtomFunction) (const Atom &, void * user_data);
 class AtomAttorney
 {
 	private:
+        
+        // this for molecules only -> separate Attorney into Mol and Bond
+        static void block (Atom &a) {a.block();};
+        static void unblock (Atom &a) {a.unblock();};
+
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
 		static void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };

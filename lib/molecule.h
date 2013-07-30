@@ -42,8 +42,9 @@ class Molecule
 		//
 		// Get methods
 		//
-		int getNAtoms () const {return 0;};
+		int getNAtoms () const {return nAtoms;};
 		int getNBonds () const {return 0;};
+		int getCharge () const {return charge;};
 
 		//
 		// Print

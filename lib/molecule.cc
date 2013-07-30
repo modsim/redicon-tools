@@ -26,7 +26,9 @@
 #include "defines.h"
 
 Molecule::Molecule (const char * name, Atom & a) : head(a), nBonds(0), bonds(NULL)
-{ 
+{
+    BCPT_ASSERT (!a.inUse(), "Atom in use, cannot create a molecule.");
+
 	Molecule::name = strdup (name);
 	nAtoms = 1;
 	atoms = new Atom* [nAtoms];
@@ -34,11 +36,14 @@ Molecule::Molecule (const char * name, Atom & a) : head(a), nBonds(0), bonds(NUL
 
 	charge = atoms[0]->getCharge();
 	radius[0] = radius[1] = radius[2] = atoms[0]->getRadius();
+    AtomAttorney::block(head);
 };
 
 Molecule::~Molecule () 
 {
 	free (name);
+    for (unsigned int i = 0; i < nAtoms; i++)
+        AtomAttorney::unblock(*atoms[i]);
 	if (nAtoms) delete [] atoms;
 	if (bonds) delete [] bonds;
 };

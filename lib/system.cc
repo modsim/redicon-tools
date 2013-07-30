@@ -23,6 +23,7 @@
 
 #include"system.h"
 
+//#define DEBUG
 #include "defines.h"
 
 System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), nMolecules(0), molecules (NULL), userData (NULL) { };
@@ -39,15 +40,27 @@ System::~System ()
 static bool atomInBox (const Atom &a, void * data)
 {
 	void ** p = (void**) data;
-	Coord3D * R0= (Coord3D*) p[0];
-	Coord3D * H = (Coord3D*) p[1];
-	Coord3D * r0 = a.getPosition ();
+	Coord3D * R0= (Coord3D*) p[0]; // box center
+	Coord3D * H = (Coord3D*) p[1]; // box size
+	Coord3D * r0 = a.getPosition (); // atom position
+
+    if (!r0)
+        throw "Atom's position not set";
+
 	double  radius = a.getRadius (); 
+
+#ifdef DEBUG
+    R0->print (stderr, "Box");
+    H->print (stderr, "BosSize");
+    r0->print (stderr, "Atom");
+#endif
 
 	for (int i = 0; i < 3; i++)
 		if ( (r0->getCoord (i) - radius <  R0->getCoord(i) - 0.5 * H->getCoord(i) )
-			&& (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
-			return false;
+			|| (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
+            throw "Out of the box";
+
+    DPRINT ("in the box\n");
 
 	return true;
 
@@ -59,26 +72,39 @@ bool System::moleculeInBox (Molecule& M)
 	try {
 		M.foreachAtom (atomInBox,(void*) p);
 	} catch (const char* msg) {
+        BCPT_ERROR ("Molecule not in box (reason: %s).", msg);
 		return false;
 	}
 
 	return true;
 }
 
+//
+// Add a molecule
+//
 bool System::addMolecule (Molecule& M) 
 {
+    
+    for (unsigned int i = 0; i < nMolecules; i++)
+        if (molecules[i] == &M)
+        {
+            BCPT_WARNING ("Molecule already added, skipping");
+            return false;
+        }
+    // FIXME: check if molecules intersect
 
 	if (moleculeInBox (M))
 	{
 		nMolecules++;
 		molecules = (Molecule**) realloc (molecules, nMolecules * sizeof(Molecule));
 		molecules[nMolecules-1] = &M;
+        charge += M.getCharge();
 	}
 	return true;
 }
 
 //
-// print Molecule's info
+// print System's info
 //
 void System::printInfo (char * name) const
 {
@@ -89,10 +115,10 @@ void System::printInfo (char * name) const
 
 void System::printInfo (std::ostream * stream) const
 {
-	*stream << "System " << " has " << nMolecules << "" "; box size: ";
+	*stream << "System has " << nMolecules << " molecules in a box of size ";
 	H.print (stream);
 	*stream << " located at "; R0.print (stream);
-	*stream  << "total charge " << charge << std::endl ;
+	*stream  << "and its total charge is " << charge << std::endl ;
 }
 
 void System::printBBStr (std::ostream * stream) const
