@@ -36,8 +36,27 @@ int main (int argc, char ** argv)
 	Atom A ("A", 1, 10, 1);
 	Molecule M ("M", A);
 
+	Atom A2 ("A", 1, 10, 1);
+	Molecule M2 ("M2", A2);
+
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);
+
+	try {
+		if (M.overlap (A))
+			std::cout << "Atom A overlaps with Molecule M" << std::endl;
+	} catch (const char * msg)	
+	{
+		std::cerr << "Exception thrown: " << msg << std::endl;
+	}
+
+	try {
+		if (M.overlap (M2))
+			std::cout << "Atom A overlaps with Molecule M" << std::endl;
+	} catch (const char * msg)	
+	{
+		std::cerr << "Exception thrown: " << msg << std::endl;
+	}
 
 	A.printInfo (&std::cout);
 	M.printInfo (&std::cout); 

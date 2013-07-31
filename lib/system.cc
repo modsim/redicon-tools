@@ -33,10 +33,7 @@ System::~System ()
 	if (molecules) free (molecules);
 };
 
-
-//
-// System::moleculeInBox
-//
+// For System::moleculeInBox
 static bool atomInBox (const Atom &a, void * data)
 {
 	void ** p = (void**) data;
@@ -44,64 +41,112 @@ static bool atomInBox (const Atom &a, void * data)
 	Coord3D * H = (Coord3D*) p[1]; // box size
 	Coord3D * r0 = a.positionCopy (); // atom position
 
-    if (!r0)
-        throw "Atom's position not set";
+	if (!r0)
+	{
+		delete r0;
+		throw "Atom's position not set";
+	}
 
 	double  radius = a.getRadius (); 
 
 #ifdef DEBUG
-    R0->print (stderr, "Box");
-    H->print (stderr, "BosSize");
-    r0->print (stderr, "Atom");
+	R0->print (stderr, "Box");
+	H->print (stderr, "BosSize");
+	r0->print (stderr, "Atom");
 #endif
 
 	for (int i = 0; i < 3; i++)
 		if ( (r0->getCoord (i) - radius <  R0->getCoord(i) - 0.5 * H->getCoord(i) )
-			|| (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
+				|| (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
 		{
 			delete r0;
-            		throw "Out of the box";
+			return false;
 		}
 
-    DPRINT ("in the box\n");
-
+	delete r0;
 	return true;
-
 }
+
+// Private method 
 bool System::moleculeInBox (Molecule& M) 
 {
 	void * p[] = {&R0, &H};
+	bool res = false;
 
 	try {
-		M.foreachAtom (atomInBox,(void*) p);
+		res = M.foreachAtom (atomInBox,(void*) p);
 	} catch (const char* msg) {
-        BCPT_ERROR ("Molecule not in box (reason: %s).", msg);
+		BCPT_ERROR ("Molecule '%s' not in box (reason: %s).", M.getName(), msg);
 		return false;
 	}
+	return res;
+}
+
+// For foreachMolecule used in System::addMolecule
+static bool moleculeNoOverlap (const Molecule & m, void * p)
+{
+	Molecule * M = (Molecule*) p;
+	bool overlap = M->overlap(m);
+
+	if (overlap)
+		return false;
+	
+	return true;
+}
+
+// Add a molecule
+bool System::addMolecule (Molecule& M) 
+{
+
+	if (!M.positionSet())
+	{
+		BCPT_ERROR ("Molecule '%s' position is not set, cannot add.", M.getName());
+		return false;
+	}
+
+	for (unsigned int i = 0; i < nMolecules; i++)
+		if (molecules[i] == &M)
+		{
+			BCPT_ERROR ("Molecule '%s' already added, skipping", M.getName());
+			return false;
+		}
+
+	// if M in box
+	if (!moleculeInBox (M))
+	{
+		BCPT_ERROR ("Molecule '%s' is outside system's box", M.getName());
+		return false;
+	}
+
+	// check M intersects with the molecules
+	try {
+		bool nooverlap = foreachMolecule (moleculeNoOverlap, (void*) &M);
+		if (!nooverlap)
+		{
+			BCPT_ERROR ("Molecule '%s' overlaps with other  molecules in the system", M.getName());
+			return false;
+		}
+	} catch (const char * msg) {
+		BCPT_ERROR ("Exception thrown: %s", msg);
+		return false;
+	}
+
+	nMolecules++;
+	molecules = (Molecule**) realloc (molecules, nMolecules * sizeof(Molecule));
+	molecules[nMolecules-1] = &M;
+	charge += M.getCharge();
 
 	return true;
 }
 
-//
-// Add a molecule
-//
-bool System::addMolecule (Molecule& M) 
+// For each loop
+bool System::foreachMolecule (MoleculeFunction func, void * data) const
 {
-    
-    for (unsigned int i = 0; i < nMolecules; i++)
-        if (molecules[i] == &M)
-        {
-            BCPT_WARNING ("Molecule already added, skipping");
-            return false;
-        }
-    // FIXME: check if molecules intersect
-
-	if (moleculeInBox (M))
+	for (unsigned int i = 0; i < nMolecules; i++)
 	{
-		nMolecules++;
-		molecules = (Molecule**) realloc (molecules, nMolecules * sizeof(Molecule));
-		molecules[nMolecules-1] = &M;
-        charge += M.getCharge();
+		DPRINT ("Molecule %i:", i);
+		if (!func(*(molecules[i]), data))
+			return false;
 	}
 	return true;
 }

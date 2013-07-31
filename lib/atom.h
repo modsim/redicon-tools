@@ -45,12 +45,11 @@ class Atom
 {
 	public:
 		Atom (const char * name, int serial, double radius, double charge);
+		Atom (const Atom &); // copy constructor
 		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string
 		~Atom ();
 
-		//
 		// Get methods
-		//
 		AtomType getType () const {return type;};
 		char * getTypeName () const {return typeName;} ;
 
@@ -59,8 +58,10 @@ class Atom
 		double getRadius () const {return radius;};
 		double getCharge () const {return charge;};
 
+		// public position stuff (FIXME: private?)
 		Coord3D * positionPtr () { return r;};
-		Coord3D * positionCopy () const; // creates Coord3D
+		Coord3D * positionCopy () const; // creates Coord3D, need delete
+		bool positionSet () const { if (r) return true; else return false;};
 
 		// checks
 		bool overlap (const Atom &) const;
@@ -77,21 +78,22 @@ class Atom
 		void printBBStr (std::ostream *) const;
 
 	private:
+	
+		friend class AtomAttorney; 
 
 		bool addBond (Bond &b) { return true;};
 		bool setType (AtomType T);
 
-		void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
-		void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
-		void setPosition (Coord3D& R) { r = new Coord3D (R);};
+		//void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
+		//void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
+		bool setPosition (Coord3D& R) { r = new Coord3D (R); if (!r) return false; else return true;};
 
-        unsigned int owned;
-        void block () { if (owned == 0) owned++;};
-        void unblock () { if (owned != 0) owned--;};
+		// Ownerships
+		unsigned int owned;
+		void block () { if (owned == 0) owned++;};
+		void unblock () { if (owned != 0) owned--;};
 
-		friend class AtomAttorney; 
-	
-        // Data
+ 	       // Data
 		char * name;
 		int serial; /* reference number from the PDB file */
 
@@ -118,20 +120,19 @@ typedef bool (AtomFunction) (const Atom &, void * user_data);
 class AtomAttorney
 {
 	private:
-        
-        // this for molecules only -> separate Attorney into Mol and Bond
-        static void block (Atom &a) {a.block();};
-        static void unblock (Atom &a) {a.unblock();};
+
+		// this for molecules only -> separate Attorney into Mol and Bond Attornies?
+		static void block (Atom &a) {a.block();};
+		static void unblock (Atom &a) {a.unblock();};
 
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
-		static void setPosition (Atom &a, double x, double y, double z) { a.r = new Coord3D (x,y,z); };
-		static void setPosition (Atom &a, double R[3]) { a.r = new Coord3D (R[0],R[1],R[2]); };
-		static void setPosition (Atom &a, Coord3D& R) { a.r = new Coord3D (R);};
-		//static Coord3D * getPosition (const Atom &a)  { return a.getPosition(); };
+
+		static bool setPosition (Atom &a, Coord3D& R) { return a.setPosition(R);};
 
 		friend class Molecule;
 		friend class Bond;
 };
 
 #endif /* __HAVE_ATOM_H__ */
+

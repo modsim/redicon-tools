@@ -34,14 +34,9 @@ class System
 
 		bool addMolecule (Molecule &);
 
-		//
 		// Get methods
-		//
 		int getNMolecules () const {return 0;};
 
-		//
-		// Print
-		//
 		// print general info
 		void printInfo (char*) const;
 		void printInfo (std::ostream *) const;
@@ -60,6 +55,7 @@ class System
 
 		unsigned int nMolecules; 
 		Molecule ** molecules;
+		bool foreachMolecule (MoleculeFunction, void * user_params) const;
 
 		void * userData;
 };

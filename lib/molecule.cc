@@ -25,10 +25,8 @@
 
 #include "defines.h"
 
-Molecule::Molecule (const char * name, Atom & a) : head(a), nBonds(0), bonds(NULL)
+Molecule::Molecule (const char * name, Atom a) : head(a), nBonds(0), bonds(NULL)
 {
-    BCPT_ASSERT (!a.inUse(), "Atom in use, cannot create a molecule.");
-
 	Molecule::name = strdup (name);
 	nAtoms = 1;
 	atoms = new Atom* [nAtoms];
@@ -48,18 +46,51 @@ Molecule::~Molecule ()
 	if (bonds) delete [] bonds;
 };
 
+// Set position
 bool Molecule::setPosition (Coord3D& R) 
 {
-	AtomAttorney::setPosition (head, R);
-	return true;
+	return AtomAttorney::setPosition (head, R);
+}
+
+// Overlap 
+bool Molecule::overlap (const Atom & a) const
+{
+
+	if (!a.positionSet())
+		throw "Molecule::overlap(): Atom's position is not set." ;
+
+	if (!head.positionSet())
+		throw "Molecule::overlap(): Molecule's position is not set." ;
+
+	for (unsigned int i = 0; i < nAtoms; i++)
+		if ( atoms[i]->overlap(a) )
+			return true;
+
+	return false;
+}
+
+bool Molecule::overlap (const Molecule & M) const
+{
+	if (!M.positionSet())
+		throw "Molecule::overlap(): Test's molecule position is not set." ;
+
+	if (!head.positionSet())
+		throw "Molecule::overlap(): Moleculke's position is not set." ;
+
+	for (unsigned int i = 0; i < nAtoms; i++)
+		if ( M.overlap(*atoms[i]) )
+			return true;
+
+	return false;
 }
 
 // For each loop
-void Molecule::foreachAtom (AtomFunction func, void * data) const
+bool Molecule::foreachAtom (AtomFunction func, void * data) const
 {
 	for (unsigned int i = 0; i < nAtoms; i++)
 		if (!func(*(atoms[i]), data))
-			throw "Molecule::foreachAtom(): User provided function failed." ;
+			return false;
+	return true;
 }
 
 //

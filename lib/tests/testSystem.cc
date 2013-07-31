@@ -21,26 +21,25 @@
 
 int main (int argc, char ** argv) 
 {
-
 	Atom A ("A", 1, 1, 1);
 	Molecule M ("M", A);
+	Molecule M2 ("M2", A);
 
-	Atom A2 ("A2", 1, 1, 1);
-	Molecule M2 ("M2", A2);
-
-  	Coord3D P1 (1.,1.,1.);
+	Coord3D P1 (1.,1.,1.);
 	M.setPosition (P1);
-	//M2.setPosition (P1);
 
-    Coord3D X0 (0.,0.,0.);
-    Coord3D size (4., 4., 4.);
-    System S (X0, size);
+	Coord3D P2 (1.,1.5,1.);
+	M2.setPosition (P2);
 
-    S.addMolecule (M);
-    S.addMolecule (M2);
+	Coord3D X0 (0.,0.,0.);
+	Coord3D size (6., 6., 6.);
+	System S (X0, size);
 
-    S.printInfo (&std::cout);
-    S.printBBStr (&std::cout);
+	S.addMolecule (M);
+	S.addMolecule (M2);
+
+	S.printInfo (&std::cout);
+	S.printBBStr (&std::cout);
 
 	return 1;
 }

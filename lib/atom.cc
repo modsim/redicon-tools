@@ -23,8 +23,10 @@
 
 #include<atom.h>
 
+//#define DEBUG
 #include "defines.h"
 
+// constructor
 Atom::Atom (const char * name, int serial, double radius, double charge) 
 	: owned(0), serial(serial), radius(radius), charge(charge), r(NULL), 
 	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
@@ -34,6 +36,17 @@ Atom::Atom (const char * name, int serial, double radius, double charge)
 	typeName = type2name ();
 };
 
+// copy constructor
+Atom::Atom (const Atom & a) 
+	: owned(0), serial(a.getSerial()), radius(a.getRadius()), charge(a.getCharge()), r(NULL), 
+	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
+	userData(NULL)
+{ 
+	Atom::name = strdup (a.getName());
+	typeName = type2name ();
+};
+
+// annihilator :P
 Atom::~Atom () 
 {
 	free (name);
@@ -44,9 +57,7 @@ Atom::~Atom ()
 	if (bonds) delete bonds;
 };
 
-//
 // Type to name etc
-//
 char * Atom::type2name () const
 {
 	char * t = NULL;
@@ -83,9 +94,7 @@ Coord3D * Atom::positionCopy () const
 		return NULL;
 }
 
-//
-// checks
-//
+// check for overlap
 bool Atom::overlap (const Atom & a) const
 {
 	if (!r)
@@ -102,16 +111,15 @@ bool Atom::overlap (const Atom & a) const
 
 	double dist = r->distance (*ra);
 	delete ra;
-
-	if (dist <= dist_min)
+	
+	DPRINT ("dist_min=%1.15e, dist=%1.15e\n", dist_min, dist);
+	if (dist < dist_min)
 		return true;
 	else
 		return false;
 }
 
-//
 // print Atom's info
-//
 void Atom::printInfo (char * name) const
 {
 	std::ostream * stream = new std::ofstream (name);
