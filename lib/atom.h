@@ -86,7 +86,7 @@ class Atom
 
 		//void setPosition (double x, double y, double z) { r = new Coord3D (x,y,z);};
 		//void setPosition (double R[3]) { r = new Coord3D (R[0],R[1],R[2]); };
-		bool setPosition (Coord3D& R) { r = new Coord3D (R); if (!r) return false; else return true;};
+		bool setPosition (Coord3D& R) ;
 
 		// Ownerships
 		unsigned int owned;

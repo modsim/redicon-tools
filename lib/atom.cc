@@ -82,6 +82,22 @@ bool Atom::setType (AtomType T)
 	return true;
 }
 
+bool Atom::setPosition (Coord3D& R) 
+{ 
+	if (r)
+	{
+		BCPT_WARNING ("Position of atom '%s' has been set, resetting", name)
+		delete r;
+	}
+	
+	r = new Coord3D (R); 
+	if (!r) 
+		return false; 
+	else 
+		return true;
+};
+
+
 // Return copy of Coord3D
 Coord3D * Atom::positionCopy () const
 {
