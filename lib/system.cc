@@ -42,7 +42,7 @@ static bool atomInBox (const Atom &a, void * data)
 	void ** p = (void**) data;
 	Coord3D * R0= (Coord3D*) p[0]; // box center
 	Coord3D * H = (Coord3D*) p[1]; // box size
-	Coord3D * r0 = a.getPosition (); // atom position
+	Coord3D * r0 = a.positionCopy (); // atom position
 
     if (!r0)
         throw "Atom's position not set";
@@ -58,7 +58,10 @@ static bool atomInBox (const Atom &a, void * data)
 	for (int i = 0; i < 3; i++)
 		if ( (r0->getCoord (i) - radius <  R0->getCoord(i) - 0.5 * H->getCoord(i) )
 			|| (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
-            throw "Out of the box";
+		{
+			delete r0;
+            		throw "Out of the box";
+		}
 
     DPRINT ("in the box\n");
 

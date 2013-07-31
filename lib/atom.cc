@@ -44,6 +44,9 @@ Atom::~Atom ()
 	if (bonds) delete bonds;
 };
 
+//
+// Type to name etc
+//
 char * Atom::type2name () const
 {
 	char * t = NULL;
@@ -66,6 +69,44 @@ bool Atom::setType (AtomType T)
 	free (typeName);
 	typeName = type2name();
 	return true;
+}
+
+// Return copy of Coord3D
+Coord3D * Atom::positionCopy () const
+{
+	if (r)
+	{
+		Coord3D * rc = new Coord3D (*r);
+		return rc;
+	}
+	else
+		return NULL;
+}
+
+//
+// checks
+//
+bool Atom::overlap (const Atom & a) const
+{
+	if (!r)
+		throw "Atom's position not set";
+
+	double dist_min = 0.5 * (radius + a.getRadius());
+	Coord3D * ra = a.positionCopy();
+
+	if (!ra)
+	{
+		delete ra;
+		throw "Test atom's position not set";
+	}
+
+	double dist = r->distance (*ra);
+	delete ra;
+
+	if (dist <= dist_min)
+		return true;
+	else
+		return false;
 }
 
 //

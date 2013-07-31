@@ -51,17 +51,21 @@ class Atom
 		//
 		// Get methods
 		//
-		char * getTypeName () const {return typeName;} ;
 		AtomType getType () const {return type;};
+		char * getTypeName () const {return typeName;} ;
 
 		char * getName () const {return name;};
 		int getSerial () const {return serial;};
 		double getRadius () const {return radius;};
 		double getCharge () const {return charge;};
 
-		Coord3D * getPosition () const { return r;};
-        bool inUse () { if (owned) return true; else return false;};
+		Coord3D * positionPtr () { return r;};
+		Coord3D * positionCopy () const; // creates Coord3D
 
+		// checks
+		bool overlap (const Atom &) const;
+        	bool inUse () const { if (owned) return true; else return false;};
+	
 		//
 		// Print
 		//

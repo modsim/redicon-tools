@@ -25,6 +25,12 @@ int main (int argc, char ** argv)
 	Atom A ("A", 1, 10, 1);
 	Atom B ("B", 2, 10, 1);
 
+	try {
+		A.overlap (B);
+	} catch (const char * msg) {
+		std::cerr << "error: " << msg << std::endl;
+	}
+
 	A.printInfo (&std::cout);
 	B.printInfo (&std::cout); 
 
