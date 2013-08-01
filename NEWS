@@ -1,0 +1,6 @@
+01-08-2013 version 0.1
+
+    * tools/molsys-create: create a system of uni-atom molecules of
+    different types, and output to a BB_BOX .str file format 
+
+    * lib/libMol.so (uninst): Atom, Molecule, System classes.

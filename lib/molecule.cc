@@ -25,34 +25,55 @@
 
 #include "defines.h"
 
-Molecule::Molecule (const char * name, Atom a) : head(a), nBonds(0), bonds(NULL)
+Molecule::Molecule (const char * name, Atom a) : head_need_del (true), nBonds(0), bonds(NULL)
 {
 	Molecule::name = strdup (name);
 	nAtoms = 1;
 	atoms = new Atom* [nAtoms];
-	atoms[0] = &head;
+	atoms[0] = head = new Atom (a);
 
 	charge = atoms[0]->getCharge();
 	radius[0] = radius[1] = radius[2] = atoms[0]->getHSRadius();
 
 	// no need for throw/catch as Atom copy-constructor copies a free atom
-	AtomAttorney::claimOwnership (head, *this);
-	AtomAttorney::setSerial (head, 1);
-	AtomAttorney::setType (head, ATOM_SINGLE);
+	AtomAttorney::claimOwnership (*head, *this);
+	AtomAttorney::setSerial (*head, 1);
+	AtomAttorney::setType (*head, ATOM_SINGLE);
+};
+
+Molecule::Molecule (const char * name, Atom * a) : head_need_del (false), nBonds(0), bonds(NULL)
+{
+
+	// need for throw/catch as we set a pointer
+	if (!AtomAttorney::claimOwnership (*a, *this))
+		throw "atom in use cannot create a molecule.";
+
+	Molecule::name = strdup (name);
+	nAtoms = 1;
+	atoms = new Atom* [nAtoms];
+	atoms[0] = head = a;
+
+	charge = atoms[0]->getCharge();
+	radius[0] = radius[1] = radius[2] = atoms[0]->getHSRadius();
+
+	AtomAttorney::setSerial (*head, 1);
+	AtomAttorney::setType (*head, ATOM_SINGLE);
 };
 
 Molecule::~Molecule () 
 {
 	free (name);
-	for (unsigned int i = 0; i < nAtoms; i++)
-		if (nAtoms) delete [] atoms;
+	for (unsigned int i = 1; i < nAtoms; i++)
+		 delete atoms[i];
+	if (head_need_del) delete head;
+	delete [] atoms;
 	if (bonds) delete [] bonds;
 };
 
 // Set position
 bool Molecule::setPosition (Coord3D& R) 
 {
-	return AtomAttorney::setPosition (head, R);
+	return AtomAttorney::setPosition (*head, R);
 }
 
 // serial number shift
@@ -71,7 +92,7 @@ bool Molecule::overlap (const Atom & a) const
 	if (!a.positionSet())
 		throw "Molecule::overlap(): Atom's position is not set." ;
 
-	if (!head.positionSet())
+	if (!head->positionSet())
 		throw "Molecule::overlap(): Molecule's position is not set." ;
 
 	for (unsigned int i = 0; i < nAtoms; i++)
@@ -85,7 +106,7 @@ bool Molecule::overlap (const Molecule & M) const
 	if (!M.positionSet())
 		throw "Molecule::overlap(): Test's molecule position is not set." ;
 
-	if (!head.positionSet())
+	if (!head->positionSet())
 		throw "Molecule::overlap(): Moleculke's position is not set." ;
 
 	for (unsigned int i = 0; i < nAtoms; i++)

@@ -39,7 +39,8 @@ static const char * myname = "molsys-create";
 void usage () 
 {
 	fprintf (stderr, "Usage: %s \n", myname);
-	fprintf (stderr, "create a system of molecules and output an .str file.\n");
+	fprintf (stderr, "create a system of uni-atom molecules and output to an .str file.\n");
+	fprintf (stderr, "Molecules are placed randomly.\n");
 	fprintf (stderr, "Options are\n");
 
 	fprintf (stderr, " -H, --size=X,Y,Z        system size (in A).\n");
@@ -52,7 +53,7 @@ void usage ()
 	fprintf (stderr, " -q, --charge=VAL,VAL,...   charges (in e).\n");
 	fprintf (stderr, " -m, --masses=VAL,VAL,...   masses (arbitrary units).\n");
 	fprintf (stderr, " -d, --hd-radia=VAL,VAL,... hydrodynamic radia (in A).\n");
-	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (units).\n");
+	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (units?).\n");
 
 //	fprintf (stderr, " -a, --arrangment=rand/latt  arrangment (random/latt).\n");
 //	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
@@ -130,7 +131,7 @@ int main (int argc, char ** argv)
 
 	int c = 0;
 
-#define ARGS    "hvH:R:n:r:N:q:a:t:s:"
+#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -139,24 +140,29 @@ int main (int argc, char ** argv)
 			{"help", no_argument, NULL, 'h'},
 			{"version", no_argument, NULL, 'v'},
 
-			{"pdb-file", required_argument, NULL, 'p'},
-			{"str-file", no_argument, NULL, 's'},
+			//{"pdb-file", required_argument, NULL, 'p'},
+			//{"str-file", no_argument, NULL, 's'},
 
-			{"size", no_argument, NULL, 'H'},
-			{"location", no_argument, NULL, 'R'},
+			{"size", required_argument, NULL, 'H'},
+			{"location", required_argument, NULL, 'R'},
 
-			{"names", no_argument, NULL, 'n'},
-			{"radii", no_argument, NULL, 'r'},
-			{"numbers", no_argument, NULL, 'N'},
-			{"charges", no_argument, NULL, 'q'},
+			{"names", required_argument, NULL, 'n'},
+			{"radia", required_argument, NULL, 'r'},
+			{"numbers", required_argument, NULL, 'N'},
 
-			{"arrangment", no_argument, NULL, 'a'},
-			{"tries", no_argument, NULL, 't'},
+
+			{"charges", required_argument, NULL, 'q'},
+			{"hd-radia", required_argument, NULL, 'd'},
+			{"lj", required_argument, NULL, 'j'},
+			{"masses", required_argument, NULL, 'm'},
+
+			//{"arrangment", no_argument, NULL, 'a'},
+			//{"tries", no_argument, NULL, 't'},
 		};
 
 		switch ((c = getopt_long (argc, argv, ARGS, long_options, &option_index))) 
 #else 
-			switch ((c = getopt (argc, argv, ARGS))) 
+		switch ((c = getopt (argc, argv, ARGS))) 
 #endif /* HAVE_GETOPT_LONG */
 			{
 				case 'p': 
@@ -228,6 +234,16 @@ int main (int argc, char ** argv)
 				case 'q':  charges = (double *) malloc (sizeof (double) );
 					ncharges = str2dlist (&optarg, ",", &charges); break;
 
+				case 'd':  HDradia = (double *) malloc (sizeof (double) );
+					nHDradia = str2dlist (&optarg, ",", &HDradia); break;
+
+				case 'm':  masses = (double *) malloc (sizeof (double) );
+					nmasses = str2dlist (&optarg, ",", &masses); break;
+
+				case 'j':  LJ = (double *) malloc (sizeof (double) );
+					nLJ = str2dlist (&optarg, ",", &LJ); break;
+
+				// usage/version
 				case 'h': usage (); exit (1); break;
 
 				case 'v': printf ("%s %s\n", myname, VERSION); exit (1); break;
@@ -320,10 +336,14 @@ int main (int argc, char ** argv)
 
 	free (radii);
 	free (N);
-	free (charges);
 	for (unsigned int i = 0; i < nnames; i++)
 		free (names[i]);
 	free (names);
+
+	if (charges ) free (charges);
+	if (masses) free (masses);
+	if (HDradia) free (HDradia);
+	if (LJ) free (LJ);
 
 	for (unsigned int i = 0; i < nMols; i++)
 		delete M[i];

@@ -33,16 +33,20 @@ class Molecule
 {
 	public:
 		Molecule (const char * name, Atom head);
-		~Molecule ();
+		Molecule (const char * name, Atom * head); // exception thrown if 'head' in use (FIXME: need it???)
 
-		bool addBond (Bond &) {return true;};
+		~Molecule ();
+		
+		// TODO:
+		//addAtom (Atom &);
+		//bool createBond (i, j) {return true;};
+		// ...
 
 		// Position stuff;
 		bool setPosition (Coord3D& R);
-		Coord3D * positionCopy () const { return head.positionCopy();};
-		Coord3D * positionPtr () { return head.positionPtr();};
-		bool positionSet () const { return head.positionSet();};
-
+		Coord3D * positionCopy () const { return head->positionCopy();};
+		Coord3D * positionPtr () { return head->positionPtr();};
+		bool positionSet () const { return head->positionSet();};
 
 		// Get methods
 		int getNAtoms () const {return nAtoms;};
@@ -69,6 +73,14 @@ class Molecule
 
 		friend class MoleculeAttorney;
 
+		// TODO:
+		//addAtom (Atom &);
+		//getAtom (unsigned int );
+		//addBond (unsigned int, unsigned int);
+		//addAngle (unsigned int, unsigned int, unsigned int);
+		//addDihedral (unsigned int, unsigned int, unsigned int, unsigned int);
+		//checkClose () ; // check if all atoms involved in bonds etc
+
 		unsigned int serial; // first atom's serial
 		unsigned int shiftSerial (unsigned int); // shift because it always set first atom to 1. Returns the serial of the last atom
 		unsigned int getSerial () const { return serial;}; // FIXME" why not make it public?
@@ -78,7 +90,8 @@ class Molecule
 		double radius[3]; // circumferent ellipsoid
 		double charge;    // total charge
 
-		Atom head;
+		Atom * head;
+		bool head_need_del;
 
 		unsigned int nAtoms;  // atoms connected via bonds (FIXME: do we need it? -- yes!)
 		Atom ** atoms;

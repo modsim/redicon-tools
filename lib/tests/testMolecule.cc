@@ -36,10 +36,12 @@ int main (int argc, char ** argv)
 	Atom A ("A", 1.);
 	Molecule M ("M", A);
 
-	Atom A2 ("A", 1.);
+	Atom A2 ("A2", 1.);
+	A2.printInfo (&std::cout);
 	Molecule M2 ("M2", A2);
 
-	Molecule M3 ("M2", A2);
+	Molecule M3 ("M3", &A2);
+	A2.printInfo (&std::cout);
 
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);
