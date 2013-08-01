@@ -39,7 +39,7 @@ static const char * myname = "molsys-create";
 void usage () 
 {
 	fprintf (stderr, "Usage: %s \n", myname);
-	fprintf (stderr, "create system of molecules and save to str/pdb files.\n");
+	fprintf (stderr, "create a system of molecules and output an .str file.\n");
 	fprintf (stderr, "Options are\n");
 
 	fprintf (stderr, " -H, --size=X,Y,Z        system size.\n");
@@ -244,7 +244,8 @@ int main (int argc, char ** argv)
 
 	for (unsigned int i = 0; i < nN; i++)
 	{
-		Atom a (names[i], 0, radii[i], charges[i]);
+		Atom a (names[i], radii[i]);
+		a.setCharge (charges[i]);
 		for (int j = 0; j < N[i]; j++)
 		{
 			M[imol] = new Molecule (names[i], a);

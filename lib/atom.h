@@ -56,6 +56,11 @@ class Atom
 		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
 		~Atom ();
 
+		// set methods
+		void setCharge (double val) { charge = val;};
+		void setLJ (double val) {LJ = val;};
+		void setMass (double val) { mass = val;};
+
 		// Get methods
 		char * getName () const {return name;};
 
