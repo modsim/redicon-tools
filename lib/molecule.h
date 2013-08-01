@@ -26,6 +26,9 @@
 
 #include <atom.h>
 
+class System;
+class MoleculeAttorney;
+
 class Molecule
 {
 	public:
@@ -64,6 +67,12 @@ class Molecule
 
 	private:
 
+		friend class MoleculeAttorney;
+
+		unsigned int serial; // first atom's serial
+		unsigned int shiftSerial (unsigned int); // shift because it always set first atom to 1. Returns the serial of the last atom
+		unsigned int getSerial () const { return serial;}; // FIXME" why not make it public?
+
 		char * name;
 
 		double radius[3]; // circumferent ellipsoid
@@ -71,7 +80,7 @@ class Molecule
 
 		Atom head;
 
-		unsigned int nAtoms;  // atoms connected via bonds (FIXME: do we need it?)
+		unsigned int nAtoms;  // atoms connected via bonds (FIXME: do we need it? -- yes!)
 		Atom ** atoms;
 
 		unsigned int nBonds; // pointers to bonds 
@@ -81,5 +90,13 @@ class Molecule
 };
 
 typedef bool (MoleculeFunction) (const Molecule &, void * user_data);
+
+class MoleculeAttorney
+{
+	private:
+		static unsigned int shiftSerial (Molecule &M, unsigned int serial) { return M.shiftSerial(serial); };
+		static unsigned int getSerial (Molecule &M) { return M.getSerial(); };
+		friend class System;
+};
 
 #endif /* __HAVE_MOLECULE_H__ */

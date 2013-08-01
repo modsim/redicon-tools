@@ -33,16 +33,19 @@ Molecule::Molecule (const char * name, Atom a) : head(a), nBonds(0), bonds(NULL)
 	atoms[0] = &head;
 
 	charge = atoms[0]->getCharge();
-	radius[0] = radius[1] = radius[2] = atoms[0]->getRadius();
-    AtomAttorney::block(head);
+	radius[0] = radius[1] = radius[2] = atoms[0]->getHSRadius();
+
+	// no need for throw/catch as Atom copy-constructor copies a free atom
+	AtomAttorney::claimOwnership (head, *this);
+	AtomAttorney::setSerial (head, 1);
+	AtomAttorney::setType (head, ATOM_SINGLE);
 };
 
 Molecule::~Molecule () 
 {
 	free (name);
-    for (unsigned int i = 0; i < nAtoms; i++)
-        AtomAttorney::unblock(*atoms[i]);
-	if (nAtoms) delete [] atoms;
+	for (unsigned int i = 0; i < nAtoms; i++)
+		if (nAtoms) delete [] atoms;
 	if (bonds) delete [] bonds;
 };
 
@@ -50,6 +53,15 @@ Molecule::~Molecule ()
 bool Molecule::setPosition (Coord3D& R) 
 {
 	return AtomAttorney::setPosition (head, R);
+}
+
+// serial number shift
+unsigned int Molecule::shiftSerial (unsigned int serial)
+{
+	// FIXME: this is assuming atoms are arranged in order of their sirial numbers
+	for (unsigned int i = 0; i < nAtoms; i ++)
+		AtomAttorney::setSerial (*(atoms[i]), serial + i);
+	return serial + nAtoms;
 }
 
 // Overlap 
@@ -68,7 +80,6 @@ bool Molecule::overlap (const Atom & a) const
 
 	return false;
 }
-
 bool Molecule::overlap (const Molecule & M) const
 {
 	if (!M.positionSet())
@@ -105,7 +116,7 @@ void Molecule::printInfo (char * name) const
 
 void Molecule::printInfo (std::ostream * stream) const
 {
-	*stream << "Molecule '" << name << "' has " << nAtoms << " atom(s) and " << nBonds << " bond(s).";
+	*stream << "Molecule '" << name << "' has " << nAtoms << " atom(s) and " << nBonds << " bond(s). ";
 	*stream << "Total charge " << charge << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
 }
 

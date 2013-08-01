@@ -262,12 +262,12 @@ int main (int argc, char ** argv)
 	}
 
 	cerr << nMols << " vs " << imol << endl;
-	S.printInfo(&std::cout);
+	S.printInfo(&std::cerr);
 
 	S.printBBStr(&std::cout);
 
 	//
-	// Free everythiong
+	// Free everything
 	//
 
 	delete H;

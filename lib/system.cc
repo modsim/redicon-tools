@@ -26,7 +26,7 @@
 //#define DEBUG
 #include "defines.h"
 
-System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), nMolecules(0), molecules (NULL), userData (NULL) { };
+System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), last_serial (1), nMolecules(0), molecules (NULL), userData (NULL) { };
 
 System::~System () 
 {
@@ -47,7 +47,7 @@ static bool atomInBox (const Atom &a, void * data)
 		throw "Atom's position not set";
 	}
 
-	double  radius = a.getRadius (); 
+	double  radius = a.getHSRadius (); 
 
 #ifdef DEBUG
 	R0->print (stderr, "Box");
@@ -134,6 +134,8 @@ bool System::addMolecule (Molecule& M)
 	nMolecules++;
 	molecules = (Molecule**) realloc (molecules, nMolecules * sizeof(Molecule));
 	molecules[nMolecules-1] = &M;
+	last_serial = MoleculeAttorney::shiftSerial (M, last_serial);
+
 	charge += M.getCharge();
 
 	return true;
@@ -165,7 +167,7 @@ void System::printInfo (std::ostream * stream) const
 {
 	*stream << "System has " << nMolecules << " molecules in a box of size ";
 	H.print (stream);
-	*stream << " located at "; R0.print (stream);
+	*stream << " centered at "; R0.print (stream);
 	*stream  << "and its total charge is " << charge << std::endl ;
 }
 

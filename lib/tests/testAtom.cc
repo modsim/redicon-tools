@@ -22,8 +22,8 @@
 int main (int argc, char ** argv) 
 {
 
-	Atom A ("A", 1, 10, 1);
-	Atom B ("B", 2, 10, 1);
+	Atom A ("A", 1.);
+	Atom B ("B", 2.);
 
 	try {
 		A.overlap (B);

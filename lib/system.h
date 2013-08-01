@@ -52,6 +52,7 @@ class System
 		Coord3D & H;  // box size
 
 		double charge;    // total charge
+		unsigned int last_serial; // serial of the last atom (lergest serial)
 
 		unsigned int nMolecules; 
 		Molecule ** molecules;

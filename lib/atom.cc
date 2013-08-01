@@ -26,20 +26,40 @@
 //#define DEBUG
 #include "defines.h"
 
-// constructor
-Atom::Atom (const char * name, int serial, double radius, double charge) 
-	: owned(0), serial(serial), radius(radius), charge(charge), r(NULL), 
-	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
+// simplified constructor 
+Atom::Atom (const char * name, double radius) 
+	: residue(NULL), molecule (NULL), 
+	serial(0), hs_radius(radius), charge(0.0), 
+	LJ (0.0), hd_radius (radius), mass (1.0), r(NULL), 
+	type (ATOM_FREE), 
+	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
 	Atom::name = strdup (name);
 	typeName = type2name ();
 };
+// full construct 
+Atom::Atom (const char * name, unsigned int serial, const Coord3D & r,
+			double hs_radius, double hd_radius,
+			double charge, double LJ, double mass)
+	: residue(NULL), molecule (NULL), serial(serial), hs_radius(hs_radius), charge(charge), 
+	LJ (LJ), hd_radius (hd_radius), mass (mass), 
+	type (ATOM_FREE), 
+	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
+	userData(NULL)
+{
+	Atom::name = strdup (name);
+	typeName = type2name ();
+	Atom::r = new Coord3D (r);
+};
 
-// copy constructor
+// copy constructor (make a free brother)
 Atom::Atom (const Atom & a) 
-	: owned(0), serial(a.getSerial()), radius(a.getRadius()), charge(a.getCharge()), r(NULL), 
-	type (ATOM_FREE), nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
+	: residue(NULL), molecule (NULL), 
+	serial(0), hs_radius(a.getHSRadius()), charge(a.getCharge()), 
+	LJ (a.getLJ()), hd_radius (a.getHDRadius()), mass (a.getMass()), 
+	r(NULL), type (ATOM_FREE), 
+	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
 	Atom::name = strdup (a.getName());
@@ -65,6 +85,8 @@ char * Atom::type2name () const
 	{
 		case ATOM_FREE: t = strdup("free"); break;
 
+		case ATOM_SINGLE: t = strdup("single"); break;
+
 		case ATOM_BONDED: t = strdup("bonded"); break;
 		
 		case ATOM_HEAD: t = strdup("head"); break;
@@ -82,6 +104,7 @@ bool Atom::setType (AtomType T)
 	return true;
 }
 
+// Position stuff
 bool Atom::setPosition (Coord3D& R) 
 { 
 	if (r)
@@ -96,7 +119,6 @@ bool Atom::setPosition (Coord3D& R)
 	else 
 		return true;
 };
-
 
 // Return copy of Coord3D
 Coord3D * Atom::positionCopy () const
@@ -116,7 +138,7 @@ bool Atom::overlap (const Atom & a) const
 	if (!r)
 		throw "Atom's position not set";
 
-	double dist_min = 0.5 * (radius + a.getRadius());
+	double dist_min = 0.5 * (hs_radius + a.getHSRadius());
 	Coord3D * ra = a.positionCopy();
 
 	if (!ra)
@@ -135,7 +157,29 @@ bool Atom::overlap (const Atom & a) const
 		return false;
 }
 
-// print Atom's info
+// Ownerships stuff
+bool Atom::claimOwnership (Residue & R)
+{
+	if (residue)
+	{
+		BCPT_ERROR ("Ownership claim refused");
+		return false;
+	}
+	residue = &R;
+	return true;
+}
+bool Atom::claimOwnership (Molecule & M)
+{
+	if (molecule)
+	{
+		BCPT_ERROR ("Ownership claim refused");
+		return false;
+	}
+	molecule = &M;
+	return true;
+}
+
+// print basic Atom's info
 void Atom::printInfo (char * name) const
 {
 	std::ostream * stream = new std::ofstream (name);
@@ -145,7 +189,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << nneighbours << " neighbours and " << nbonds << " nbonds" << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << nneighbours << " neighbours and " << nbonds << " bonds." << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const
@@ -158,6 +202,6 @@ void Atom::printBBStr (std::ostream * stream) const
 		BCPT_WARNING ("atom %s (%i): no coordinates, setting to zeros!", name, serial);
 		*stream << " 0.0 0.0 0.0 " ;
 	}
-	*stream << charge << " " << radius << std::endl ;
+	*stream << hd_radius << " " << charge <<  " " << 2. * hs_radius << " " << LJ << " " << mass << std::endl ;
 }
 

@@ -24,7 +24,7 @@ bool PrintAtom (const Atom & a, void * data)
 	double x = *((double*) data);
 	a.printInfo (&std::cout);
 	
-	if (x < a.getRadius())
+	if (x < a.getHSRadius())
 		return false;
 	else
 		return true;
@@ -33,11 +33,13 @@ bool PrintAtom (const Atom & a, void * data)
 int main (int argc, char ** argv) 
 {
 
-	Atom A ("A", 1, 10, 1);
+	Atom A ("A", 1.);
 	Molecule M ("M", A);
 
-	Atom A2 ("A", 1, 10, 1);
+	Atom A2 ("A", 1.);
 	Molecule M2 ("M2", A2);
+
+	Molecule M3 ("M2", A2);
 
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);
