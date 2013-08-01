@@ -35,7 +35,7 @@ class System
 		bool addMolecule (Molecule &);
 
 		// Get methods
-		int getNMolecules () const {return 0;};
+		int getNMolecules () const {return nMolecules;};
 
 		// print general info
 		void printInfo (char*) const;

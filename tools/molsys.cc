@@ -42,16 +42,20 @@ void usage ()
 	fprintf (stderr, "create a system of molecules and output an .str file.\n");
 	fprintf (stderr, "Options are\n");
 
-	fprintf (stderr, " -H, --size=X,Y,Z        system size.\n");
-	fprintf (stderr, " -R, --location=X,Y,Z    system's location.\n");
+	fprintf (stderr, " -H, --size=X,Y,Z        system size (in A).\n");
+	fprintf (stderr, " -R, --location=X,Y,Z    system's location, ie box center (in A).\n");
 
-	fprintf (stderr, " -n, --name=NAME,NAME...   atom's names.\n");
-	fprintf (stderr, " -r, --radius=VAL,VAL...   atom's radius.\n");
-	fprintf (stderr, " -N, --number=VAL,VAL,...  number of particles.\n");
-	fprintf (stderr, " -q, --charge=VAL,VAL,...  charges.\n");
+	fprintf (stderr, " -n, --names=NAME,NAME...   names of atoms.\n");
+	fprintf (stderr, " -r, --radia=VAL,VAL...     radia (in A).\n");
+	fprintf (stderr, " -N, --numbers=VAL,VAL,...  number of particles.\n");
 
-	fprintf (stderr, " -a, --arrangment=rand/latt  arrangment (random/latt).\n");
-	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
+	fprintf (stderr, " -q, --charge=VAL,VAL,...   charges (in e).\n");
+	fprintf (stderr, " -m, --masses=VAL,VAL,...   masses (arbitrary units).\n");
+	fprintf (stderr, " -d, --hd-radia=VAL,VAL,... hydrodynamic radia (in A).\n");
+	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (units).\n");
+
+//	fprintf (stderr, " -a, --arrangment=rand/latt  arrangment (random/latt).\n");
+//	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
 
 	fprintf (stderr, " -v, --version            print version iformation and exit.\n");
 	fprintf (stderr, " -h, --help               print this message and exit.\n");
@@ -96,14 +100,21 @@ int main (int argc, char ** argv)
 	double * radii = (double*) malloc ( sizeof(double) );
 	unsigned int nradii = 0;
 
+
 	/* C++ template for str2list<unsigned int>
 	 * unsigned int * N = (unsigned int*) malloc ( sizeof(unsigned int) );
 	unsigned int nN = 0;*/
 	double * N = (double*) malloc ( sizeof(double) );
 	unsigned int nN = 0;
 
-	double * charges = (double*) malloc ( sizeof(double) );
+	double * charges = NULL;
 	unsigned int ncharges = 0;
+	double * HDradia = NULL;
+	unsigned int nHDradia = 0;
+	double * masses = NULL;
+	unsigned int nmasses = 0;
+	double * LJ = NULL;
+	unsigned int nLJ = 0;
 
 	//char * arrangment = NULL;
 
@@ -134,10 +145,10 @@ int main (int argc, char ** argv)
 			{"size", no_argument, NULL, 'H'},
 			{"location", no_argument, NULL, 'R'},
 
-			{"name", no_argument, NULL, 'n'},
+			{"names", no_argument, NULL, 'n'},
 			{"radii", no_argument, NULL, 'r'},
-			{"number", no_argument, NULL, 'N'},
-			{"charge", no_argument, NULL, 'q'},
+			{"numbers", no_argument, NULL, 'N'},
+			{"charges", no_argument, NULL, 'q'},
 
 			{"arrangment", no_argument, NULL, 'a'},
 			{"tries", no_argument, NULL, 't'},
@@ -198,13 +209,24 @@ int main (int argc, char ** argv)
 					  }
 					break;
 
-				case 'n':  names = str2strlist (&optarg, ",", &nnames); break;
+				case 'n':  names = str2strlist (&optarg, ",", &nnames); 
+					   for (unsigned int i = 0; i < nnames; i++)
+						   for (unsigned int j = i+1; j < nnames; j++)
+							   if ( strlen(names[i]) == strlen (names[j]) )
+								   if ( strncmp (names[i], names[j], strlen (names[i])) == 0)
+								   {
+									   fprintf (stderr, "%s: error: atom names '%s' and '%s' are the same.\n", myname, names[i], names[j]);
+									   return 1;
+								   }
+				break;
 
 				case 'r':  nradii = str2dlist (&optarg, ",", &radii); break;
 
-				case 'q':  ncharges = str2dlist (&optarg, ",", &charges); break;
-
 				case 'N':  nN = str2dlist (&optarg, ",", &N); break;
+
+				// optional options
+				case 'q':  charges = (double *) malloc (sizeof (double) );
+					ncharges = str2dlist (&optarg, ",", &charges); break;
 
 				case 'h': usage (); exit (1); break;
 
@@ -225,13 +247,35 @@ int main (int argc, char ** argv)
 		return 1; /* failure */
 	}
 	
-	if ( (nradii != ncharges) && (ncharges != nN) && (nN != nnames))
+	if ( (nradii != nN) || (nN != nnames))
 	{
-		cerr << myname << ": error: number of molecule's names, radii, charges, and their number in the system is not the same."  << endl;
+		cerr << myname << ": error: number of molecule's names, radii, and their numbers in the system must be the same."  << endl;
 		return 1; /* failure */
 	}
 
+	if ( (charges) && (ncharges != nnames))
+	{
+		cerr << myname << ": error: number of molecule's charges must equal the number of molecule types (see -n, -r and -N)."  << endl;
+		return 1; /* failure */
+	}
 
+	if ( (masses) && (nmasses != nnames))
+	{
+		cerr << myname << ": error: number of molecule's masses must equal the number of molecule types (see -n, -r and -N)."  << endl;
+		return 1; /* failure */
+	}
+	if ( (HDradia) && (nHDradia != nnames))
+	{
+		cerr << myname << ": error: number of molecule's HD radia must equal the number of molecule types (see -n, -r and -N)."  << endl;
+		return 1; /* failure */
+	}
+	if ( (LJ) && (nLJ != nnames))
+	{
+		cerr << myname << ": error: number of molecule's LJ parameters must equal the number of molecule types (see -n, -r and -N)."  << endl;
+		return 1; /* failure */
+	}
+
+	// Create system
 	System S (*R, *H);
 	unsigned int nMols = 0;
 	for (unsigned int i = 0; i < nN; i++)
@@ -245,7 +289,7 @@ int main (int argc, char ** argv)
 	for (unsigned int i = 0; i < nN; i++)
 	{
 		Atom a (names[i], radii[i]);
-		a.setCharge (charges[i]);
+		if (charges) a.setCharge (charges[i]);
 		for (int j = 0; j < N[i]; j++)
 		{
 			M[imol] = new Molecule (names[i], a);
@@ -262,7 +306,7 @@ int main (int argc, char ** argv)
 		}
 	}
 
-	cerr << nMols << " vs " << imol << endl;
+	std::cerr << "Packing info: " << nMols << " molecules given, " << S.getNMolecules() << " packed in a box." << std::endl;
 	S.printInfo(&std::cerr);
 
 	S.printBBStr(&std::cout);
