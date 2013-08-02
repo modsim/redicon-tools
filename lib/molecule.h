@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <iostream> 
 #include <fstream>
+#include <vector>
 
 #include <atom.h>
 
@@ -33,7 +34,7 @@ class Molecule
 {
 	public:
 		Molecule (const char * name, Atom head);
-		Molecule (const char * name, Atom * head); // exception thrown if 'head' in use (FIXME: need it???)
+		Molecule (const char * file);
 
 		~Molecule ();
 		
@@ -49,7 +50,7 @@ class Molecule
 		bool positionSet () const { return head->positionSet();};
 
 		// Get methods
-		int getNAtoms () const {return nAtoms;};
+		int getNAtoms () const {return Atoms.size();};
 		int getNBonds () const {return 0;};
 		int getCharge () const {return charge;};
 		char * getName () const {return name;};
@@ -91,10 +92,7 @@ class Molecule
 		double charge;    // total charge
 
 		Atom * head;
-		bool head_need_del;
-
-		unsigned int nAtoms;  // atoms connected via bonds (FIXME: do we need it? -- yes!)
-		Atom ** atoms;
+		std::vector<Atom*> Atoms;
 
 		unsigned int nBonds; // pointers to bonds 
 		Bond ** bonds;

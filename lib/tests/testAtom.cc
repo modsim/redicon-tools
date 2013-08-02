@@ -22,7 +22,6 @@
 int main (int argc, char ** argv) 
 {
 
-
 	Atom A ("A", 1.);
 	Atom B ("B", 2.);
 

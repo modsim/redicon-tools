@@ -40,11 +40,15 @@ int main (int argc, char ** argv)
 	A2.printInfo (&std::cout);
 	Molecule M2 ("M2", A2);
 
-	Molecule M3 ("M3", &A2);
-	A2.printInfo (&std::cout);
-
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);
+
+	Molecule * MPDB = NULL;
+	try {
+		MPDB = new Molecule ("1.pdb");
+	} catch (const char * msg) {
+	    std::cerr << "Error: " << msg << std::endl;
+	}
 
 	try {
 		if (M.overlap (A))
@@ -64,18 +68,25 @@ int main (int argc, char ** argv)
 
 	A.printInfo (&std::cout);
 	M.printInfo (&std::cout); 
+	if (MPDB)
+		MPDB->printInfo (&std::cout); 
 
 	std::cout << std::endl;
 
 	A.printBBStr (&std::cout);
 	M.printBBStr (&std::cout); 
+	if (MPDB)
+		MPDB->printBBStr (&std::cout); 
 
 	try {
 		double x = 2.;
-		M.foreachAtom (PrintAtom, (void*) &x);
+		MPDB->foreachAtom (PrintAtom, (void*) &x);
 	} catch (const char* msg) {
 		std::cerr << msg << std::endl;
 	}
+
+	if (MPDB)
+		delete MPDB;
 
 	return 1;
 }

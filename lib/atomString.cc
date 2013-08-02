@@ -37,7 +37,7 @@ Atom::Atom (const std::string & line)
 	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
-	BCPT_WARNING ("PDB does not contain the hard core and hydrodynamic radia (default: 1.), LJ energy depth (default: 0.0) and mass (default: 1). Do not forget to reset if needed.");
+	//BCPT_WARNING ("PDB does not contain the hard core and hydrodynamic radia (default: 1.), LJ energy depth (default: 0.0) and mass (default: 1). Do not forget to reset if needed.");
 
 #ifdef DEBUG
 	std::cerr << line << std::endl;
@@ -46,7 +46,7 @@ Atom::Atom (const std::string & line)
 
 	str = line.substr (0,5);
 	if (str.find ("ATOM", 0) == std::string::npos)
-		throw "not an ATOM record";
+		throw "Not  ATOM record";
 
 	str = line.substr (6, 5);
 	serial = atoi(str.c_str());

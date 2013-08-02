@@ -25,15 +25,14 @@
 
 #include "defines.h"
 
-Molecule::Molecule (const char * name, Atom a) : head_need_del (true), nBonds(0), bonds(NULL)
+Molecule::Molecule (const char * name, Atom a) : nBonds(0), bonds(NULL)
 {
 	Molecule::name = strdup (name);
-	nAtoms = 1;
-	atoms = new Atom* [nAtoms];
-	atoms[0] = head = new Atom (a);
+	Atoms.push_back (new Atom(a)); // ignore throw as we check above
+	head = Atoms.at (0);
 
-	charge = atoms[0]->getCharge();
-	radius[0] = radius[1] = radius[2] = atoms[0]->getHSRadius();
+	charge = head->getCharge();
+	radius[0] = radius[1] = radius[2] = head->getHSRadius();
 
 	// no need for throw/catch as Atom copy-constructor copies a free atom
 	AtomAttorney::claimOwnership (*head, *this);
@@ -41,38 +40,20 @@ Molecule::Molecule (const char * name, Atom a) : head_need_del (true), nBonds(0)
 	AtomAttorney::setType (*head, ATOM_SINGLE);
 };
 
-Molecule::Molecule (const char * name, Atom * a) : head_need_del (false), nBonds(0), bonds(NULL)
-{
-
-	// need for throw/catch as we set a pointer
-	if (!AtomAttorney::claimOwnership (*a, *this))
-		throw "atom in use cannot create a molecule.";
-
-	Molecule::name = strdup (name);
-	nAtoms = 1;
-	atoms = new Atom* [nAtoms];
-	atoms[0] = head = a;
-
-	charge = atoms[0]->getCharge();
-	radius[0] = radius[1] = radius[2] = atoms[0]->getHSRadius();
-
-	AtomAttorney::setSerial (*head, 1);
-	AtomAttorney::setType (*head, ATOM_SINGLE);
-};
-
 Molecule::~Molecule () 
 {
 	free (name);
-	for (unsigned int i = 1; i < nAtoms; i++)
-		 delete atoms[i];
-	if (head_need_del) delete head;
-	delete [] atoms;
+	for (auto &a : Atoms) // C++0x
+		delete a;
 	if (bonds) delete [] bonds;
 };
 
 // Set position
 bool Molecule::setPosition (Coord3D& R) 
 {
+	//for (auto &a : Atoms) // C++0x
+		// shift all atoms
+
 	return AtomAttorney::setPosition (*head, R);
 }
 
@@ -80,27 +61,29 @@ bool Molecule::setPosition (Coord3D& R)
 unsigned int Molecule::shiftSerial (unsigned int serial)
 {
 	// FIXME: this is assuming atoms are arranged in order of their sirial numbers
-	for (unsigned int i = 0; i < nAtoms; i ++)
-		AtomAttorney::setSerial (*(atoms[i]), serial + i);
-	return serial + nAtoms;
+	for (auto &a : Atoms) // C++0x
+		AtomAttorney::setSerial (*a, serial++);
+
+	return serial;
 }
 
 // Overlap 
-bool Molecule::overlap (const Atom & a) const
+bool Molecule::overlap (const Atom & ta) const
 {
 
-	if (!a.positionSet())
+	if (!ta.positionSet())
 		throw "Molecule::overlap(): Atom's position is not set." ;
 
 	if (!head->positionSet())
 		throw "Molecule::overlap(): Molecule's position is not set." ;
 
-	for (unsigned int i = 0; i < nAtoms; i++)
-		if ( atoms[i]->overlap(a) )
+	for (auto &a : Atoms) // C++0x
+		if ( a->overlap(ta) )
 			return true;
 
 	return false;
 }
+
 bool Molecule::overlap (const Molecule & M) const
 {
 	if (!M.positionSet())
@@ -109,8 +92,8 @@ bool Molecule::overlap (const Molecule & M) const
 	if (!head->positionSet())
 		throw "Molecule::overlap(): Moleculke's position is not set." ;
 
-	for (unsigned int i = 0; i < nAtoms; i++)
-		if ( M.overlap(*atoms[i]) )
+	for (auto &a : Atoms) // C++0x
+		if ( M.overlap(*a) )
 			return true;
 
 	return false;
@@ -119,8 +102,8 @@ bool Molecule::overlap (const Molecule & M) const
 // For each loop
 bool Molecule::foreachAtom (AtomFunction func, void * data) const
 {
-	for (unsigned int i = 0; i < nAtoms; i++)
-		if (!func(*(atoms[i]), data))
+	for (auto &a : Atoms) // C++0x
+		if (!func(*a, data))
 			return false;
 	return true;
 }
@@ -137,14 +120,15 @@ void Molecule::printInfo (char * name) const
 
 void Molecule::printInfo (std::ostream * stream) const
 {
-	*stream << "Molecule '" << name << "' has " << nAtoms << " atom(s) and " << nBonds << " bond(s). ";
-	*stream << "Total charge " << charge << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
+	*stream << "Molecule '" << name << "' has " << getNAtoms() << " atom(s) and " << nBonds << " bond(s). ";
+//	*stream << "Total charge " << getCharge() << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
+	*stream << "Total charge " << getCharge() << std::endl ;
+
 }
 
 void Molecule::printBBStr (std::ostream * stream) const
 {
-
-	for (unsigned int i = 0; i < nAtoms; i++)
-		(atoms[i])->printBBStr (stream);
+	for (auto &a : Atoms) // C++0x
+		a->printBBStr (stream);
 }
 
