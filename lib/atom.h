@@ -24,7 +24,7 @@
 #include <iostream> 
 #include <fstream>
 
-#include <coord3D.h>
+#include <point3D.h>
 
 typedef enum {
 
@@ -48,7 +48,7 @@ class Atom
 {
 	public:
 
-		Atom (const char * name, unsigned int serial, const Coord3D & coord,
+		Atom (const char * name, unsigned int serial, const Point3D & coord,
 			double hs_radius, double hd_radius,
 			double charge, double LJ, double mass);
 		Atom (const char * name, double radius); // simplified constructor
@@ -81,8 +81,8 @@ class Atom
 		double getLJ () const {return LJ;};
 
 		// public position stuff (FIXME: private?)
-		Coord3D * positionPtr () { return r;};
-		Coord3D * positionCopy () const; // creates Coord3D, need delete
+		Point3D * positionPtr () { return r;};
+		Point3D * positionCopy () const; // creates Point3D, need delete
 		bool positionSet () const { if (r) return true; else return false;};
 
 		// checks
@@ -120,8 +120,8 @@ class Atom
 		double mass;   // might not be known
 
 		// Atom's position (might not ne known or needed)
-		Coord3D * r; 
-		bool setPosition (Coord3D& R) ;
+		Point3D * r; 
+		bool setPosition (Point3D& R) ;
 
 		// Atoms type (free, single, bonded, etc)
 		AtomType type;
@@ -152,7 +152,7 @@ class AtomAttorney
 		static void setSerial (Atom &a, unsigned int serial) { return a.setSerial (serial);};
 		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
 
-		static bool setPosition (Atom &a, Coord3D& R) { return a.setPosition(R);};
+		static bool setPosition (Atom &a, Point3D& R) { return a.setPosition(R);};
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 
 		friend class Molecule;

@@ -49,7 +49,7 @@ Molecule::~Molecule ()
 };
 
 // Set position
-bool Molecule::setPosition (Coord3D& R) 
+bool Molecule::setPosition (Point3D& R) 
 {
 	//for (auto &a : Atoms) // C++0x
 		// shift all atoms

@@ -39,7 +39,7 @@ Atom::Atom (const char * name, double radius)
 	typeName = type2name ();
 };
 // full construct 
-Atom::Atom (const char * name, unsigned int serial, const Coord3D & r,
+Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 			double hs_radius, double hd_radius,
 			double charge, double LJ, double mass)
 	: residue(NULL), molecule (NULL), serial(serial), hs_radius(hs_radius), charge(charge), 
@@ -50,7 +50,7 @@ Atom::Atom (const char * name, unsigned int serial, const Coord3D & r,
 {
 	Atom::name = strdup (name);
 	typeName = type2name ();
-	Atom::r = new Coord3D (r);
+	Atom::r = new Point3D (r);
 };
 
 // copy constructor (make a free brother)
@@ -105,7 +105,7 @@ bool Atom::setType (AtomType T)
 }
 
 // Position stuff
-bool Atom::setPosition (Coord3D& R) 
+bool Atom::setPosition (Point3D& R) 
 { 
 	if (r)
 	{
@@ -113,19 +113,19 @@ bool Atom::setPosition (Coord3D& R)
 		delete r;
 	}
 	
-	r = new Coord3D (R); 
+	r = new Point3D (R); 
 	if (!r) 
 		return false; 
 	else 
 		return true;
 };
 
-// Return copy of Coord3D
-Coord3D * Atom::positionCopy () const
+// Return copy of Point3D
+Point3D * Atom::positionCopy () const
 {
 	if (r)
 	{
-		Coord3D * rc = new Coord3D (*r);
+		Point3D * rc = new Point3D (*r);
 		return rc;
 	}
 	else
@@ -139,7 +139,7 @@ bool Atom::overlap (const Atom & a) const
 		throw "Atom's position not set";
 
 	double dist_min = 0.5 * (hs_radius + a.getHSRadius());
-	Coord3D * ra = a.positionCopy();
+	Point3D * ra = a.positionCopy();
 
 	if (!ra)
 	{

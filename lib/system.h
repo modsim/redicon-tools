@@ -29,7 +29,7 @@
 class System
 {
 	public:
-		System (Coord3D & R0, Coord3D & size); // Box of size size with the center at R0
+		System (Point3D & R0, Coord3D & size); // Box of size size with the center at R0
 		~System ();
 
 		bool addMolecule (Molecule &);
@@ -48,7 +48,7 @@ class System
 
 		bool moleculeInBox (Molecule & M);
 
-		Coord3D & R0; // box center
+		Point3D & R0; // box center
 		Coord3D & H;  // box size
 
 		double charge;    // total charge

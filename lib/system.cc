@@ -56,8 +56,8 @@ static bool atomInBox (const Atom &a, void * data)
 #endif
 
 	for (int i = 0; i < 3; i++)
-		if ( (r0->getCoord (i) - radius <  R0->getCoord(i) - 0.5 * H->getCoord(i) )
-				|| (r0->getCoord (i) + radius >  R0->getCoord(i) + 0.5 * H->getCoord(i) ) )
+		if ( (r0->get (i) - radius <  R0->get(i) - 0.5 * H->get(i) )
+				|| (r0->get (i) + radius >  R0->get(i) + 0.5 * H->get(i) ) )
 		{
 			delete r0;
 			return false;

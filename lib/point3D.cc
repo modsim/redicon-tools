@@ -1,4 +1,4 @@
-/*  Coord3D.cc  2013-07-29 Coord base class source code
+/*  Point3D.cc  2013-07-29 Point base class source code
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
@@ -21,7 +21,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "coord3D.h"
+#include "point3D.h"
 
 //#define DEBUG
 #include "defines.h"
@@ -29,47 +29,47 @@
 //
 // Constructors
 //
-Coord3D::Coord3D (double x, double y, double z) : dim(3)
+Point3D::Point3D (double x, double y, double z) : dim(3)
 {
 	r[0] = x; r[1] = y; r[2] = z;
 }
 
 // from prealloc'ed double*
-Coord3D::Coord3D (double R[3]) : dim(3)
+Point3D::Point3D (double R[3]) : dim(3)
 {
 	memcpy (this->r, R, dim * sizeof (double) );
 }
 
 // Copy-constructor
-Coord3D::Coord3D (const Coord3D & R) : dim(3)
+Point3D::Point3D (const Point3D & R) : dim(3)
 {
-	R.getCoord (this->r);
+	R.get (this->r);
 }
 
 //
 // Get coords
 //
-double Coord3D::getCoord (unsigned int i) const
+double Point3D::get (unsigned int i) const
 {
 	BCPT_RET_VAL_IF_FAIL (i<dim, 0.0);
 	return r[i];
 }
-void Coord3D::getCoord (double * R) const
+void Point3D::get (double * R) const
 {
 	BCPT_RET_IF_FAIL (r);
 	memcpy (R, r, dim * sizeof (double));
 }
 
 //
-// Set Coords
+// Set Points
 //
-bool Coord3D::setCoord (unsigned int i, double val)
+bool Point3D::set (unsigned int i, double val)
 {
 	BCPT_RET_VAL_IF_FAIL (i<dim, false);
 	r[i] = val;
 	return true;
 }
-bool Coord3D::setCoord (const double * val)
+bool Point3D::set (const double * val)
 {
 	BCPT_RET_VAL_IF_FAIL (val, false);
 	memcpy (this->r, val, dim * sizeof (double) );
@@ -79,7 +79,7 @@ bool Coord3D::setCoord (const double * val)
 //
 // Operations
 //
-double Coord3D::norm () const
+double Point3D::norm () const
 {
 	double r2 = 0;
 	for (unsigned int i = 0; i < dim; i++)
@@ -88,11 +88,11 @@ double Coord3D::norm () const
 	return sqrt (r2);
 }
 
-double Coord3D::distance (const Coord3D & a) const
+double Point3D::distance (const Point3D & a) const
 {
 	double r2 = 0;
 	for (unsigned int i = 0; i < dim; i++)
-		r2 += pow2(r[i] - a.getCoord(i));
+		r2 += pow2(r[i] - a.get(i));
 
 	return sqrt (r2);
 }
@@ -100,7 +100,7 @@ double Coord3D::distance (const Coord3D & a) const
 //
 // Print coords
 //
-void Coord3D::print (FILE * file, const char * name) const
+void Point3D::print (FILE * file, const char * name) const
 {
 	BCPT_RET_IF_FAIL (file);
 
@@ -114,7 +114,7 @@ void Coord3D::print (FILE * file, const char * name) const
 	return;
 }
 
-void Coord3D::print (FILE * file, const char * name, unsigned int i) const
+void Point3D::print (FILE * file, const char * name, unsigned int i) const
 {
 	BCPT_RET_IF_FAIL (file);
 	BCPT_RET_IF_FAIL (i < dim);
@@ -126,7 +126,7 @@ void Coord3D::print (FILE * file, const char * name, unsigned int i) const
 	return;
 }
 
-void Coord3D::print (std::ostream * stream) const
+void Point3D::print (std::ostream * stream) const
 {
 	*stream << "  " << r[0] << " " << r[1] << " " <<  r[2] << "  ";
 }

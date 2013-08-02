@@ -1,4 +1,4 @@
-/*  Coord3D.h  2013-07-29  Coord Class Header File 
+/*  Point3D.h  2013-07-29  3D Point Class Header File 
  *
  * Copyright (C) 2012 Svyatoslav Kondrat (Valiska)
  *
@@ -17,34 +17,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#if !defined ( __HAVE_COORD3D_H__ )
-#  define __HAVE_COORD3D_H__
+#if !defined ( __HAVE_POINT3D_H__ )
+#  define __HAVE_POINT3D_H__
 
 #include <stdio.h>
 #include <iostream> 
 #include <fstream>
 
-class Coord3D
+class Point3D;
+typedef Point3D Coord3D; 
+
+class Point3D
 {
 	public:
-		Coord3D (double x, double y, double z);
-		Coord3D (double Coord[3]);
-		Coord3D (const Coord3D &); // copy-constructor
+		Point3D (double x, double y, double z);
+		Point3D (double Point[3]);
+		Point3D (const Point3D &); // copy-constructor
 
-		~Coord3D() {};
+		~Point3D() {};
 
-		double getCoord (unsigned int i) const;
-		void getCoord (double *) const;
+		double get (unsigned int i) const;
+		void get (double *) const;
 
-		// set Coords
-		bool setCoord (unsigned int i, double val);
-		bool setCoord (const double val[3]); // no checks, use with caution
+		// set Points
+		bool set (unsigned int i, double val);
+		bool set (const double val[3]); // no checks, use with caution
 
 		// Operations
 		double norm () const;
-		double distance (const Coord3D &a) const;
+		double distance (const Point3D &a) const;
+		Point3D & vector (const Point3D &b) const;
 
-		// Print Coords
+		// Print Points
 		void print (FILE * file, const char * name) const ;
 		void print (FILE * file, const char * name, unsigned int i) const;
 

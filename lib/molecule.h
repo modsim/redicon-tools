@@ -44,9 +44,9 @@ class Molecule
 		// ...
 
 		// Position stuff;
-		bool setPosition (Coord3D& R);
-		Coord3D * positionCopy () const { return head->positionCopy();};
-		Coord3D * positionPtr () { return head->positionPtr();};
+		bool setPosition (Point3D& R);
+		Point3D * positionCopy () const { return head->positionCopy();};
+		Point3D * positionPtr () { return head->positionPtr();};
 		bool positionSet () const { return head->positionSet();};
 
 		// Get methods

@@ -66,8 +66,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libMol_la_LIBADD =
-am_libMol_la_OBJECTS = coord3D.lo atom.lo atomString.lo molecule.lo \
-	moleculePDBread.lo system.lo
+am_libMol_la_OBJECTS = point3D.lo atom.lo atomPDB.lo molecule.lo \
+	moleculePDB.lo system.lo
 libMol_la_OBJECTS = $(am_libMol_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -260,9 +260,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = tests
 noinst_LTLIBRARIES = libMol.la
-libMol_la_SOURCES = coord3D.cc coord3D.h \
-	atom.h atom.cc atomString.cc \
-	molecule.h molecule.cc moleculePDBread.cc \
+libMol_la_SOURCES = point3D.cc point3D.h \
+	atom.h atom.cc atomPDB.cc \
+	molecule.h molecule.cc moleculePDB.cc \
 	system.h system.cc
 
 AM_CPPFLAGS = -std=c++0x -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
@@ -323,10 +323,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atom.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomString.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/coord3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomPDB.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molecule.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculePDBread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculePDB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system.Plo@am__quote@
 
 .cc.o:

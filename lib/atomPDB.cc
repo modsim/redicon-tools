@@ -64,7 +64,7 @@ Atom::Atom (const std::string & line)
 
 	str = line.substr (46, 8);
 	double z = atof (str.c_str());
-	r = new Coord3D (x, y, z);
+	r = new Point3D (x, y, z);
 
 	try {
 		str = line.substr (79,2);
