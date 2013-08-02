@@ -52,8 +52,11 @@ class Atom
 			double hs_radius, double hd_radius,
 			double charge, double LJ, double mass);
 		Atom (const char * name, double radius); // simplified constructor
+
 		Atom (const Atom &); // copy constructor
-		Atom (const char * string) {}; // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
+//		Atom (const char * string); // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
+		Atom (const std::string & string); // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
+
 		~Atom ();
 
 		// set methods
@@ -62,7 +65,7 @@ class Atom
 		void setMass (double val) { mass = val;};
 
 		// Get methods
-		char * getName () const {return name;};
+		const char * getName () const {return name;};
 
 		AtomType getType () const {return type;};
 		char * getTypeName () const {return typeName;} ;

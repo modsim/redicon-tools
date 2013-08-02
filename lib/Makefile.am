@@ -2,7 +2,7 @@ SUBDIRS = tests
 
 noinst_LTLIBRARIES = libMol.la
 libMol_la_SOURCES = coord3D.cc coord3D.h \
-	atom.cc atom.h \
+	atom.h atom.cc str.c atomString.cc \
 	molecule.h molecule.cc \
 	system.h system.cc
 

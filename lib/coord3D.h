@@ -48,8 +48,8 @@ class Coord3D
 		void print (FILE * file, const char * name) const ;
 		void print (FILE * file, const char * name, unsigned int i) const;
 
-		void print (std::ofstream *, const char * name) const;
-		void print (std::ofstream *, const char * name, int i) const;
+		//void print (std::ofstream *, const char * name) const;
+		//void print (std::ofstream *, const char * name, int i) const;
 
 		void print (std::ostream *) const;
 

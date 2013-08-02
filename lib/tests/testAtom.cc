@@ -22,8 +22,18 @@
 int main (int argc, char ** argv) 
 {
 
+
 	Atom A ("A", 1.);
 	Atom B ("B", 2.);
+
+#define atom_str "ATOM    145  N   VAL A  25      32.433  16.336  57.540  1.00 11.92      A1   N"
+	try {
+		Atom C (atom_str);
+		C.printInfo (&std::cout); 
+		C.printBBStr (&std::cout); 
+	} catch (const char * msg) {
+		std::cerr << msg << std::endl;
+	}
 
 	try {
 		A.overlap (B);
