@@ -64,23 +64,23 @@ void usage ()
 	return;
 };
 
-void setRandomPosition (const Coord3D & H, const Coord3D & R, Coord3D * p)
+void setRandomPosition (const Point3D & H, const Point3D & R, Point3D * p)
 {
 	double r[3];
 	for (int i = 0; i < 3; i++)
-		r[i] = R.getCoord(i) - 0.5 * H.getCoord (i) + H.getCoord (i) * rand() / (RAND_MAX + 1.0);
-	p->setCoord (r);
+		r[i] = R.get(i) - 0.5 * H.get (i) + H.get (i) * rand() / (RAND_MAX + 1.0);
+	p->set (r);
 #ifdef DEBUG
 	p->print (stderr, "p");
 #endif
 }
 
-Coord3D getRandomPosition (const Coord3D & H, const Coord3D & R, double a)
+Point3D getRandomPosition (const Point3D & H, const Point3D & R, double a)
 {
 	double r[3];
 	for (int i = 0; i < 3; i++)
-		r[i] = R.getCoord(i) - 0.5 * H.getCoord (i) + a + (H.getCoord (i) - 2. * a) * rand() / (RAND_MAX + 1.0);
-	Coord3D p(r);
+		r[i] = R.get(i) - 0.5 * H.get (i) + a + (H.get (i) - 2. * a) * rand() / (RAND_MAX + 1.0);
+	Point3D p(r);
 
 #ifdef DEBUG
 	p.print (stderr, "p");
@@ -91,8 +91,8 @@ Coord3D getRandomPosition (const Coord3D & H, const Coord3D & R, double a)
 
 int main (int argc, char ** argv) 
 {
-	Coord3D * H = NULL;
-	Coord3D * R = NULL;
+	Point3D * H = NULL;
+	Point3D * R = NULL;
 
 	char ** names = NULL;
 	unsigned int nnames = 0;
@@ -195,7 +195,7 @@ int main (int argc, char ** argv)
 							  return 1;
 
 						  }
-						  H = new Coord3D (Hd[0], Hd[1], Hd[2]);
+						  H = new Point3D (Hd[0], Hd[1], Hd[2]);
 						  free (Hd);
 					  }
 					break;
@@ -210,7 +210,7 @@ int main (int argc, char ** argv)
 							  return 1;
 
 						  }
-						  R = new Coord3D (Rd[0], Rd[1], Rd[2]);
+						  R = new Point3D (Rd[0], Rd[1], Rd[2]);
 						  free (Rd);
 					  }
 					break;
@@ -312,7 +312,7 @@ int main (int argc, char ** argv)
 			int counter = 0;
 			while (1)
 			{
-				Coord3D p = getRandomPosition (*H, *R, radii[i]);
+				Point3D p = getRandomPosition (*H, *R, radii[i]);
 				M[imol]->setPosition (p);
 				counter++;
 				if ( S.addMolecule (*M[imol]) || (counter > ntries) )
