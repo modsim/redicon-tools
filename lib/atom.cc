@@ -95,13 +95,15 @@ char * Atom::type2name () const
 	char * t = NULL;
 	switch (type)
 	{
-		case ATOM_FREE: t = strdup("free"); break;
+		case ATOM_FREE: t = strdup("free atom"); break;
 
-		case ATOM_SINGLE: t = strdup("single"); break;
+		case ATOM_SINGLE: t = strdup("single atom"); break;
 
-		case ATOM_BONDED: t = strdup("bonded"); break;
-		
-		case ATOM_HEAD: t = strdup("head"); break;
+		case ATOM_BONDED: t = strdup("bonded atom"); break;
+
+		case ATOM_TERMINAL: t = strdup("terminal atom"); break;
+
+		case ATOM_HEAD: t = strdup("head atom"); break;
 
 		default: t = strdup("unknown") ;
 	}
@@ -213,7 +215,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << getNNeighbours() << " neighbours and " << getNBonds() << " bonds." << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is a "  << typeName << " and has " << getNNeighbours() << " neighbour(s) and " << getNBonds() << " bond(s)." << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const

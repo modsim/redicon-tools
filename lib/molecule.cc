@@ -25,7 +25,7 @@
 
 #include "defines.h"
 
-Molecule::Molecule (const char * name, Atom a) : nBonds(0), bonds(NULL), owner (NULL)
+Molecule::Molecule (const char * name, Atom a) : owner (NULL)
 {
 	Molecule::name = strdup (name);
 	Atoms.push_back (new Atom(a)); // ignore throw as we check above
@@ -48,7 +48,8 @@ Molecule::~Molecule ()
 	free (name);
 	for (auto &a : Atoms) // C++0x
 		delete a;
-	if (bonds) delete [] bonds;
+	for (auto &b : Bonds) // C++0x
+		delete b;
 };
 
 // Position
@@ -164,7 +165,7 @@ void Molecule::printInfo (char * name) const
 
 void Molecule::printInfo (std::ostream * stream) const
 {
-	*stream << "Molecule '" << name << "' has " << getNAtoms() << " atom(s) and " << nBonds << " bond(s). ";
+	*stream << "Molecule '" << name << "' has " << getNAtoms() << " atom(s) and " << getNBonds() << " bond(s). ";
 //	*stream << "Total charge " << getCharge() << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
 	*stream << "Total charge " << getCharge() << std::endl ;
 
@@ -174,5 +175,9 @@ void Molecule::printBBStr (std::ostream * stream) const
 {
 	for (auto &a : Atoms) // C++0x
 		a->printBBStr (stream);
+
+	for (auto &b : Bonds) // C++0x
+		b->printBBStr (stream);
+
 }
 

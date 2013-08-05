@@ -26,7 +26,7 @@
 //#define DEBUG
 #include "defines.h"
 
-Molecule::Molecule (const char * file) : nBonds(0), bonds(NULL), owner (NULL)
+Molecule::Molecule (const char * file) : owner (NULL)
 {
 
 	Molecule::name = strdup (file);
@@ -47,6 +47,7 @@ Molecule::Molecule (const char * file) : nBonds(0), bonds(NULL), owner (NULL)
 	}
 
 	head = Atoms.at (0);
+	AtomAttorney::setType (*head, ATOM_HEAD);
 
 	stream.close ();
 
@@ -55,7 +56,35 @@ Molecule::Molecule (const char * file) : nBonds(0), bonds(NULL), owner (NULL)
 	{
 		charge += a->getCharge();
 		AtomAttorney::claimOwnership (*a, *this);
-		AtomAttorney::setType (*a, ATOM_SINGLE);
+		if ( a->getNBonds() == 0 )
+		{ // unbonded atom, bond to the neighbouring atoms from serials
+			unsigned int s = a->getSerial ();
+			DPRINT ("Atom '%s' (serial %i) is not bonded\n", a->getName(), s);
+			if (getNAtoms() == 1)
+				AtomAttorney::setType (*a, ATOM_SINGLE);
+
+			else if ( (s == 1) && (getNAtoms() > 1) )
+			{	
+				DPRINT ("\tit is a head atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s)));
+				AtomAttorney::setType (*a, ATOM_HEAD);
+			}
+
+			else if ( (s == getNAtoms() && (getNAtoms() > 1)) )
+			{
+				DPRINT ("\tit is a terminal atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
+				AtomAttorney::setType (*a, ATOM_TERMINAL);
+			}
+
+			else
+			{
+				DPRINT ("\tit is a bonded atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
+				Bonds.push_back (new Bond (a, Atoms.at(s)));
+				AtomAttorney::setType (*a, ATOM_BONDED);
+			}
+		}
 	}
 
 #ifdef DEBUG

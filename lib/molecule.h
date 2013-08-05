@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <atom.h>
+#include <bond.h>
 
 class System;
 class MoleculeAttorney;
@@ -38,10 +39,6 @@ class Molecule
 
 		~Molecule ();
 		
-		// TODO:
-		//addAtom (Atom &);
-		//bool createBond (i, j) {return true;};
-		// ...
 
 		bool isOwned () {if (owner) return true; else return false;};
 
@@ -57,9 +54,9 @@ class Molecule
 		bool translateBy (const Point3D & T);
 
 		// Get info
-		int getNAtoms () const {return Atoms.size();};
-		int getNBonds () const {return 0;};
-		int getCharge () const {return charge;};
+		unsigned int getNAtoms () const {return Atoms.size();};
+		unsigned int getNBonds () const {return Bonds.size();};
+		double getCharge () const {return charge;};
 		char * getName () const {return name;};
 
 		// checks for overlaps
@@ -81,9 +78,12 @@ class Molecule
 	
 		Atom * head;
 		std::vector<Atom*> Atoms;
+		std::vector<Bond*> Bonds;
 
-		unsigned int nBonds; // pointers to bonds 
-		Bond ** bonds;
+		// TODO:
+		//addAtom (Atom &);
+		//bool createBond (i, j) {return true;};
+		// ...
 
 	private:
 
