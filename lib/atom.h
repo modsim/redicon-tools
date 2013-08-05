@@ -23,8 +23,10 @@
 #include <stdio.h>
 #include <iostream> 
 #include <fstream>
+#include <vector>
 
 #include <point3D.h>
+//#include <bond.h>
 
 typedef enum {
 
@@ -38,10 +40,9 @@ typedef enum {
 
 } AtomType;
 
-class Bond;
 class Residue;
 class Molecule;
-
+class Bond;
 class AtomAttorney;
 
 class Atom 
@@ -54,7 +55,6 @@ class Atom
 		Atom (const char * name, double radius); // simplified constructor
 
 		Atom (const Atom &); // copy constructor
-//		Atom (const char * string); // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
 		Atom (const std::string & string); // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
 
 		~Atom ();
@@ -66,6 +66,8 @@ class Atom
 
 		// Get methods
 		const char * getName () const {return name;};
+		unsigned int getNNeighbours () const {return Neighbours.size();};
+		unsigned int getNBonds () const {return Bonds.size();};
 
 		AtomType getType () const {return type;};
 		char * getTypeName () const {return typeName;} ;
@@ -83,7 +85,7 @@ class Atom
 		// public position stuff (FIXME: private?)
 		Point3D * positionPtr () { return r;};
 		Point3D * positionCopy () const; // creates Point3D, need delete
-		bool positionSet () const { if (r) return true; else return false;};
+		bool positionIsSet () const { if (r) return true; else return false;};
 
 		// checks
 		bool overlap (const Atom &) const;
@@ -130,12 +132,9 @@ class Atom
 		char * typeName;
 		bool setType (AtomType T);
 
-		unsigned int nneighbours; /* atoms connected via bonds (FIXME: do we need it?) */
-		Atom ** neighbours;
-
-		unsigned int nbonds; /* pointers to bonds */
-		Bond ** bonds;
-		bool addBond (Bond &b) { return true;};
+		std::vector<Atom*> Neighbours;
+		std::vector<Bond*> Bonds;
+		bool addBond (Bond & b);
 
 		void * userData;
 };

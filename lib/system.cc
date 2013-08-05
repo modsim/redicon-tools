@@ -109,7 +109,7 @@ static bool moleculeNoOverlap (const Molecule & m, void * p)
 bool System::addMolecule (Molecule& M) 
 {
 
-	if (!M.positionSet())
+	if (!M.positionIsSet())
 	{
 		BCPT_ERROR ("Molecule '%s' position is not set, cannot add.", M.getName());
 		return false;

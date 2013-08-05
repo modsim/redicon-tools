@@ -18,6 +18,7 @@
  */
 
 #include "atom.h"
+#include "bond.h"
 
 int main (int argc, char ** argv) 
 {
@@ -39,6 +40,11 @@ int main (int argc, char ** argv)
 	} catch (const char * msg) {
 		std::cerr << "error: " << msg << std::endl;
 	}
+
+	// Test bonds
+	Bond b (&A, &B);
+	b.printInfo(&std::cout);
+	b.printBBStr(&std::cout); 
 
 	A.printInfo (&std::cout);
 	B.printInfo (&std::cout); 

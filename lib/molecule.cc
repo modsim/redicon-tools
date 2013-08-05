@@ -115,10 +115,10 @@ unsigned int Molecule::shiftSerial (unsigned int serial)
 bool Molecule::overlap (const Atom & ta) const
 {
 
-	if (!ta.positionSet())
+	if (!ta.positionIsSet())
 		throw "Molecule::overlap(): Atom's position is not set." ;
 
-	if (!head->positionSet())
+	if (!head->positionIsSet())
 		throw "Molecule::overlap(): Molecule's position is not set." ;
 
 	for (auto &a : Atoms) // C++0x
@@ -130,10 +130,10 @@ bool Molecule::overlap (const Atom & ta) const
 
 bool Molecule::overlap (const Molecule & M) const
 {
-	if (!M.positionSet())
+	if (!M.positionIsSet())
 		throw "Molecule::overlap(): Test's molecule position is not set." ;
 
-	if (!head->positionSet())
+	if (!head->positionIsSet())
 		throw "Molecule::overlap(): Moleculke's position is not set." ;
 
 	for (auto &a : Atoms) // C++0x

@@ -46,7 +46,7 @@ class Molecule
 		bool isOwned () {if (owner) return true; else return false;};
 
 		// Position stuff;
-		bool positionSet () const {return head->positionSet();};
+		bool positionIsSet () const {return head->positionIsSet();};
 		Point3D * positionCopy () const { return head->positionCopy();};
 		Point3D * positionPtr () { return head->positionPtr();};
 

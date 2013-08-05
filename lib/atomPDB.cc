@@ -34,7 +34,6 @@ Atom::Atom (const std::string & line)
 	: residue(NULL), molecule (NULL), 
 	hs_radius(1.), LJ (0.0), hd_radius (1.), mass (1.0), 
 	type (ATOM_FREE), 
-	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
 	//BCPT_WARNING ("PDB does not contain the hard core and hydrodynamic radia (default: 1.), LJ energy depth (default: 0.0) and mass (default: 1). Do not forget to reset if needed.");

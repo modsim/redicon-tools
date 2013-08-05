@@ -21,7 +21,8 @@
 #include <string.h>
 #include <iostream> 
 
-#include<atom.h>
+//#include<atom.h>
+#include<bond.h>
 
 //#define DEBUG
 #include "defines.h"
@@ -32,7 +33,6 @@ Atom::Atom (const char * name, double radius)
 	serial(0), hs_radius(radius), charge(0.0), 
 	LJ (0.0), hd_radius (radius), mass (1.0), r(NULL), 
 	type (ATOM_FREE), 
-	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
 	Atom::name = strdup (name);
@@ -45,7 +45,6 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 	: residue(NULL), molecule (NULL), serial(serial), hs_radius(hs_radius), charge(charge), 
 	LJ (LJ), hd_radius (hd_radius), mass (mass), 
 	type (ATOM_FREE), 
-	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 {
 	Atom::name = strdup (name);
@@ -59,11 +58,12 @@ Atom::Atom (const Atom & a)
 	serial(0), hs_radius(a.getHSRadius()), charge(a.getCharge()), 
 	LJ (a.getLJ()), hd_radius (a.getHDRadius()), mass (a.getMass()), 
 	r(NULL), type (ATOM_FREE), 
-	nneighbours(0), neighbours(NULL), nbonds(0), bonds(NULL),
 	userData(NULL)
 { 
 	Atom::name = strdup (a.getName());
 	typeName = type2name ();
+	Neighbours.clear();
+	Bonds.clear();
 };
 
 // annihilator :P
@@ -71,11 +71,23 @@ Atom::~Atom ()
 {
 	free (name);
 	if (typeName) free (typeName);
-
 	if (r) delete r;
-	if (neighbours) delete neighbours;
-	if (bonds) delete bonds;
 };
+
+// Add a bond
+bool Atom::addBond (Bond & b)
+{
+	Atom * n = b.getBondedAtom(this);
+	if (n)
+	{
+		Neighbours.push_back (n);
+		Bonds.push_back (&b);
+		return true;
+	}
+	
+	BCPT_ERROR ("Adding bond failed, atom '%s' does not belong to the bond", getName());
+	return false;
+}
 
 // Type to name etc
 char * Atom::type2name () const
@@ -201,7 +213,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << nneighbours << " neighbours and " << nbonds << " bonds." << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is "  << typeName << " and has " << getNNeighbours() << " neighbours and " << getNBonds() << " bonds." << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const
