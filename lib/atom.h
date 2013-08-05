@@ -121,7 +121,8 @@ class Atom
 
 		// Atom's position (might not ne known or needed)
 		Point3D * r; 
-		bool setPosition (Point3D& R) ;
+		bool setPosition (const Point3D & R) ;
+		bool translateBy (const Point3D & R) ;
 
 		// Atoms type (free, single, bonded, etc)
 		AtomType type;
@@ -152,7 +153,10 @@ class AtomAttorney
 		static void setSerial (Atom &a, unsigned int serial) { return a.setSerial (serial);};
 		static bool setType (Atom &a, AtomType t) { return a.setType(t); };
 
-		static bool setPosition (Atom &a, Point3D& R) { return a.setPosition(R);};
+		// make position accesebile to a molecule
+		static bool setPosition (Atom &a, const Point3D& R) { return a.setPosition(R);};
+		static bool translateBy (Atom &a, const Point3D& R) { return a.translateBy(R);};
+
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 
 		friend class Molecule;

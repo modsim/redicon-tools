@@ -88,7 +88,7 @@ double Point3D::norm () const
 	return sqrt (r2);
 }
 
-double Point3D::distance (const Point3D & a) const
+double Point3D::distanceTo (const Point3D & a) const
 {
 	double r2 = 0;
 	for (unsigned int i = 0; i < dim; i++)
@@ -96,14 +96,20 @@ double Point3D::distance (const Point3D & a) const
 
 	return sqrt (r2);
 }
-Point3D & Point3D::vector (const Point3D & a) const
+Point3D Point3D::vectorTo (const Point3D & a) const
 {
 	double R[3];
 	for (unsigned int i = 0; i < dim; i++)
-		R[i] = r[i] - a.get(i);
+		R[i] = a.get(i) - r[i];
 
 	Point3D p (R);
 	return p;
+}
+
+void Point3D::translateBy (const Point3D & a)
+{
+	for (unsigned int i = 0; i < dim; i++)
+		r[i] += a.get(i);
 }
 
 //

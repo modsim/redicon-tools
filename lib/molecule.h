@@ -46,12 +46,17 @@ class Molecule
 		bool isOwned () {if (owner) return true; else return false;};
 
 		// Position stuff;
-		bool setPosition (Point3D& R);
+		bool positionSet () const {return head->positionSet();};
 		Point3D * positionCopy () const { return head->positionCopy();};
 		Point3D * positionPtr () { return head->positionPtr();};
-		bool positionSet () const { return head->positionSet();};
 
-		// Get methods
+		// this is initial position set, depends on th emolecule type (polymer, one atom
+		virtual bool setPosition (const Point3D & R); 		
+		// move or translate a molecule
+		bool moveTo (const Point3D & R) ;
+		bool translateBy (const Point3D & T);
+
+		// Get info
 		int getNAtoms () const {return Atoms.size();};
 		int getNBonds () const {return 0;};
 		int getCharge () const {return charge;};

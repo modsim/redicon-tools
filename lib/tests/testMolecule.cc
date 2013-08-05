@@ -49,6 +49,11 @@ int main (int argc, char ** argv)
 	} catch (const char * msg) {
 	    std::cerr << "Error: " << msg << std::endl;
 	}
+	if (MPDB)
+	{
+		MPDB->printBBStr (&std::cout); 
+		MPDB->moveTo(P1);
+	}
 
 	try {
 		if (M.overlap (A))

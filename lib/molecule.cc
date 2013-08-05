@@ -51,13 +51,54 @@ Molecule::~Molecule ()
 	if (bonds) delete [] bonds;
 };
 
-// Set position
-bool Molecule::setPosition (Point3D& R) 
+// Position
+// set (virtual method, default to check and warn)
+bool Molecule::setPosition (const Point3D& R)
 {
-	//for (auto &a : Atoms) // C++0x
-		// shift all atoms
+	if (head->positionPtr()) 
+	{
+		BCPT_WARNING ("Position is set, use Molecule::moveTo() to reset.");
+		return false;
+	}
 
-	return AtomAttorney::setPosition (*head, R);
+	BCPT_WARNING ("Virtual method, not implemented for a general molecule.");
+	return false;
+}
+
+// translate molecule by a vector
+bool Molecule::translateBy (const Point3D& T) 
+{
+	Point3D * po = head->positionPtr();
+	if (!po) 
+	{
+		BCPT_WARNING ("Position not set, cannot translate.");
+		return false;
+	}
+
+	// if the head position is set, we expect athe other atoms' positions to be set
+	// so throw an exception if this is not so
+	for (auto &a : Atoms) // C++0x
+		if (!AtomAttorney::translateBy(*a, T))
+			throw "Translating atom failed in translateBy()";
+
+	return true;
+}
+bool Molecule::moveTo (const Point3D& R) 
+{
+	Point3D * po = head->positionPtr();
+
+	// if head's position is set, normally the positions of all atoms are set, so just translate
+	// we try to translate and throw an eception s we do not expect a 'normal' error
+	if (po) 	{	
+		Point3D T = po->vectorTo(R);
+		try {
+			translateBy (T);
+		} catch (const char * msg) {
+			throw msg;
+		}
+	}
+
+	return true;
 }
 
 // serial number shift

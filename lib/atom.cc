@@ -105,7 +105,7 @@ bool Atom::setType (AtomType T)
 }
 
 // Position stuff
-bool Atom::setPosition (Point3D& R) 
+bool Atom::setPosition (const Point3D& R) 
 { 
 	if (r)
 	{
@@ -118,6 +118,18 @@ bool Atom::setPosition (Point3D& R)
 		return false; 
 	else 
 		return true;
+};
+
+bool Atom::translateBy (const Point3D& R) 
+{ 
+	if (!r)
+	{
+		BCPT_ERROR ("Position of atom '%s' has not been set, cannot translate", name)
+		return false;
+	}
+	
+	r->translateBy (R); 
+	return true;
 };
 
 // Return copy of Point3D
@@ -147,7 +159,7 @@ bool Atom::overlap (const Atom & a) const
 		throw "Test atom's position not set";
 	}
 
-	double dist = r->distance (*ra);
+	double dist = r->distanceTo (*ra);
 	delete ra;
 	
 	DPRINT ("dist_min=%1.15e, dist=%1.15e\n", dist_min, dist);
