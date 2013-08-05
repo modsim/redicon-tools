@@ -160,6 +160,8 @@ class AtomAttorney
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
 
 		friend class Molecule;
+		friend class Monatomic;
+
 		friend class Residue;
 		friend class Bond;
 };

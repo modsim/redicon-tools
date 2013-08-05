@@ -18,6 +18,8 @@
  */
 
 #include "molecule.h"
+#include "monatomic.h"
+
 
 bool PrintAtom (const Atom & a, void * data)
 {
@@ -32,13 +34,12 @@ bool PrintAtom (const Atom & a, void * data)
 
 int main (int argc, char ** argv) 
 {
-
 	Atom A ("A", 1.);
-	Molecule M ("M", A);
+	Monatomic M ("M", A);
 
 	Atom A2 ("A2", 1.);
 	A2.printInfo (&std::cout);
-	Molecule M2 ("M2", A2);
+	Monatomic M2 ("M2", A2);
 
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);

@@ -1,4 +1,4 @@
-/*  moleculecc 2013-07-30 valiska@gmail.com
+/*  molecule.cc 2013-07-30 valiska@gmail.com
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *

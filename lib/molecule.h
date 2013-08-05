@@ -77,10 +77,18 @@ class Molecule
 		// Output BD_BOX str line
 		void printBBStr (std::ostream *) const;
 
+	protected:
+	
+		Atom * head;
+		std::vector<Atom*> Atoms;
+
+		unsigned int nBonds; // pointers to bonds 
+		Bond ** bonds;
+
 	private:
 
 		friend class MoleculeAttorney;
-
+	
 		// TODO:
 		//addAtom (Atom &);
 		//getAtom (unsigned int );
@@ -97,13 +105,7 @@ class Molecule
 
 		double radius[3]; // circumferent ellipsoid
 		double charge;    // total charge
-
-		Atom * head;
-		std::vector<Atom*> Atoms;
-
-		unsigned int nBonds; // pointers to bonds 
-		Bond ** bonds;
-
+		
 		System * owner;
 		bool claimOwnership (System & s) { if (!owner) {owner = &s; return true;} else return false;};
 		bool releaseOwnership (System & s) { if (owner == &s) {owner = NULL; return true;} else return false;};

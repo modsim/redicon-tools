@@ -31,6 +31,7 @@
 
 #include "str.h"
 #include <system.h>
+#include <monatomic.h>
 
 #include "defines.h"
 
@@ -308,7 +309,7 @@ int main (int argc, char ** argv)
 		if (charges) a.setCharge (charges[i]);
 		for (int j = 0; j < N[i]; j++)
 		{
-			Molecule * M = new Molecule (names[i], a);
+			Monatomic * M = new Monatomic (names[i], a);
 			int counter = 0;
 			while (1)
 			{

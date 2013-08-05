@@ -38,7 +38,7 @@ System::~System ()
 			try {
 				delete m;
 			} catch (const char * msg) {
-				BCPT_WARNING ("Deleting molecule '%s' failed: ", m->getName(), msg);
+				BCPT_WARNING ("Deleting molecule '%s' failed: %s", m->getName(), msg);
 			}
 		}
 	}
