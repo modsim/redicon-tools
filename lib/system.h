@@ -30,9 +30,10 @@ class System
 {
 	public:
 		System (Point3D & R0, Coord3D & size); // Box of size size with the center at R0
-		~System ();
+		~System (); // to delete molecules, use System::tryDelete()
 
 		bool addMolecule (Molecule &);
+		void tryDelete() { trydelete = true;};
 
 		// Get methods
 		int getNMolecules () const {return Molecules.size();};
@@ -56,6 +57,8 @@ class System
 		std::vector<Molecule*> Molecules;
 		bool foreachMolecule (MoleculeFunction, void * user_params) const;
 		unsigned int last_serial; // serial of the last atom of th elast molecule (lergest serial)
+
+		bool trydelete;
 
 		void * userData;
 };

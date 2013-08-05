@@ -42,6 +42,9 @@ Molecule::Molecule (const char * name, Atom a) : nBonds(0), bonds(NULL), owner (
 
 Molecule::~Molecule () 
 {
+	if (owner)
+		throw "You cannot destroy me, I have an owner";
+
 	free (name);
 	for (auto &a : Atoms) // C++0x
 		delete a;

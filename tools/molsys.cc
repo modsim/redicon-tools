@@ -32,6 +32,8 @@
 #include "str.h"
 #include <system.h>
 
+#include "defines.h"
+
 using namespace std;
 //#define DEBUG
 
@@ -297,8 +299,6 @@ int main (int argc, char ** argv)
 	for (unsigned int i = 0; i < nN; i++)
 		nMols += N[i];
 
-	Molecule ** M = (Molecule**) malloc (nMols * sizeof (Molecule*) );
-
 	int imol = 0;
 	int ntries = 10;
 
@@ -308,15 +308,21 @@ int main (int argc, char ** argv)
 		if (charges) a.setCharge (charges[i]);
 		for (int j = 0; j < N[i]; j++)
 		{
-			M[imol] = new Molecule (names[i], a);
+			Molecule * M = new Molecule (names[i], a);
 			int counter = 0;
 			while (1)
 			{
 				Point3D p = getRandomPosition (*H, *R, radii[i]);
-				M[imol]->setPosition (p);
+				M->setPosition (p);
 				counter++;
-				if ( S.addMolecule (*M[imol]) || (counter > ntries) )
+				if ( S.addMolecule (*M) )
 					break;
+				if (counter > ntries)
+				{
+					BCPT_ERROR ("cannot add molecule '%s' after %i tries, I am giving up.", M->getName(), counter);
+					delete M;
+					break;
+				}
 			}
 			imol++;
 		}
@@ -345,10 +351,6 @@ int main (int argc, char ** argv)
 	if (HDradia) free (HDradia);
 	if (LJ) free (LJ);
 
-	for (unsigned int i = 0; i < nMols; i++)
-		delete M[i];
-	free (M);
-
 	if (pdb_file)
 		free (pdb_file);
 
@@ -359,6 +361,8 @@ int main (int argc, char ** argv)
 		free (pdb);
 	if (str)
 		free (str);
+
+	S.tryDelete();
 
 	return 1;
 }

@@ -26,12 +26,22 @@
 //#define DEBUG
 #include "defines.h"
 
-System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), last_serial (1), userData (NULL) { };
+System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), last_serial (1), trydelete (false), userData (NULL) { };
 
 System::~System () 
 {
 	for (auto &m : Molecules) // C++0x
+	{
 		MoleculeAttorney::releaseOwnership (*m, *this);
+		if (trydelete)
+		{
+			try {
+				delete m;
+			} catch (const char * msg) {
+				BCPT_WARNING ("Deleting molecule '%s' failed: ", m->getName(), msg);
+			}
+		}
+	}
 };
 
 // For System::moleculeInBox
@@ -139,7 +149,6 @@ bool System::addMolecule (Molecule& M)
 		charge += M.getCharge();
 		return true;
 	}
-	
 	
 	BCPT_ERROR ("cannot add a molecule to the system, the molecules is owned by someone else.");
 	return false;
