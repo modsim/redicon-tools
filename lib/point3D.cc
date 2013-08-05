@@ -96,6 +96,15 @@ double Point3D::distance (const Point3D & a) const
 
 	return sqrt (r2);
 }
+Point3D & Point3D::vector (const Point3D & a) const
+{
+	double R[3];
+	for (unsigned int i = 0; i < dim; i++)
+		R[i] = r[i] - a.get(i);
+
+	Point3D p (R);
+	return p;
+}
 
 //
 // Print coords

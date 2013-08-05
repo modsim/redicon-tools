@@ -35,7 +35,7 @@ class System
 		bool addMolecule (Molecule &);
 
 		// Get methods
-		int getNMolecules () const {return nMolecules;};
+		int getNMolecules () const {return Molecules.size();};
 
 		// print general info
 		void printInfo (char*) const;
@@ -52,11 +52,10 @@ class System
 		Coord3D & H;  // box size
 
 		double charge;    // total charge
-		unsigned int last_serial; // serial of the last atom (lergest serial)
 
-		unsigned int nMolecules; 
-		Molecule ** molecules;
+		std::vector<Molecule*> Molecules;
 		bool foreachMolecule (MoleculeFunction, void * user_params) const;
+		unsigned int last_serial; // serial of the last atom of th elast molecule (lergest serial)
 
 		void * userData;
 };

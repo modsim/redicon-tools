@@ -26,7 +26,7 @@
 //#define DEBUG
 #include "defines.h"
 
-Molecule::Molecule (const char * file) : nBonds(0), bonds(NULL)
+Molecule::Molecule (const char * file) : nBonds(0), bonds(NULL), owner (NULL)
 {
 
 	Molecule::name = strdup (file);

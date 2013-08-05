@@ -25,7 +25,7 @@
 
 #include "defines.h"
 
-Molecule::Molecule (const char * name, Atom a) : nBonds(0), bonds(NULL)
+Molecule::Molecule (const char * name, Atom a) : nBonds(0), bonds(NULL), owner (NULL)
 {
 	Molecule::name = strdup (name);
 	Atoms.push_back (new Atom(a)); // ignore throw as we check above

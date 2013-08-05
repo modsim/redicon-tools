@@ -26,11 +26,12 @@
 //#define DEBUG
 #include "defines.h"
 
-System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), last_serial (1), nMolecules(0), molecules (NULL), userData (NULL) { };
+System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), last_serial (1), userData (NULL) { };
 
 System::~System () 
 {
-	if (molecules) free (molecules);
+	for (auto &m : Molecules) // C++0x
+		MoleculeAttorney::releaseOwnership (*m, *this);
 };
 
 // For System::moleculeInBox
@@ -104,8 +105,8 @@ bool System::addMolecule (Molecule& M)
 		return false;
 	}
 
-	for (unsigned int i = 0; i < nMolecules; i++)
-		if (molecules[i] == &M)
+	for (auto &m : Molecules)
+		if (m == &M)
 		{
 			BCPT_ERROR ("Molecule '%s' already added, skipping", M.getName());
 			return false;
@@ -118,7 +119,7 @@ bool System::addMolecule (Molecule& M)
 		return false;
 	}
 
-	// check M intersects with the molecules
+	// check if M intersects with the molecules
 	try {
 		bool nooverlap = foreachMolecule (moleculeNoOverlap, (void*) &M);
 		if (!nooverlap)
@@ -131,25 +132,25 @@ bool System::addMolecule (Molecule& M)
 		return false;
 	}
 
-	nMolecules++;
-	molecules = (Molecule**) realloc (molecules, nMolecules * sizeof(Molecule));
-	molecules[nMolecules-1] = &M;
-	last_serial = MoleculeAttorney::shiftSerial (M, last_serial);
-
-	charge += M.getCharge();
-
-	return true;
+	if (MoleculeAttorney::claimOwnership (M, *this))
+	{
+		Molecules.push_back (&M);
+		last_serial = MoleculeAttorney::shiftSerial (M, last_serial);
+		charge += M.getCharge();
+		return true;
+	}
+	
+	
+	BCPT_ERROR ("cannot add a molecule to the system, the molecules is owned by someone else.");
+	return false;
 }
 
 // For each loop
 bool System::foreachMolecule (MoleculeFunction func, void * data) const
 {
-	for (unsigned int i = 0; i < nMolecules; i++)
-	{
-		DPRINT ("Molecule %i:", i);
-		if (!func(*(molecules[i]), data))
+	for (auto &m : Molecules)
+		if (!func(*m, data))
 			return false;
-	}
 	return true;
 }
 
@@ -165,7 +166,7 @@ void System::printInfo (char * name) const
 
 void System::printInfo (std::ostream * stream) const
 {
-	*stream << "System has " << nMolecules << " molecules in a box of size ";
+	*stream << "System has " << getNMolecules() << " molecules in a box of size ";
 	H.print (stream);
 	*stream << " centered at "; R0.print (stream);
 	*stream  << "and its total charge is " << charge << std::endl ;
@@ -173,7 +174,7 @@ void System::printInfo (std::ostream * stream) const
 
 void System::printBBStr (std::ostream * stream) const
 {
-	for (unsigned int i = 0; i < nMolecules; i++)
-		(molecules[i])->printBBStr (stream);
+	for (auto &m : Molecules)
+		m->printBBStr (stream);
 }
 

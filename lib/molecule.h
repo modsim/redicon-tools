@@ -43,6 +43,8 @@ class Molecule
 		//bool createBond (i, j) {return true;};
 		// ...
 
+		bool isOwned () {if (owner) return true; else return false;};
+
 		// Position stuff;
 		bool setPosition (Point3D& R);
 		Point3D * positionCopy () const { return head->positionCopy();};
@@ -97,6 +99,10 @@ class Molecule
 		unsigned int nBonds; // pointers to bonds 
 		Bond ** bonds;
 
+		System * owner;
+		bool claimOwnership (System & s) { if (!owner) {owner = &s; return true;} else return false;};
+		bool releaseOwnership (System & s) { if (owner == &s) {owner = NULL; return true;} else return false;};
+
 		void * userData;
 };
 
@@ -107,6 +113,9 @@ class MoleculeAttorney
 	private:
 		static unsigned int shiftSerial (Molecule &M, unsigned int serial) { return M.shiftSerial(serial); };
 		static unsigned int getSerial (Molecule &M) { return M.getSerial(); };
+		static bool claimOwnership (Molecule & M, System & s) {return M.claimOwnership (s);};
+		static bool releaseOwnership (Molecule & M, System & s) {return M.releaseOwnership (s);};
+
 		friend class System;
 };
 

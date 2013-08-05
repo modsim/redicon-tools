@@ -46,7 +46,7 @@ class Point3D
 		// Operations
 		double norm () const;
 		double distance (const Point3D &a) const;
-		Point3D & vector (const Point3D &b) const;
+		Point3D & vector (const Point3D &b) const; // vector to a point b
 
 		// Print Points
 		void print (FILE * file, const char * name) const ;

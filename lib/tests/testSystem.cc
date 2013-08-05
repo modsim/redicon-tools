@@ -35,12 +35,21 @@ int main (int argc, char ** argv)
 	Molecule M3 ("M3", A);
 	M3.setPosition (P3);
 
-	Coord3D X0 (0.,0.,0.);
-	Coord3D size (6., 6., 6.);
+	Point3D X0 (0.,0.,0.);
+	Coord3D size (6., 6., 6.); // Point3D and Coord3D are synonyms
+
+	System * S0 = new System (X0, size);
+	S0->addMolecule (M);
+	S0->addMolecule (M2);
+	S0->printInfo (&std::cout);
+	S0->printBBStr (&std::cout);
+	delete S0;
+
 	System S (X0, size);
 
 	S.addMolecule (M);
 	S.addMolecule (M2);
+	S.addMolecule (M3);
 	S.addMolecule (M3);
 
 	S.printInfo (&std::cout);
