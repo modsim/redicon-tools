@@ -35,8 +35,8 @@ Bond::Bond (Atom * a, Atom * b) : a(a), b(b), userData (NULL)
 		const Point3D * p1 = a->positionPtr();
 		const Point3D * p2 = b->positionPtr();
 		rmin = rmax = p1->distanceTo (*p2);
-		H = 0;
-		BCPT_WARNING ("setting rigid bond length to %g", rmin);
+		H = 1.;
+	//	BCPT_WARNING ("setting rigid bond length to %g", rmin);
 	}
 	else
 	{

@@ -28,7 +28,8 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
+
+#include <molecule.h>
 
 static const char * myname = "pdb2str";
 void usage () 
@@ -36,7 +37,7 @@ void usage ()
 	fprintf (stderr, "Usage: %s -p PDB -s STR\n", myname);
 	fprintf (stderr, "where options are\n");
 
-	fprintf (stderr, " -p, --pdb-file=FILE          input PDB file name.\n");
+	fprintf (stderr, " -p, --pdb-file=FILE          input PDB or PQR file name.\n");
 	fprintf (stderr, " -s, --str-file=FILE          output file name for BD_BOX's str file format.\n");
 
 	fprintf (stderr, " -v, --version                print version iformation and exit.\n");
@@ -47,11 +48,8 @@ void usage ()
 
 int main (int argc, char ** argv) 
 {
-	char * pdb = (char*) NULL;
-	FILE * pdb_file = (FILE*) NULL;
-
-	char * str = (char*) NULL;
-	FILE * str_file = (FILE*) NULL;
+	std::string pdb;
+	std::string str;
 
 	/* 
 	 * Command-line parser 
@@ -79,22 +77,10 @@ int main (int argc, char ** argv)
 #endif /* HAVE_GETOPT_LONG */
 			{
 				case 'p': 
-					  pdb = strdup (optarg);
-					  pdb_file = fopen (pdb, "r");
-					  if (!pdb_file)
-					  {
-						  fprintf (stderr, "%s: error: caanot open file '%s' for reading.\n", myname, pdb);
-						  return 1;
-					  }
+					  pdb = std::string (optarg);
 					  break;
 				case 's': 
-					  str = strdup (optarg);
-					  str_file = fopen (pdb, "r");
-					  if (!str_file)
-					  {
-						  fprintf (stderr, "%s: error: caanot open file '%s' for writing.\n", myname, str);
-						  return 1;
-					  }
+					  str = std::string (optarg);
 					  break;
 
 				case 'h': usage (); exit (1); break;
@@ -110,27 +96,29 @@ int main (int argc, char ** argv)
 	//
 	// Analyze options
 	//
-	if (!pdb_file || !str_file)
+	if (pdb.empty() || str.empty())
 	{
-		cerr << myname << ": error: no input and/or output file, use "  << myname << " --help for help." << endl;
+		std::cerr << myname << ": error: no input and/or output file, use "  << myname << " --help for help." << std::endl;
 		return 1; /* failure */
 
 	}
 	
+	Molecule * M;
+	if (pdb.rfind(".pdb") != std::string::npos)
+		M = new Molecule (FILETYPE_PDB, pdb.c_str());
+	else if (pdb.rfind(".pqr") != std::string::npos)
+		M = new Molecule (FILETYPE_PQR, pdb.c_str());
+	else
+	{
+		std::cerr << myname << ": error: unknown file extension " << pdb << std::endl;
+		return 1;
+	}
 
-	//
+	std::cerr << "writing to a STR file " << str << std::endl;
+	M->printBBStr (str.c_str());
+
 	// Free everythiong
-	//
-	if (pdb_file)
-		free (pdb_file);
-
-	if (str_file)
-		fclose (str_file);
-
-	if (pdb)
-		free (pdb);
-	if (str)
-		free (str);
+	delete M;
 
 	return 1;
 }

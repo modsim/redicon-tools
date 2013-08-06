@@ -34,13 +34,15 @@ class MoleculeAttorney;
 class Molecule
 {
 	public:
+
+		// NOTE: molecules can get more then one head, we consider this as association
 		Molecule (const char * name, Atom head);
-		Molecule (unsigned int ft, const char * file);
+		Molecule (unsigned int ft, const char * file); 
 		~Molecule ();
 
 		bool isOwned () {if (owner) return true; else return false;};
 
-		// Position stuff;
+		// Position
 		bool positionIsSet () const {return head->positionIsSet();};
 		Point3D * positionCopy () const { return head->positionCopy();};
 		Point3D * positionPtr () { return head->positionPtr();};
@@ -70,6 +72,7 @@ class Molecule
 		void printInfo (std::ostream *) const;
 		
 		// Output BD_BOX str line
+		void printBBStr (const char *) const;
 		void printBBStr (std::ostream *) const;
 
 	protected:

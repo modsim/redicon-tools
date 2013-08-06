@@ -29,7 +29,7 @@
 
 // simplified constructor 
 Atom::Atom (const char * name, double radius) 
-	: residue(NULL), molecule (NULL), 
+	: residue(NULL), molecule (NULL), residue_name (NULL),
 	serial(0), hs_radius(radius), charge(0.0), 
 	LJ (0.0), hd_radius (radius), mass (1.0), r(NULL), 
 	type (ATOM_FREE), 
@@ -43,7 +43,8 @@ Atom::Atom (const char * name, double radius)
 Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 			double hs_radius, double hd_radius,
 			double charge, double LJ, double mass)
-	: residue(NULL), molecule (NULL), serial(serial), hs_radius(hs_radius), charge(charge), 
+	: residue(NULL), molecule (NULL),residue_name (NULL), 
+	serial(serial), hs_radius(hs_radius), charge(charge), 
 	LJ (LJ), hd_radius (hd_radius), mass (mass), 
 	type (ATOM_FREE), 
 	userData(NULL)
@@ -56,7 +57,7 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 
 // construct from the line
 Atom::Atom (unsigned int ft, const std::string & line) 
-	: residue(NULL), molecule (NULL), 
+	: residue(NULL), molecule (NULL), residue_name (NULL), 
 	hs_radius(1.), LJ (0.0), hd_radius (1.), mass (1.0), 
 	type (ATOM_FREE), 
 	userData(NULL)
@@ -88,7 +89,7 @@ Atom::Atom (unsigned int ft, const std::string & line)
 
 // copy constructor (make a free brother)
 Atom::Atom (const Atom & a) 
-	: residue(NULL), molecule (NULL), 
+	: residue(NULL), molecule (NULL), residue_name (NULL),
 	serial(0), hs_radius(a.getHSRadius()), charge(a.getCharge()), 
 	LJ (a.getLJ()), hd_radius (a.getHDRadius()), mass (a.getMass()), 
 	r(NULL), type (ATOM_FREE), 
@@ -104,6 +105,8 @@ Atom::Atom (const Atom & a)
 Atom::~Atom () 
 {
 	free (name);
+	if (residue_name)
+		free (residue_name);
 	if (typeName) free (typeName);
 	if (r) delete r;
 };

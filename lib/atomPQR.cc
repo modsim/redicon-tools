@@ -28,7 +28,7 @@
 
 // For PDB ATOM see http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
 
-#define DEBUG
+//#define DEBUG
 #include "defines.h"
 
 bool Atom::readPQR (const std::string & line) 
@@ -37,7 +37,7 @@ bool Atom::readPQR (const std::string & line)
 #ifdef DEBUG
 	std::cerr << "Atom::readPQR(): '" << line << "'" << std::endl;
 #endif
-	std::string str = line.substr (0,5);
+	std::string str = line.substr (0,6);
 	if ( (str.find ("ATOM", 0) == std::string::npos) && (str.find ("HEtATM", 0) == std::string::npos) )
 	{
 		BCPT_ERROR ("Not an ATOM or HETATM record");
@@ -46,22 +46,40 @@ bool Atom::readPQR (const std::string & line)
 
 	// assume a PQR line a space separated line with the needed values
 	const char * cline = line.c_str();
-	char keyword[6];
-	name = (char*) malloc (4 * sizeof (char));
-	char residue_name[3];
-	unsigned int residue_number;
+	DPRINT ("cline: '%s'\n", cline);
+
+	char * keyword = (char*) malloc  (10 * sizeof (char));;
+	name = (char*) malloc (10 * sizeof (char));
+	residue_name = (char*) malloc (10 * sizeof (char));
+
 	double x,y,z;
 
-	if ( sscanf (cline, "%s %u %s %s %u %lf %lf %lf %lf %lf", 
-		&keyword, &serial, name, &residue_name, &residue_number, 
-		&x, &y, &z, &charge, &hs_radius) != 10)
+	if (!name || !keyword || ! residue_name)
+	{
+		BCPT_ERROR ("cannot allocate memory for atom name.");
+		return false;
+	}
+
+	if ( sscanf (cline, "%s %lu %s %s %u %lf %lf %lf %lf %lf", 
+		keyword, &serial, name, residue_name, &residue_number, &x, &y, &z, &charge, &hs_radius) != 10)
 	{
 		BCPT_ERROR ("Error parsing a PQR line");
 		free (name);
 		return false;
 	}
+
+	free (keyword);
+
 	hd_radius = hs_radius;
 	r = new Point3D (x, y, z);
+
+#ifdef DEBUG
+	std::cerr << "name: " << name << std::endl;
+	std::cerr << "serial: " << serial << std::endl;
+	std::cerr << "radius: " << hs_radius << std::endl;
+	std::cerr << "coords: "; r->print (&std::cerr); std::cerr << std::endl;
+#endif
+
 	return true;
 };
 

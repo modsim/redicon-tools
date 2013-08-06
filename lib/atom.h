@@ -78,7 +78,7 @@ class Atom
 		AtomType getType () const {return type;};
 		char * getTypeName () const {return typeName;} ;
 
-		int getSerial () const {return serial;};
+		unsigned long int getSerial () const {return serial;};
 
 		double getHSRadius () const {return hs_radius;};
 		double getHDRadius () const {return hd_radius;};
@@ -122,8 +122,11 @@ class Atom
 
 		// Data / parameters
 		char * name;
-		int serial; // reference number from the PDB file
-		void setSerial (unsigned int serial) {Atom::serial = serial;};
+		char * residue_name;
+		unsigned int residue_number;
+
+		unsigned long int serial; // reference number from the PDB file
+		void setSerial (unsigned long int serial) {Atom::serial = serial;};
 
 		double hs_radius; // atom is a spherical core 
 		double charge;

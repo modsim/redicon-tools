@@ -23,6 +23,7 @@
 
 #include<molecule.h>
 
+//#define DEBUG
 #include "defines.h"
 
 Molecule::Molecule (const char * name, Atom a) : owner (NULL)
@@ -90,40 +91,65 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 	head = Atoms.at (0);
 	AtomAttorney::setType (*head, ATOM_HEAD);
 
+	DPRINT ("*** File read, running over atoms\n");
+
 	charge = 0;
+	unsigned long int ia = 0;
 	for (auto &a : Atoms) // C++0x
 	{
+		DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), a->getSerial(), ia);
+
 		charge += a->getCharge();
 		AtomAttorney::claimOwnership (*a, *this);
+
 		if ( a->getNBonds() == 0 )
 		{ // unbonded atom, bond to the neighbouring atoms from serials
 			unsigned int s = a->getSerial ();
-			DPRINT ("Atom '%s' (serial %i) is not bonded\n", a->getName(), s);
+			DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), s, ia);
 			if (getNAtoms() == 1)
 				AtomAttorney::setType (*a, ATOM_SINGLE);
 
-			else if ( (s == 1) && (getNAtoms() > 1) )
+			else if ( (ia == 0) && (getNAtoms() > 1) )
 			{	
-				DPRINT ("\tit is a head atom");
-				Bonds.push_back (new Bond (a, Atoms.at(s)));
-				AtomAttorney::setType (*a, ATOM_HEAD);
+				// connect only if molecules in series
+				DPRINT ("\tit is a head atom\n");
+				Atom * next = Atoms.at(ia+1);
+				if (next->getSerial() == s + 1)
+				{
+					Bonds.push_back (new Bond (a, next));
+					AtomAttorney::setType (*a, ATOM_HEAD);
+				}
 			}
 
-			else if ( (s == getNAtoms() && (getNAtoms() > 1)) )
+			else if ( (ia == getNAtoms() - 1) && (getNAtoms() > 1) )
 			{
-				DPRINT ("\tit is a terminal atom");
-				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
-				AtomAttorney::setType (*a, ATOM_TERMINAL);
+				DPRINT ("\tit is a terminal atom\n");
+				Atom * prev = Atoms.at(ia-1);
+				if (prev->getSerial() == s-1)
+				{
+					Bonds.push_back (new Bond (a, prev));
+					AtomAttorney::setType (*a, ATOM_TERMINAL);
+				}
 			}
 
 			else
 			{
-				DPRINT ("\tit is a bonded atom");
-				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
-				Bonds.push_back (new Bond (a, Atoms.at(s)));
-				AtomAttorney::setType (*a, ATOM_BONDED);
+				DPRINT ("\tit is a bonded atom\n");
+				Atom * next = Atoms.at(ia+1);
+				if (next->getSerial() == s + 1)
+				{
+					Bonds.push_back (new Bond (a, next));
+					AtomAttorney::setType (*a, ATOM_BONDED);
+				}
+				Atom * prev = Atoms.at(ia-1);
+				if (prev->getSerial() == s-1)
+				{
+					Bonds.push_back (new Bond (a, prev));
+					AtomAttorney::setType (*a, ATOM_BONDED);
+				}
 			}
 		}
+		ia++;
 	}
 
 #ifdef DEBUG
@@ -263,6 +289,14 @@ void Molecule::printInfo (std::ostream * stream) const
 //	*stream << "Total charge " << getCharge() << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
 	*stream << "Total charge " << getCharge() << std::endl ;
 
+}
+
+// Save STR file
+void Molecule::printBBStr (const char * name) const
+{
+	std::ostream * stream = new std::ofstream (name);
+	printBBStr (stream);
+	delete stream;
 }
 
 void Molecule::printBBStr (std::ostream * stream) const

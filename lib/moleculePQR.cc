@@ -29,6 +29,9 @@
 bool Molecule::readPQR (std::ifstream * stream)
 {
 	std::string line;
+#ifdef DEBUG
+	unsigned int ia = 0;
+#endif
 
 	while (!stream->eof())
 	{
@@ -41,9 +44,22 @@ bool Molecule::readPQR (std::ifstream * stream)
 			} catch (const char * msg) {
 				return false;
 			}
+			DPRINT ("Adding %i th atom\n", ++ia);
 			Atoms.push_back (a);
 		}
 	}
+	DPRINT ("DONE: no more atoms\n");
+#ifdef DEBUG
+	ia = 0;
+	for (auto &a : Atoms)
+	{
+		DPRINT ("atom %u\n", ++ia);
+		a->printInfo (&std::cerr);
+	}
+#endif
+
 	return true;
+
+
 };
 
