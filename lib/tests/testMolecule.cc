@@ -44,11 +44,15 @@ int main (int argc, char ** argv)
   	Coord3D P1 (10.,10.,10.);
 	M.setPosition (P1);
 
+	// Read PDB
 	Molecule * MPDB = NULL;
 	try {
-		MPDB = new Molecule ("1.pdb");
+		MPDB = new Molecule (FILETYPE_PDB, "1.pdb");
 	} catch (const char * msg) {
-	    std::cerr << "Error: " << msg << std::endl;
+	    std::cerr << "Error creating a molecule from 1.pdb:  " << msg << std::endl;
+	    delete MPDB;
+	    MPDB = NULL;
+	    std::cerr << "pointer: " << MPDB << std::endl;
 	}
 	if (MPDB)
 	{
@@ -56,6 +60,23 @@ int main (int argc, char ** argv)
 		MPDB->moveTo(P1);
 	}
 
+	// Read PQR
+	Molecule * MPQR = NULL;
+	try {
+		MPQR = new Molecule (FILETYPE_PQR, "dna.pqr");
+	} catch (const char * msg) {
+		std::cerr << "Error creating a molecule from dna.pqr:  " << msg << std::endl;
+		delete MPQR;
+		MPQR = NULL;
+		std::cerr << "pointer: " << MPQR << std::endl;
+	}
+	if (MPQR)
+	{
+		MPQR->printBBStr (&std::cout); 
+		MPQR->moveTo(P1);
+	}
+
+	// Test overlap 
 	try {
 		if (M.overlap (A))
 			std::cout << "Atom A overlaps with Molecule M" << std::endl;
@@ -80,19 +101,24 @@ int main (int argc, char ** argv)
 	std::cout << std::endl;
 
 	A.printBBStr (&std::cout);
-	M.printBBStr (&std::cout); 
+	M.printBBStr (&std::cout);
 	if (MPDB)
+	{
 		MPDB->printBBStr (&std::cout); 
 
-	try {
-		double x = 2.;
-		MPDB->foreachAtom (PrintAtom, (void*) &x);
-	} catch (const char* msg) {
-		std::cerr << msg << std::endl;
+		try {
+			double x = 2.;
+			MPDB->foreachAtom (PrintAtom, (void*) &x);
+		} catch (const char* msg) {
+			std::cerr << msg << std::endl;
+		}
 	}
 
 	if (MPDB)
 		delete MPDB;
+
+	if (MPQR)
+		delete MPQR;
 
 	return 1;
 }

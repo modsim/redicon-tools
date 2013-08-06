@@ -40,6 +40,13 @@ typedef enum {
 
 } AtomType;
 
+typedef enum {
+	FILETYPE_PDB,
+	FILETYPE_PQR,
+	FILETYPE_STR
+
+} FileType;
+
 class Residue;
 class Molecule;
 class Bond;
@@ -52,10 +59,9 @@ class Atom
 		Atom (const char * name, unsigned int serial, const Point3D & coord,
 			double hs_radius, double hd_radius,
 			double charge, double LJ, double mass);
-		Atom (const char * name, double radius); // simplified constructor
-
+		explicit Atom (const char * name, double radius); // simplified constructor
+		explicit Atom (unsigned int ft, const std::string & string); // get from a line of a specific file type
 		Atom (const Atom &); // copy constructor
-		Atom (const std::string & string); // get prom PDB HETATM or ATOM string, or from BD_BOX's STR
 
 		~Atom ();
 
@@ -101,6 +107,11 @@ class Atom
 	private:
 	
 		friend class AtomAttorney; 
+
+		// Read a line of the corresponding file formats
+		bool readPDB (const std::string & line);
+		bool readPQR (const std::string & line);
+		bool readSTR (const std::string & line);
 
 		// Ownerships
 		Residue * residue;   // residue I belong to, none=NULL

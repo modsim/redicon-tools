@@ -38,6 +38,7 @@ Atom::Atom (const char * name, double radius)
 	Atom::name = strdup (name);
 	typeName = type2name ();
 };
+
 // full construct 
 Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 			double hs_radius, double hd_radius,
@@ -51,6 +52,39 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 	typeName = type2name ();
 	Atom::r = new Point3D (r);
 };
+
+
+// construct from the line
+Atom::Atom (unsigned int ft, const std::string & line) 
+	: residue(NULL), molecule (NULL), 
+	hs_radius(1.), LJ (0.0), hd_radius (1.), mass (1.0), 
+	type (ATOM_FREE), 
+	userData(NULL)
+{ 
+
+#ifdef DEBUG
+	std::cerr << line << std::endl;
+#endif
+
+	switch (ft) {
+	
+		case FILETYPE_PQR: 
+			if (!readPQR (line))
+				throw "Atom::Atom(): Reading a PQR line failed";
+			break;
+
+		case FILETYPE_PDB: 
+			if (!readPDB (line))
+				throw "Atom::Atom(): Reading a PDB line failed";
+			break;
+
+		default:
+			throw "Atom::Atom(): Unsupported or unimplemented file type";
+
+	}
+	typeName = type2name ();
+}
+
 
 // copy constructor (make a free brother)
 Atom::Atom (const Atom & a) 

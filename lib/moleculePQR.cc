@@ -1,4 +1,4 @@
-/*  moleculePDB.cc 2013-08-02 valiska@gmail.com
+/*  moleculePQR.cc 2013-08-06 valiska@gmail.com copied from moleculePDB.cc
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
@@ -26,7 +26,7 @@
 //#define DEBUG
 #include "defines.h"
 
-bool Molecule::readPDB (std::ifstream * stream)
+bool Molecule::readPQR (std::ifstream * stream)
 {
 	std::string line;
 
@@ -37,7 +37,7 @@ bool Molecule::readPDB (std::ifstream * stream)
 		{	
 			Atom * a;
 			try {
-				a = new Atom(FILETYPE_PDB, line);
+				a = new Atom(FILETYPE_PQR, line);
 			} catch (const char * msg) {
 				return false;
 			}

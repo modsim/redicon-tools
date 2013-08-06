@@ -40,6 +40,100 @@ Molecule::Molecule (const char * name, Atom a) : owner (NULL)
 	AtomAttorney::setType (*head, ATOM_SINGLE);
 };
 
+// Read from a file
+Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
+{
+
+	Molecule::name = strdup (file);
+	std::ifstream stream (file);
+	
+	if (stream.rdstate() != std::ios_base::goodbit) 
+	{
+		free (name);
+		throw "Cannot open file." ;
+	}
+
+	switch (ft) {
+	
+
+		case FILETYPE_PDB:
+			if (!readPDB (&stream))
+			{
+				stream.close();
+				free (Molecule::name);
+				for (auto &a : Atoms)
+					delete a;
+				throw "Molecule::Molecule(): Reading a PDB file failed";
+			}
+			break;
+
+		case FILETYPE_PQR: 
+			if (!readPQR (&stream))
+			{
+				free (Molecule::name);
+				stream.close();
+				for (auto &a : Atoms)
+					delete a;
+				throw "Molecule::Molecule(): Reading a PQR file failed";
+			}
+			break;
+
+		default:
+			free (name);
+			stream.close();
+			throw "Molecule::Molecule(): Unsupported or unimplemented file type";
+
+	}
+	stream.close ();
+
+	// Analyze what we read
+	head = Atoms.at (0);
+	AtomAttorney::setType (*head, ATOM_HEAD);
+
+	charge = 0;
+	for (auto &a : Atoms) // C++0x
+	{
+		charge += a->getCharge();
+		AtomAttorney::claimOwnership (*a, *this);
+		if ( a->getNBonds() == 0 )
+		{ // unbonded atom, bond to the neighbouring atoms from serials
+			unsigned int s = a->getSerial ();
+			DPRINT ("Atom '%s' (serial %i) is not bonded\n", a->getName(), s);
+			if (getNAtoms() == 1)
+				AtomAttorney::setType (*a, ATOM_SINGLE);
+
+			else if ( (s == 1) && (getNAtoms() > 1) )
+			{	
+				DPRINT ("\tit is a head atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s)));
+				AtomAttorney::setType (*a, ATOM_HEAD);
+			}
+
+			else if ( (s == getNAtoms() && (getNAtoms() > 1)) )
+			{
+				DPRINT ("\tit is a terminal atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
+				AtomAttorney::setType (*a, ATOM_TERMINAL);
+			}
+
+			else
+			{
+				DPRINT ("\tit is a bonded atom");
+				Bonds.push_back (new Bond (a, Atoms.at(s-2)));
+				Bonds.push_back (new Bond (a, Atoms.at(s)));
+				AtomAttorney::setType (*a, ATOM_BONDED);
+			}
+		}
+	}
+
+#ifdef DEBUG
+	for (auto &a : Atoms) // C++0x
+		a->printInfo (&std::cerr);
+#endif
+
+}
+
+// annihilator
 Molecule::~Molecule () 
 {
 	if (owner)

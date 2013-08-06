@@ -35,10 +35,8 @@ class Molecule
 {
 	public:
 		Molecule (const char * name, Atom head);
-		Molecule (const char * file);
-
+		Molecule (unsigned int ft, const char * file);
 		~Molecule ();
-		
 
 		bool isOwned () {if (owner) return true; else return false;};
 
@@ -88,7 +86,10 @@ class Molecule
 	private:
 
 		friend class MoleculeAttorney;
-	
+		
+		bool readPDB (std::ifstream *);
+		bool readPQR (std::ifstream *);
+
 		// TODO:
 		//addAtom (Atom &);
 		//getAtom (unsigned int );

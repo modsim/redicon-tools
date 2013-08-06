@@ -1,4 +1,5 @@
-/*  atomString.cc 2013-08-02 valiska@gmail.com
+/*  atomPQR.cc 2013-08-02 valiska@gmail.com
+ *  get an Atom from PQR line
  *
  * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
  *
@@ -27,48 +28,40 @@
 
 // For PDB ATOM see http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
 
-//#define DEBUG
+#define DEBUG
 #include "defines.h"
 
-bool Atom::readPDB (const std::string & line) 
+bool Atom::readPQR (const std::string & line) 
 { 
 
 #ifdef DEBUG
-	std::cerr << "Atom::readPDB(): '" << line << "'" << std::endl;
+	std::cerr << "Atom::readPQR(): '" << line << "'" << std::endl;
 #endif
-	std::string str;
-
-	str = line.substr (0,6);
-	if ( (str.find ("ATOM", 0) == std::string::npos) && (str.find ("HETATM", 0) == std::string::npos) )
+	std::string str = line.substr (0,5);
+	if ( (str.find ("ATOM", 0) == std::string::npos) && (str.find ("HEtATM", 0) == std::string::npos) )
 	{
 		BCPT_ERROR ("Not an ATOM or HETATM record");
 		return false;
 	}
 
-	str = line.substr (6, 5);
-	serial = atoi(str.c_str());
+	// assume a PQR line a space separated line with the needed values
+	const char * cline = line.c_str();
+	char keyword[6];
+	name = (char*) malloc (4 * sizeof (char));
+	char residue_name[3];
+	unsigned int residue_number;
+	double x,y,z;
 
-	str = line.substr (12, 4);
-	name = strdup(str.c_str());
-
- 	// FIXME: we ignore chars from 17 to 31
-
-	str = line.substr (30, 8);
-	double x = atof (str.c_str());
-
-	str = line.substr (38, 8);
-	double y = atof (str.c_str());
-
-	str = line.substr (46, 8);
-	double z = atof (str.c_str());
-	r = new Point3D (x, y, z);
-
-	try {
-		str = line.substr (79,2);
-	} catch (const std::out_of_range & oor) {
-		BCPT_WARNING ("No charge: string out of range, setting to zero.");
-		charge = 0;
+	if ( sscanf (cline, "%s %u %s %s %u %lf %lf %lf %lf %lf", 
+		&keyword, &serial, name, &residue_name, &residue_number, 
+		&x, &y, &z, &charge, &hs_radius) != 10)
+	{
+		BCPT_ERROR ("Error parsing a PQR line");
+		free (name);
+		return false;
 	}
+	hd_radius = hs_radius;
+	r = new Point3D (x, y, z);
 	return true;
 };
 
