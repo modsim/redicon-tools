@@ -42,6 +42,11 @@ class Molecule
 
 		bool isOwned () {if (owner) return true; else return false;};
 
+		// Bind atoms with their neighbors (determined by the serial number)
+		// if they are not yet binded
+		bool setBondsLinear (double eps, double H);
+		//bool setBondsLinear (double rmin, double rmax, double H);
+
 		// Position
 		bool positionIsSet () const {return head->positionIsSet();};
 		Point3D * positionCopy () const { return head->positionCopy();};

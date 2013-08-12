@@ -33,7 +33,8 @@ bool Molecule::readPDB (std::ifstream * stream)
 	while (!stream->eof())
 	{
 		std::getline (*stream, line);
-		if ( (line.find ("ATOM", 0) != std::string::npos) || (line.find ("HETATM", 0) != std::string::npos) )
+		std::string str = line.substr (0,6);
+		if ( (str.find ("ATOM", 0) != std::string::npos) || (str.find ("HETATM", 0) != std::string::npos) )
 		{	
 			Atom * a;
 			try {

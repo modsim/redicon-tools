@@ -38,7 +38,7 @@ bool Atom::readPQR (const std::string & line)
 	std::cerr << "Atom::readPQR(): '" << line << "'" << std::endl;
 #endif
 	std::string str = line.substr (0,6);
-	if ( (str.find ("ATOM", 0) == std::string::npos) && (str.find ("HEtATM", 0) == std::string::npos) )
+	if ( (str.find ("ATOM", 0) == std::string::npos) && (str.find ("HETATM", 0) == std::string::npos) )
 	{
 		BCPT_ERROR ("Not an ATOM or HETATM record");
 		return false;

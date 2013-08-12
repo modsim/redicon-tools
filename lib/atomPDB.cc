@@ -65,6 +65,8 @@ bool Atom::readPDB (const std::string & line)
 
 	try {
 		str = line.substr (79,2);
+		charge = atof (str.c_str());
+
 	} catch (const std::out_of_range & oor) {
 		BCPT_WARNING ("No charge: string out of range, setting to zero.");
 		charge = 0;

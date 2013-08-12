@@ -87,76 +87,19 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 	}
 	stream.close ();
 
-	// Analyze what we read
 	head = Atoms.at (0);
 	AtomAttorney::setType (*head, ATOM_HEAD);
 
 	DPRINT ("*** File read, running over atoms\n");
-
 	charge = 0;
-	unsigned long int ia = 0;
 	for (auto &a : Atoms) // C++0x
 	{
-		DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), a->getSerial(), ia);
-
 		charge += a->getCharge();
 		AtomAttorney::claimOwnership (*a, *this);
-
-		if ( a->getNBonds() == 0 )
-		{ // unbonded atom, bond to the neighbouring atoms from serials
-			unsigned int s = a->getSerial ();
-			DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), s, ia);
-			if (getNAtoms() == 1)
-				AtomAttorney::setType (*a, ATOM_SINGLE);
-
-			else if ( (ia == 0) && (getNAtoms() > 1) )
-			{	
-				// connect only if molecules in series
-				DPRINT ("\tit is a head atom\n");
-				Atom * next = Atoms.at(ia+1);
-				if (next->getSerial() == s + 1)
-				{
-					Bonds.push_back (new Bond (a, next));
-					AtomAttorney::setType (*a, ATOM_HEAD);
-				}
-			}
-
-			else if ( (ia == getNAtoms() - 1) && (getNAtoms() > 1) )
-			{
-				DPRINT ("\tit is a terminal atom\n");
-				Atom * prev = Atoms.at(ia-1);
-				if (prev->getSerial() == s-1)
-				{
-					Bonds.push_back (new Bond (a, prev));
-					AtomAttorney::setType (*a, ATOM_TERMINAL);
-				}
-			}
-
-			else
-			{
-				DPRINT ("\tit is a bonded atom\n");
-				Atom * next = Atoms.at(ia+1);
-				if (next->getSerial() == s + 1)
-				{
-					Bonds.push_back (new Bond (a, next));
-					AtomAttorney::setType (*a, ATOM_BONDED);
-				}
-				Atom * prev = Atoms.at(ia-1);
-				if (prev->getSerial() == s-1)
-				{
-					Bonds.push_back (new Bond (a, prev));
-					AtomAttorney::setType (*a, ATOM_BONDED);
-				}
-			}
-		}
-		ia++;
-	}
-
 #ifdef DEBUG
-	for (auto &a : Atoms) // C++0x
 		a->printInfo (&std::cerr);
 #endif
-
+	}
 }
 
 // annihilator
@@ -171,6 +114,69 @@ Molecule::~Molecule ()
 	for (auto &b : Bonds) // C++0x
 		delete b;
 };
+
+bool Molecule::setBondsLinear (double eps, double H)
+{
+	unsigned long int ia = 0;
+	for (auto &a : Atoms) // C++0x
+	{
+		DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), a->getSerial(), ia);
+
+		if ( a->getNBonds() == 0 )
+		{ 
+			// unbonded atom, bond to the neighbouring atoms from serials
+			unsigned int s = a->getSerial ();
+			DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), s, ia);
+			if (getNAtoms() == 1)
+				AtomAttorney::setType (*a, ATOM_SINGLE);
+
+			else if ( (ia == 0) && (getNAtoms() > 1) )
+			{	
+				// connect only if molecules in series
+				DPRINT ("\tit is a head atom\n");
+				Atom * next = Atoms.at(ia+1);
+				if (next->getSerial() == s + 1)
+				{
+					Bonds.push_back (new Bond (a, next, eps, H));
+					AtomAttorney::setType (*a, ATOM_HEAD);
+				}
+			}
+
+			else if ( (ia == getNAtoms() - 1) && (getNAtoms() > 1) )
+			{
+				DPRINT ("\tit is a terminal atom\n");
+				Atom * prev = Atoms.at(ia-1);
+				if (prev->getSerial() == s-1)
+				{
+					Bonds.push_back (new Bond (a, prev, eps, H));
+					AtomAttorney::setType (*a, ATOM_TERMINAL);
+				}
+			}
+
+			else
+			{
+				DPRINT ("\tit is a bonded atom\n");
+				Atom * next = Atoms.at(ia+1);
+				if (next->getSerial() == s + 1)
+				{
+					Bonds.push_back (new Bond (a, next, eps, H));
+					AtomAttorney::setType (*a, ATOM_BONDED);
+				}
+				Atom * prev = Atoms.at(ia-1);
+				if (prev->getSerial() == s-1)
+				{
+					Bonds.push_back (new Bond (a, prev, eps, H));
+					AtomAttorney::setType (*a, ATOM_BONDED);
+				}
+			}
+		}
+		ia++;
+	}
+
+	return true;
+}
+
+
 
 // Position
 // set (virtual method, default to check and warn)

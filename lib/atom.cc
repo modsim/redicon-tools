@@ -31,7 +31,7 @@
 Atom::Atom (const char * name, double radius) 
 	: residue(NULL), molecule (NULL), residue_name (NULL),
 	serial(0), hs_radius(radius), charge(0.0), 
-	LJ (0.0), hd_radius (radius), mass (1.0), r(NULL), 
+	LJ (0.5), hd_radius (radius), mass (1.0), r(NULL), 
 	type (ATOM_FREE), 
 	userData(NULL)
 { 
@@ -58,7 +58,7 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 // construct from the line
 Atom::Atom (unsigned int ft, const std::string & line) 
 	: residue(NULL), molecule (NULL), residue_name (NULL), 
-	hs_radius(1.), LJ (0.0), hd_radius (1.), mass (1.0), 
+	hs_radius(1.), LJ (0.5), hd_radius (1.), mass (1.0), 
 	type (ATOM_FREE), 
 	userData(NULL)
 { 
@@ -85,7 +85,6 @@ Atom::Atom (unsigned int ft, const std::string & line)
 	}
 	typeName = type2name ();
 }
-
 
 // copy constructor (make a free brother)
 Atom::Atom (const Atom & a) 
@@ -201,7 +200,7 @@ bool Atom::overlap (const Atom & a) const
 	if (!r)
 		throw "Atom's position not set";
 
-	double dist_min = 0.5 * (hs_radius + a.getHSRadius());
+	double dist_min =hs_radius + a.getHSRadius();
 	Point3D * ra = a.positionCopy();
 
 	if (!ra)

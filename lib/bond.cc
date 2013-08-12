@@ -25,7 +25,9 @@
 
 #include "defines.h"
 
-Bond::Bond (Atom * a, Atom * b) : a(a), b(b), userData (NULL)
+#define DEPS    0.0
+
+Bond::Bond (Atom * a, Atom * b, double eps, double H) : a(a), b(b), H(H), userData (NULL)
 {
 	if (a == b)
 		throw "Cannot create a bond between the same atom.";
@@ -34,14 +36,14 @@ Bond::Bond (Atom * a, Atom * b) : a(a), b(b), userData (NULL)
 	{ // try to get bond length & set rigid bond
 		const Point3D * p1 = a->positionPtr();
 		const Point3D * p2 = b->positionPtr();
-		rmin = rmax = p1->distanceTo (*p2);
-		H = 1.;
-	//	BCPT_WARNING ("setting rigid bond length to %g", rmin);
+		double d = p1->distanceTo (*p2);
+		rmin = d - eps* d;
+		rmax = d + eps * d;
 	}
 	else
 	{
-		BCPT_WARNING ("cannot get bond length, setting rigid bond to zero");
-		rmin = rmax = H = 0.0;
+		BCPT_ERROR ("cannot get the 'ground state' bond length");
+		throw ("cannot get the 'ground state' bond length");
 	}
 
 	AtomAttorney::setType (*a, ATOM_BONDED);

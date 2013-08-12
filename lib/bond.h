@@ -30,7 +30,7 @@
 class Bond
 {
 	public:
-		Bond (Atom * a1, Atom * a2);
+		Bond (Atom * a1, Atom * a2, double eps, double H);
 		Bond (Atom * a1, Atom * a2, double rmin, double rmax, double H);
 		~Bond () {};
 		

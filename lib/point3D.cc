@@ -90,7 +90,7 @@ double Point3D::norm () const
 
 double Point3D::distanceTo (const Point3D & a) const
 {
-	double r2 = 0;
+	double r2 = 0.0;
 	for (unsigned int i = 0; i < dim; i++)
 		r2 += pow2(r[i] - a.get(i));
 
