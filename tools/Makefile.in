@@ -70,7 +70,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_molsys_create_OBJECTS = molsys.$(OBJEXT) str.$(OBJEXT)
 molsys_create_OBJECTS = $(am_molsys_create_OBJECTS)
 molsys_create_DEPENDENCIES = $(top_srcdir)/lib/libMol.la
-am_pdb2str_OBJECTS = pdb2str.$(OBJEXT)
+am_pdb2str_OBJECTS = pdb2str.$(OBJEXT) str.$(OBJEXT)
 pdb2str_OBJECTS = $(am_pdb2str_OBJECTS)
 pdb2str_DEPENDENCIES = $(top_srcdir)/lib/libMol.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -227,7 +227,7 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
 AM_LDFLAGS = -pedantic -ansi 
 #-fwritable-strings
-pdb2str_SOURCES = pdb2str.cc
+pdb2str_SOURCES = pdb2str.cc str.c
 pdb2str_LDADD = $(top_srcdir)/lib/libMol.la
 molsys_create_SOURCES = molsys.cc str.h str.c 
 molsys_create_LDADD = $(top_srcdir)/lib/libMol.la

@@ -37,7 +37,8 @@ Bond::Bond (Atom * a, Atom * b, double eps, double H) : a(a), b(b), H(H), userDa
 		const Point3D * p1 = a->positionPtr();
 		const Point3D * p2 = b->positionPtr();
 		double d = p1->distanceTo (*p2);
-		rmin = d - eps* d;
+		r0 = d;
+		rmin = d - eps * d;
 		rmax = d + eps * d;
 	}
 	else
@@ -101,6 +102,6 @@ void Bond::printInfo (std::ostream * stream) const
 
 void Bond::printBBStr (std::ostream * stream) const
 {
-	*stream << "bond " <<  a->getSerial() << " " << b->getSerial() << " " << rmin << " " << rmax << " " << H << std::endl ;
+	*stream << "bond " <<  a->getSerial() << " " << b->getSerial() << " " << r0 << " " << rmax << " " << H << std::endl ;
 }
 

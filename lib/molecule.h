@@ -42,7 +42,7 @@ class Molecule
 
 		bool isOwned () {if (owner) return true; else return false;};
 
-		// Bind atoms with their neighbors (determined by the serial number)
+		// Bind atoms with their neighbours (determined by the serial numbers)
 		// if they are not yet binded
 		bool setBondsLinear (double eps, double H);
 		//bool setBondsLinear (double rmin, double rmax, double H);

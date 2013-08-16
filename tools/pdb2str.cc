@@ -30,6 +30,7 @@
 #include <fstream>
 
 #include <molecule.h>
+#include "str.h"
 
 static const char * myname = "pdb2str";
 void usage () 
@@ -39,6 +40,8 @@ void usage ()
 
 	fprintf (stderr, " -p, --pdb-file=FILE          input PDB or PQR file name.\n");
 	fprintf (stderr, " -s, --str-file=FILE          output file name for BD_BOX's str file format.\n");
+	fprintf (stderr, " -b, --bind-atoms=EPS,H       bind atoms if not bonded with deviation eps\n"
+	                 "                              and the 'spring constant' H.\n");
 
 	fprintf (stderr, " -v, --version                print version iformation and exit.\n");
 	fprintf (stderr, " -h, --help                   print this message and exit.\n");
@@ -51,13 +54,15 @@ int main (int argc, char ** argv)
 	std::string pdb;
 	std::string str;
 
+	double * BondInfo = NULL;
+	int nBondInfo = 0;
 	/* 
 	 * Command-line parser 
 	 */  
 
 	int c = 0;
 
-#define ARGS    "hvp:s:"
+#define ARGS    "hvp:s:b:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -67,7 +72,8 @@ int main (int argc, char ** argv)
 			{"version", no_argument, NULL, 'v'},
 
 			{"pdb-file", required_argument, NULL, 'p'},
-			{"str-file", no_argument, NULL, 's'},
+			{"str-file", required_argument, NULL, 's'},
+			{"bond", required_argument, NULL, 'b'},
 
 		};
 
@@ -81,6 +87,18 @@ int main (int argc, char ** argv)
 					  break;
 				case 's': 
 					  str = std::string (optarg);
+					  break;
+					  break;
+				case 'b':
+					  BondInfo = (double*) malloc ( 2 * sizeof (double));
+					  nBondInfo = str2dlist (&optarg, ",", &BondInfo);
+						  if (nBondInfo != 2)
+						  {
+							  free(BondInfo);
+							  fprintf (stderr, "%s: error: -b option requeres two argments: bond separation relative to the read separations, and the spring constant, use '%s -H EPS,H'\n", myname, myname);
+							  return 1;
+
+						  }
 					  break;
 
 				case 'h': usage (); exit (1); break;
@@ -114,11 +132,17 @@ int main (int argc, char ** argv)
 		return 1;
 	}
 
+	if (BondInfo)
+		M->setBondsLinear (BondInfo[0], BondInfo[1]);
+
 	std::cerr << "writing to a STR file " << str << std::endl;
 	M->printBBStr (str.c_str());
 
 	// Free everythiong
 	delete M;
+
+	if (BondInfo)
+		free (BondInfo);
 
 	return 1;
 }

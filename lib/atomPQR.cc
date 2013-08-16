@@ -68,6 +68,12 @@ bool Atom::readPQR (const std::string & line)
 		return false;
 	}
 
+	if (hs_radius == 0.0)
+	{
+		BCPT_WARNING ("Atom %s (%i) has zero radius, resetting to one", name, serial);
+		hs_radius = .4;
+	}
+
 	free (keyword);
 
 	hd_radius = hs_radius;

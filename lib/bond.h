@@ -58,7 +58,7 @@ class Bond
 	
 		Atom * a;
 		Atom * b;
-		double rmin, rmax, H;
+		double r0, rmin, rmax, H;
 
 		void * userData;
 };
