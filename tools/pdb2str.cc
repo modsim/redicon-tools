@@ -123,9 +123,20 @@ int main (int argc, char ** argv)
 	
 	Molecule * M;
 	if (pdb.rfind(".pdb") != std::string::npos)
-		M = new Molecule (FILETYPE_PDB, pdb.c_str());
+		try {
+			M = new Molecule (FILETYPE_PDB, pdb.c_str());
+		} catch (const char * msg) {
+			printf ("Error cautgh: %s\n", msg);
+			return 1;
+		}
 	else if (pdb.rfind(".pqr") != std::string::npos)
-		M = new Molecule (FILETYPE_PQR, pdb.c_str());
+		try {
+			M = new Molecule (FILETYPE_PQR, pdb.c_str());
+		} catch (const char * msg) {
+			printf ("Error cautgh: %s\n", msg);
+			return 1;
+		}
+
 	else
 	{
 		std::cerr << myname << ": error: unknown file extension " << pdb << std::endl;

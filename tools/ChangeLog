@@ -1,3 +1,7 @@
+2013-08-19  version 0.1.15  <s.kondrat@fz-juelich.de>
+
+	* pdb2str.cc: try/catch block for molecule constructor.
+
 2013-08-19  version 0.1.14  <s.kondrat@fz-juelich.de>
 
 	* analyze-xyz.py: bug fixes.
