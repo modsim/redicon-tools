@@ -1,0 +1,46 @@
+2013-08-19  version 0.1.14  <s.kondrat@fz-juelich.de>
+
+	* analyze-xyz.py: bug fixes.
+
+2013-08-16  version 0.1.13  <s.kondrat@fz-juelich.de>
+
+	* analyze-xyz.py: create a data file with positions, deviations,
+	and MSD and diffusion coefficient as functions of time.
+
+	* pdb2str.cc: -b (bind atoms) option.
+
+2013-08-06 20:20 CEST  version 0.1.11  <s.kondrat@fz-juelich.de>
+
+	* pdb2str.cc: create BD_BOX's str from a PDB/PQR file.
+
+2013-08-05 16:10 CEST  version 0.1.7  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: monatomic to use setPosition().
+
+2013-08-05 13:45 CEST  version 0.1.6  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: no malloc() molecules pointers, use
+	System::tryDelete();
+
+2013-08-02 20:00 CEST  version 0.1.4  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: Coord3D -> Point3D from lib/.
+
+2013-08-01 18:35 CEST  version 0.0.14 -> 0.1.0  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: -d, -j, -m options added.
+
+2013-08-01 15:45 CEST  version 0.0.13  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: check molcules names, other bug fixes.
+
+2013-08-01 14:45 CEST  version 0.0.12  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: adopted to new atom/molecule iface changes. tests
+	OK.
+
+2013-07-31 20:30 CEST  version 0.0.10  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: create a system of molecules and save to str file
+	format. Single-atom molecules supported so far, may features to
+	be added.

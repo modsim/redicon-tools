@@ -24,8 +24,8 @@ from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option("-f", "--file", help="file name with data for eta", metavar="FILE", type="string", dest="filename")
-parser.add_option("-k", "--line-from", help="track atoms from given line", metavar="VAL", type="int", dest="k")
-parser.add_option("-n", "--to-line", help="track atoms to given line", metavar="VAL", type="int", dest="n")
+parser.add_option("-k", "--line-from", help="track atoms from given line (0,1,...)", metavar="VAL", type="int", dest="k")
+parser.add_option("-n", "--number-of-lines", help="track given number of lines", metavar="VAL", type="int", dest="n")
 parser.add_option("-l", "--lines", help="track atoms from comma-separated lines", metavar="VAL", type="int", dest="l")
 
 # Grab options
@@ -53,6 +53,7 @@ if options.l:
 
 
 debug = False
+#debug = True
 
 # Time and centre of a 'molecule' position
 time = [];
@@ -61,12 +62,8 @@ ry = [];
 rz = []; 
 
 # Runnig vars
-iline = itime = size = 0
+iline = itime = size = natoms = 0
 xo = yo = zo = 0.0;
-
-# Print when and from what file
-t = datetime.datetime.now()
-print '# Created by analyze-xyz.py on %s at %s from %s' % (t.strftime("%d-%m-%Y"), t.strftime("%H:%M:%S %Z"), filename)
 
 for line in fileinput.input(filename):
 	if debug:
@@ -80,7 +77,6 @@ for line in fileinput.input(filename):
 		tokens = line.split()
 		if iline == 0:
 			size = int(tokens[0])	
-			print '# System sconsists of %i atoms' % (size)
 			if n == 0:
 				n = size;
 		else:
@@ -95,11 +91,16 @@ for line in fileinput.input(filename):
 			print 'Averaging: iline =%i, itime = %i, size=%i => %i' % (iline, itime, size, iline/(size+2))
 
 		if iline != 1:
-			rx.append (xo/(n-k)); 	
-			ry.append (yo/(n-k)); 
-			rz.append (zo/(n-k)); 
+			if natoms != n:
+				print 'Internal error, number of atoms read %i and expected %i are not the same :(' % (natoms, n)
+    				sys.exit()
+			
+			rx.append (xo/(natoms));
+			ry.append (yo/(natoms));
+			rz.append (zo/(natoms)); 
 
 			itime = itime + 1
+			natoms = 0;
 			xo = yo = zo = 0.0;
 
 		tokens = line.split();
@@ -110,9 +111,10 @@ for line in fileinput.input(filename):
 			time.append ( float(itime) )
 
 	# if atom - position lines of interest
-	elif iline - itime * (size - 2) > k and iline - itime * (size - 2) < n:
+	elif iline - itime * (size + 2) - 2 >= k and iline - itime * (size + 2) - 2 < k + n:
+		natoms = natoms + 1
 		if debug:
-			print '%i' % (iline)
+			print 'line %i, atom %i' % (iline, natoms)
 		tokens = line.split()
 		xo += float(tokens[1])
 		yo += float(tokens[2])
@@ -130,7 +132,14 @@ x0 = rx[0]
 y0 = ry[0]
 z0 = rz[0]
 
+# Save info lines to the file
+t = datetime.datetime.now()
+print '# Created by analyze-xyz.py on %s at %s from %s' % (t.strftime("%d-%m-%Y"), t.strftime("%H:%M:%S %Z"), filename)
+print '# System sconsists of %i atoms' % (size)
+print '# Tracking %i molecule(s) starting from %ith' % (n, k)
 print '# time (ps)    rx (A)   ry (A)   rz (A)    dr (A)    dr2 (A^2)    D (mum^2/s)'
+
+# run over time and calculate dr, msd, etc
 for j in range(0, len(time), 1):
 
 	dr2 = math.pow (x0 - rx[j], 2) + math.pow (y0 - ry[j], 2) + math.pow (z0 - rz[j], 2)
