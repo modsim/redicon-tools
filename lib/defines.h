@@ -32,16 +32,16 @@
 **********************************************/
 
 #define BCPT_WARNING(str...)     { fprintf(stderr, "\n*** BCP TOOLS WARNING: %s():", __ASSERT_FUNCTION); \
-		    fprintf(stderr, " "str); fprintf(stderr,"\n\n"); fflush(stderr); }
+		    fprintf(stderr, " " str); fprintf(stderr,"\n\n"); fflush(stderr); }
 
 
 #define BCPT_ERROR(str...)     { fprintf(stderr, "\n*** BCP TOOLS ERROR: %s():", __ASSERT_FUNCTION); \
-		    fprintf(stderr, " "str); fprintf(stderr,"\n\n"); fflush(stderr); }
+		    fprintf(stderr, " " str); fprintf(stderr,"\n\n"); fflush(stderr); }
 
 /* Critical errors/assertions which depend on user (given data, functions, etc) */
 #define BCPT_ASSERT(cond,str...) { \
   if (!(cond)) {\
-    fprintf(stderr, "\n*** BCP TOOLS CRITICAL ERROR: "str);\
+    fprintf(stderr, "\n*** BCP TOOLS CRITICAL ERROR: " str);\
     fprintf(stderr, " aborting.\n");\
     fflush(stderr);\
     abort();\
