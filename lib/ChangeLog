@@ -1,4 +1,8 @@
-2013-08-07 : CEST  version 0.1.12  <s.kondrat@fz-juelich.de>
+2013-08-23  version 0.1.16  <s.kondrat@fz-juelich.de>
+
+	* angle.{cc,h}: bond angles, compiles ok tests needed.
+
+2013-08-07  version 0.1.12  <s.kondrat@fz-juelich.de>
 
 	* bond.{cc,h}: constructor changes the interface to have shift
 	eps and constant H.
