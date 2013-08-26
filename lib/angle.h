@@ -71,6 +71,7 @@ class Angle
 		std::string typestr;
 		double alpha0, H;
 
+		bool atomsOK (const Atom &a1, const Atom &a2, const Atom &a3) const;
 		bool calcAngle (double * angle) const;
 		const std::string getTypeStr(void);
 };

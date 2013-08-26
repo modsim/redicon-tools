@@ -64,9 +64,14 @@ int main (int argc, char ** argv)
 		std::cerr << "error creating a bond: " << msg << std::endl;
 	}
 
+#define atom_pqr2 "ATOM      2  N   MET     1      4.673 -2.260  5.998 -0.2200 1.0000"
 	// Test bond angle
 	try {
-		Angle a (&A, &B, &C);
+		Atom A1 (FILETYPE_PDB, atom_pdb);
+		Atom A2 (FILETYPE_PQR, atom_pqr);
+		Atom A3 (FILETYPE_PQR, atom_pqr2);
+		Angle a (&A1, &A2, &A3);
+
 		a.printInfo(&std::cout);
 		a.printBBStr(&std::cout); 
 	} catch (const char * msg) {
