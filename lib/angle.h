@@ -72,7 +72,7 @@ class Angle
 		double alpha0, H;
 
 		bool calcAngle (double * angle) const;
-		std::string getTypeStr(void);
+		const std::string getTypeStr(void);
 };
 
 #endif /* __HAVE_BOND_H__ */

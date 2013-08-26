@@ -19,19 +19,21 @@
 
 #include "atom.h"
 #include "bond.h"
+#include "angle.h"
 
 int main (int argc, char ** argv) 
 {
 
 	Atom A ("A", 1.);
 	Atom B ("B", 2.);
+	Atom C ("B", 3.);
 
 // Read a PDB line
 #define atom_pdb "ATOM    145  N   VAL A  25      32.433  16.336  57.540  1.00 11.92      A1   N"
 	try {
-		Atom C (FILETYPE_PDB, atom_pdb);
-		C.printInfo (&std::cout); 
-		C.printBBStr (&std::cout); 
+		Atom D (FILETYPE_PDB, atom_pdb);
+		D.printInfo (&std::cout); 
+		D.printBBStr (&std::cout); 
 	} catch (const char * msg) {
 		std::cerr << msg << std::endl;
 	}
@@ -39,9 +41,9 @@ int main (int argc, char ** argv)
 // Read a PQR line
 #define atom_pqr "ATOM      1  N   MET     1      45.673 -25.260  52.998 -0.3200 2.0000"
 	try {
-		Atom C (FILETYPE_PQR, atom_pqr);
-		C.printInfo (&std::cout); 
-		C.printBBStr (&std::cout); 
+		Atom D (FILETYPE_PQR, atom_pqr);
+		D.printInfo (&std::cout); 
+		D.printBBStr (&std::cout); 
 	} catch (const char * msg) {
 		std::cerr << msg << std::endl;
 	}
@@ -54,11 +56,24 @@ int main (int argc, char ** argv)
 	}
 
 	// Test bonds
-	Bond b (&A, &B);
-	b.printInfo(&std::cout);
-	b.printBBStr(&std::cout); 
+	try {
+		Bond b (&A, &B, 0.1, 10.);
+		b.printInfo(&std::cout);
+		b.printBBStr(&std::cout);
+	} catch (const char * msg) {
+		std::cerr << "error creating a bond: " << msg << std::endl;
+	}
 
-	A.printInfo (&std::cout);
+	// Test bond angle
+	try {
+		Angle a (&A, &B, &C);
+		a.printInfo(&std::cout);
+		a.printBBStr(&std::cout); 
+	} catch (const char * msg) {
+		std::cerr << "error creating a bond angle: " << msg << std::endl;
+	}
+
+A.printInfo (&std::cout);
 	B.printInfo (&std::cout); 
 
 	std::cout << std::endl;
