@@ -5,7 +5,7 @@ libMol_la_SOURCES = point3D.cc point3D.h \
 	atom.h atom.cc atomPDB.cc atomPQR.cc \
 	bond.h bond.cc \
 	angle.h angle.cc \
-	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc \
+	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc moleculeBonds.cc moleculeAngles.cc \
 	monatomic.h \
 	system.h system.cc
 

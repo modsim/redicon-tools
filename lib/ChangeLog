@@ -1,3 +1,14 @@
+2013-08-29  version 0.1.20  <s.kondrat@fz-juelich.de>
+
+	* tests/testMolecule.cc: tests setAngleLinear() ok.
+
+	* moleculeAngle.cc: setAngleLinear(): create angle bonds in a
+	molecule walking along the 'chain'.
+
+	* angle.cc atom.cc molecule.cc: angle stuff addded.
+
+	* molecule.cc -> molecule.cc, moleculeBonds.cc:
+
 2013-08-26  18:30 CET  version 0.1.19  <s.kondrat@fz-juelich.de>
 
 	* angle.cc: get angle ok, check atoms ok.

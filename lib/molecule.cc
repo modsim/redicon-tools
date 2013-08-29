@@ -113,70 +113,10 @@ Molecule::~Molecule ()
 		delete a;
 	for (auto &b : Bonds) // C++0x
 		delete b;
+	for (auto &a : Angles) // C++0x
+		delete a;
+
 };
-
-bool Molecule::setBondsLinear (double eps, double H)
-{
-	unsigned long int ia = 0;
-	for (auto &a : Atoms) // C++0x
-	{
-		DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), a->getSerial(), ia);
-
-		if ( a->getNBonds() == 0 )
-		{ 
-			// unbonded atom, bond to the neighbouring atoms from serials
-			unsigned int s = a->getSerial ();
-			DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), s, ia);
-			if (getNAtoms() == 1)
-				AtomAttorney::setType (*a, ATOM_SINGLE);
-
-			else if ( (ia == 0) && (getNAtoms() > 1) )
-			{	
-				// connect only if molecules in series
-				DPRINT ("\tit is a head atom\n");
-				Atom * next = Atoms.at(ia+1);
-				if (next->getSerial() == s + 1)
-				{
-					Bonds.push_back (new Bond (a, next, eps, H));
-					AtomAttorney::setType (*a, ATOM_HEAD);
-				}
-			}
-
-			else if ( (ia == getNAtoms() - 1) && (getNAtoms() > 1) )
-			{
-				DPRINT ("\tit is a terminal atom\n");
-				Atom * prev = Atoms.at(ia-1);
-				if (prev->getSerial() == s-1)
-				{
-					Bonds.push_back (new Bond (a, prev, eps, H));
-					AtomAttorney::setType (*a, ATOM_TERMINAL);
-				}
-			}
-
-			else
-			{
-				DPRINT ("\tit is a bonded atom\n");
-				Atom * next = Atoms.at(ia+1);
-				if (next->getSerial() == s + 1)
-				{
-					Bonds.push_back (new Bond (a, next, eps, H));
-					AtomAttorney::setType (*a, ATOM_BONDED);
-				}
-				Atom * prev = Atoms.at(ia-1);
-				if (prev->getSerial() == s-1)
-				{
-					Bonds.push_back (new Bond (a, prev, eps, H));
-					AtomAttorney::setType (*a, ATOM_BONDED);
-				}
-			}
-		}
-		ia++;
-	}
-
-	return true;
-}
-
-
 
 // Position
 // set (virtual method, default to check and warn)
@@ -291,7 +231,9 @@ void Molecule::printInfo (char * name) const
 
 void Molecule::printInfo (std::ostream * stream) const
 {
-	*stream << "Molecule '" << name << "' has " << getNAtoms() << " atom(s) and " << getNBonds() << " bond(s). ";
+	*stream << "Molecule '" << name << "' has " << getNAtoms() << " atom(s), " << getNBonds() << " bond(s). " ;
+	*stream << "and " << getNAngles() << " angle bond(s). " ;
+
 //	*stream << "Total charge " << getCharge() << ", size (" << radius[0] << ", " << radius[1] << ", " << radius[2] << ")." << std::endl ;
 	*stream << "Total charge " << getCharge() << std::endl ;
 
@@ -312,6 +254,9 @@ void Molecule::printBBStr (std::ostream * stream) const
 
 	for (auto &b : Bonds) // C++0x
 		b->printBBStr (stream);
+
+	for (auto &a : Angles) // C++0x
+		a->printBBStr (stream);
 
 }
 

@@ -46,6 +46,9 @@ Angle::Angle (Atom * a1, Atom * a2, Atom * a3, AnglePotType type, double H, doub
 			alpha, alpha0);
 	}
 
+	AtomAttorney::addAngle (*a1, *this);
+	AtomAttorney::addAngle (*a2, *this);
+	AtomAttorney::addAngle (*a3, *this);
 };
 
 Angle::Angle (Atom * a1, Atom * a2, Atom * a3, AnglePotType type, double H) : type(type), H(H)
@@ -56,6 +59,10 @@ Angle::Angle (Atom * a1, Atom * a2, Atom * a3, AnglePotType type, double H) : ty
 	a[0] = a1; a[1] = a2; a[2] = a3;
 	typestr = getTypeStr();
 	calcAngle(&alpha0);
+
+	AtomAttorney::addAngle (*a1, *this);
+	AtomAttorney::addAngle (*a2, *this);
+	AtomAttorney::addAngle (*a3, *this);
 };
 
 Angle::Angle (Atom * a1, Atom * a2, Atom * a3, double H) : type(ANGLE_POTTYPE_SQUARE), H(H)
@@ -66,6 +73,10 @@ Angle::Angle (Atom * a1, Atom * a2, Atom * a3, double H) : type(ANGLE_POTTYPE_SQ
 	a[0] = a1; a[1] = a2; a[2] = a3;
 	typestr = getTypeStr();
 	calcAngle(&alpha0);
+
+	AtomAttorney::addAngle (*a1, *this);
+	AtomAttorney::addAngle (*a2, *this);
+	AtomAttorney::addAngle (*a3, *this);
 };
 
 Angle::Angle (Atom * a1, Atom * a2, Atom * a3, AnglePotType type) : type(type), H(1.0)
@@ -76,6 +87,10 @@ Angle::Angle (Atom * a1, Atom * a2, Atom * a3, AnglePotType type) : type(type), 
 	a[0] = a1; a[1] = a2; a[2] = a3;
 	typestr = getTypeStr();
 	calcAngle(&alpha0);
+
+	AtomAttorney::addAngle (*a1, *this);
+	AtomAttorney::addAngle (*a2, *this);
+	AtomAttorney::addAngle (*a3, *this);
 };
 
 Angle::Angle (Atom * a1, Atom * a2, Atom * a3) : type(ANGLE_POTTYPE_SQUARE), H(1.0)
@@ -86,6 +101,10 @@ Angle::Angle (Atom * a1, Atom * a2, Atom * a3) : type(ANGLE_POTTYPE_SQUARE), H(1
 	a[0] = a1; a[1] = a2; a[2] = a3;
 	typestr = getTypeStr();
 	calcAngle(&alpha0);
+
+	AtomAttorney::addAngle (*a1, *this);
+	AtomAttorney::addAngle (*a2, *this);
+	AtomAttorney::addAngle (*a3, *this);
 };
 
 const std::string Angle::getTypeStr () 

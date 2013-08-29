@@ -27,6 +27,7 @@
 
 #include <atom.h>
 #include <bond.h>
+#include <angle.h>
 
 class System;
 class MoleculeAttorney;
@@ -45,7 +46,8 @@ class Molecule
 		// Bind atoms with their neighbours (determined by the serial numbers)
 		// if they are not yet binded
 		bool setBondsLinear (double eps, double H);
-		//bool setBondsLinear (double rmin, double rmax, double H);
+		// set current angles to optimal lineraly along the molecule
+		bool setAnglesLinear (AnglePotType type, double H);
 
 		// Position
 		bool positionIsSet () const {return head->positionIsSet();};
@@ -61,6 +63,8 @@ class Molecule
 		// Get info
 		unsigned int getNAtoms () const {return Atoms.size();};
 		unsigned int getNBonds () const {return Bonds.size();};
+		unsigned int getNAngles () const {return Angles.size();};
+
 		double getCharge () const {return charge;};
 		char * getName () const {return name;};
 
@@ -85,6 +89,7 @@ class Molecule
 		Atom * head;
 		std::vector<Atom*> Atoms;
 		std::vector<Bond*> Bonds;
+		std::vector<Angle*> Angles;
 
 		// TODO:
 		//addAtom (Atom &);
@@ -108,7 +113,7 @@ class Molecule
 
 		unsigned int serial; // first atom's serial
 		unsigned int shiftSerial (unsigned int); // shift because it always set first atom to 1. Returns the serial of the last atom
-		unsigned int getSerial () const { return serial;}; // FIXME" why not make it public?
+		unsigned int getSerial () const { return serial;}; // FIXME: why not make it public?
 
 		char * name;
 

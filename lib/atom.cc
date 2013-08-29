@@ -125,6 +125,13 @@ bool Atom::addBond (Bond & b)
 	return false;
 }
 
+bool Atom::addAngle (Angle & a)
+{
+	// FIXME: do checks etc
+	Angles.push_back (&a);
+	return true;
+}
+
 // Type to name etc
 char * Atom::type2name () const
 {
@@ -251,7 +258,7 @@ void Atom::printInfo (char * name) const
 
 void Atom::printInfo (std::ostream * stream) const
 {
-	*stream << "Atom '" << name << "' (serial " << serial << ") is a "  << typeName << " and has " << getNNeighbours() << " neighbour(s) and " << getNBonds() << " bond(s)." << std::endl ;
+	*stream << "Atom '" << name << "' (serial " << serial << ") is a "  << typeName << " and has " << getNNeighbours() << " neighbour(s), " << getNBonds() << " bond(s)," << " and " << getNAngles() << " angle bond(s)."  << std::endl ;
 }
 
 void Atom::printBBStr (std::ostream * stream) const
