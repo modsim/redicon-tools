@@ -40,8 +40,10 @@ void usage ()
 
 	fprintf (stderr, " -p, --pdb-file=FILE          input PDB or PQR file name.\n");
 	fprintf (stderr, " -s, --str-file=FILE          output file name for BD_BOX's str file format.\n");
-	fprintf (stderr, " -b, --bind-atoms=EPS,H       bind atoms if not bonded with deviation eps\n"
+	fprintf (stderr, " -b, --bonds=EPS,H            bind atoms if not bonded with deviation eps\n"
 	                 "                              and the 'spring constant' H.\n");
+	fprintf (stderr, " -a, --angle=H                make bond angles along a 'chain' (serial numbers)\n"
+	                 "                              with the 'spring constant' H.\n");
 
 	fprintf (stderr, " -v, --version                print version iformation and exit.\n");
 	fprintf (stderr, " -h, --help                   print this message and exit.\n");
@@ -56,13 +58,14 @@ int main (int argc, char ** argv)
 
 	double * BondInfo = NULL;
 	int nBondInfo = 0;
+	double AngleH = 0.0;
 	/* 
 	 * Command-line parser 
 	 */  
 
 	int c = 0;
 
-#define ARGS    "hvp:s:b:"
+#define ARGS    "hvp:s:b:a:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -73,8 +76,8 @@ int main (int argc, char ** argv)
 
 			{"pdb-file", required_argument, NULL, 'p'},
 			{"str-file", required_argument, NULL, 's'},
-			{"bond", required_argument, NULL, 'b'},
-
+			{"bonds", required_argument, NULL, 'b'},
+			{"angles", required_argument, NULL, 'a'},
 		};
 
 		switch ((c = getopt_long (argc, argv, ARGS, long_options, &option_index))) 
@@ -99,6 +102,9 @@ int main (int argc, char ** argv)
 							  return 1;
 
 						  }
+					  break;
+
+				case 'a': AngleH= atof (optarg);
 					  break;
 
 				case 'h': usage (); exit (1); break;
@@ -145,6 +151,9 @@ int main (int argc, char ** argv)
 
 	if (BondInfo)
 		M->setBondsLinear (BondInfo[0], BondInfo[1]);
+
+	if (AngleH)
+		M->setAnglesLinear (ANGLE_POTTYPE_SQUARE, AngleH);
 
 	std::cerr << "writing to a STR file " << str << std::endl;
 	M->printBBStr (str.c_str());

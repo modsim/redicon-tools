@@ -1,3 +1,7 @@
+2013-08-22  version 0.1.21  <s.kondrat@fz-juelich.de>
+
+	* pdb2str.cc: -a angle, add angle bonds 'in series'.
+
 2013-08-22  version 0.1.15  <s.kondrat@fz-juelich.de>
 
 	* pdb2str.cc: try/catch block for molecule constructor.
