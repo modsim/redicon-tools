@@ -1,3 +1,8 @@
+2013-09-02  version 0.1.22  <s.kondrat@fz-juelich.de>
+
+	* atverage-me.py: average (coarse-grain) data files over a given
+	time/space interval. Tests needed.
+
 2013-08-22  version 0.1.21  <s.kondrat@fz-juelich.de>
 
 	* pdb2str.cc: -a angle, add angle bonds 'in series'.
