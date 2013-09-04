@@ -1,3 +1,7 @@
+2013-09-04  version 0.1.23  <s.kondrat@fz-juelich.de>
+
+	* pdb2str: -i (molecule info) option added.
+
 2013-09-02  version 0.1.22  <s.kondrat@fz-juelich.de>
 
 	* atverage-me.py: average (coarse-grain) data files over a given

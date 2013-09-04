@@ -44,6 +44,7 @@ void usage ()
 	                 "                              and the 'spring constant' H.\n");
 	fprintf (stderr, " -a, --angle=H                make bond angles along a 'chain' (serial numbers)\n"
 	                 "                              with the 'spring constant' H.\n");
+	fprintf (stderr, " -i, --info                   print info about the molecule.\n");
 
 	fprintf (stderr, " -v, --version                print version iformation and exit.\n");
 	fprintf (stderr, " -h, --help                   print this message and exit.\n");
@@ -59,13 +60,15 @@ int main (int argc, char ** argv)
 	double * BondInfo = NULL;
 	int nBondInfo = 0;
 	double AngleH = 0.0;
+
+	bool printInfo = false;
 	/* 
 	 * Command-line parser 
 	 */  
 
 	int c = 0;
 
-#define ARGS    "hvp:s:b:a:"
+#define ARGS    "hvip:s:b:a:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -76,6 +79,7 @@ int main (int argc, char ** argv)
 
 			{"pdb-file", required_argument, NULL, 'p'},
 			{"str-file", required_argument, NULL, 's'},
+			{"info", no_argument, NULL, 'i'},
 			{"bonds", required_argument, NULL, 'b'},
 			{"angles", required_argument, NULL, 'a'},
 		};
@@ -107,6 +111,9 @@ int main (int argc, char ** argv)
 				case 'a': AngleH= atof (optarg);
 					  break;
 
+				case 'i': printInfo = true;
+					  break;
+
 				case 'h': usage (); exit (1); break;
 
 				case 'v': printf ("%s %s\n", myname, VERSION); exit (1); break;
@@ -120,9 +127,9 @@ int main (int argc, char ** argv)
 	//
 	// Analyze options
 	//
-	if (pdb.empty() || str.empty())
+	if (pdb.empty())
 	{
-		std::cerr << myname << ": error: no input and/or output file, use "  << myname << " --help for help." << std::endl;
+		std::cerr << myname << ": error: no input file, use "  << myname << " --help for help." << std::endl;
 		return 1; /* failure */
 
 	}
@@ -155,8 +162,14 @@ int main (int argc, char ** argv)
 	if (AngleH)
 		M->setAnglesLinear (ANGLE_POTTYPE_SQUARE, AngleH);
 
-	std::cerr << "writing to a STR file " << str << std::endl;
-	M->printBBStr (str.c_str());
+	if (!str.empty())
+	{
+		std::cerr << "writing to a STR file " << str << std::endl;
+		M->printBBStr (str.c_str());
+	}
+
+	if (printInfo)
+		M->printInfo (&std::cout);
 
 	// Free everythiong
 	delete M;
