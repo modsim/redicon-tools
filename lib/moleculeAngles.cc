@@ -23,7 +23,7 @@
 
 #include<molecule.h>
 
-#define DEBUG
+//#define DEBUG
 #include "defines.h"
 
 

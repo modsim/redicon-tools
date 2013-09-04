@@ -62,6 +62,7 @@ int main (int argc, char ** argv)
 	if (MPDB)
 	{
 		MPDB->printBBStr (&std::cout); 
+		MPDB->printInfo (&std::cout); 
 		MPDB->moveTo(P1);
 	}
 
@@ -77,6 +78,7 @@ int main (int argc, char ** argv)
 	}
 	if (MPQR)
 	{
+		MPQR->printInfo (&std::cout); 
 		MPQR->printBBStr (&std::cout); 
 		MPQR->moveTo(P1);
 	}

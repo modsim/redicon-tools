@@ -1,3 +1,8 @@
+2013-09-04  version 0.1.22  <s.kondrat@fz-juelich.de>
+
+	* molecule.cc: calculate the size of a molecule read from the
+	PDB/PQR files.
+
 2013-08-29  version 0.1.20  <s.kondrat@fz-juelich.de>
 
 	* tests/testMolecule.cc: tests setAngleLinear() ok.
