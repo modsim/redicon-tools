@@ -47,6 +47,8 @@ class Point3D
 		double norm () const;
 		double distanceTo (const Point3D &b) const;
 		Point3D vectorTo (const Point3D &b) const; // vector to a point b
+		double angleBetween (const Point3D &b) const ; // angle between me as a vector and vector b
+
 		void translateBy (const Point3D &b) ; // translate me by a vector b
 
 		// Print Points

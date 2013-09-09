@@ -1,6 +1,6 @@
 bin_PROGRAMS = pdb2str molsys-create
 
-bin_SCRIPTS= analyze-xyz.py 
+bin_SCRIPTS= analyze-xyz.py average-me.py
 EXTRA_DIST = $(bin_SCRIPTS)
 
 AM_CPPFLAGS= -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/

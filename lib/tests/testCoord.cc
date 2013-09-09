@@ -17,30 +17,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "coord3D.h"
+#include "point3D.h"
 
 int main (int argc, char ** argv) 
 {
 
 	Coord3D P1 (2, .1, .2);
-	P1.setCoord (0, 10.);
+	P1.set (0, 10.);
 
 	Coord3D P3 = P1;
-	P3.setCoord (0, 5.);
+	P3.set (0, 5.);
 
-	double x[] = {0., 0., 0.};
+	double x[] = {1., 1., 1.};
 	Coord3D * P2 = new Coord3D (x);
 
 	P1.print (stdout, "P1"); std::cout << std::endl;
 	P2->print (stdout, "P2"); std::cout << std::endl;
 	P3.print (stdout, "P3"); std::cout << std::endl;
 
-	std::cout << "|P1,P2| = " << P1.distance (*P2) << std::endl ;
-	std::cout << "|P2,P1| = " << P2->distance (P1) << std::endl ;
+	std::cout << "|P1,P2| = " << P1.distanceTo (*P2) << std::endl ;
+	std::cout << "|P2,P1| = " << P2->distanceTo (P1) << std::endl ;
 	std::cout << std::endl;
 
-	std::cout << "|P1,P3| = " << P1.distance (P3) << std::endl ;
-	std::cout << "|P3,P1| = " << P3.distance (P1) << std::endl ;
+	std::cout << "|P1,P3| = " << P1.distanceTo (P3) << std::endl ;
+	std::cout << "|P3,P1| = " << P3.distanceTo (P1) << std::endl ;
+
+	std::cout << "(P1,P2) = " << P1.angleBetween (*P2) << std::endl ;
+	std::cout << "(P2,P1) = " << P2->angleBetween (P1) << std::endl ;
 
 	delete P2;
 

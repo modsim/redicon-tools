@@ -50,6 +50,7 @@ typedef enum {
 class Residue;
 class Molecule;
 class Bond;
+class Angle;
 class AtomAttorney;
 
 class Atom 
@@ -74,6 +75,7 @@ class Atom
 		const char * getName () const {return name;};
 		unsigned int getNNeighbours () const {return Neighbours.size();};
 		unsigned int getNBonds () const {return Bonds.size();};
+		unsigned int getNAngles () const {return Angles.size();};
 
 		AtomType getType () const {return type;};
 		char * getTypeName () const {return typeName;} ;
@@ -150,6 +152,9 @@ class Atom
 		std::vector<Bond*> Bonds;
 		bool addBond (Bond & b);
 
+		std::vector<Angle*> Angles;
+		bool addAngle (Angle & a);
+
 		void * userData;
 };
 
@@ -171,12 +176,15 @@ class AtomAttorney
 		static bool translateBy (Atom &a, const Point3D& R) { return a.translateBy(R);};
 
 		static bool addBond (Atom &a, Bond &b) { return a.addBond(b); };
+		static bool addAngle (Atom &a, Angle &A) { return a.addAngle(A); };
 
 		friend class Molecule;
 		friend class Monatomic;
 
 		friend class Residue;
 		friend class Bond;
+		friend class Angle;
+
 };
 
 #endif /* __HAVE_ATOM_H__ */

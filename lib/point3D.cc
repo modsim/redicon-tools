@@ -106,6 +106,18 @@ Point3D Point3D::vectorTo (const Point3D & a) const
 	return p;
 }
 
+double Point3D::angleBetween (const Point3D & a) const
+{
+	double prod = 0.;
+	for (unsigned int i = 0; i < dim; i++)
+		prod += a.get(i) * r[i];
+
+	prod /= (a.norm() * norm());
+
+	DPRINT ("product=%f, alpha=%f\n", prod, acos (prod));
+	return acos (prod);
+}
+
 void Point3D::translateBy (const Point3D & a)
 {
 	for (unsigned int i = 0; i < dim; i++)

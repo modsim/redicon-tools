@@ -54,9 +54,15 @@ int main (int argc, char ** argv)
 	    MPDB = NULL;
 	    std::cerr << "pointer: " << MPDB << std::endl;
 	}
+
+	// Add bonds and angles
+	MPDB->setBondsLinear (1, 100.);
+	MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
+
 	if (MPDB)
 	{
 		MPDB->printBBStr (&std::cout); 
+		MPDB->printInfo (&std::cout); 
 		MPDB->moveTo(P1);
 	}
 
@@ -72,6 +78,7 @@ int main (int argc, char ** argv)
 	}
 	if (MPQR)
 	{
+		MPQR->printInfo (&std::cout); 
 		MPQR->printBBStr (&std::cout); 
 		MPQR->moveTo(P1);
 	}

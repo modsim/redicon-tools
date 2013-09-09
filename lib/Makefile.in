@@ -67,7 +67,8 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libMol_la_LIBADD =
 am_libMol_la_OBJECTS = point3D.lo atom.lo atomPDB.lo atomPQR.lo \
-	bond.lo molecule.lo moleculePDB.lo moleculePQR.lo system.lo
+	bond.lo angle.lo molecule.lo moleculePDB.lo moleculePQR.lo \
+	moleculeBonds.lo moleculeAngles.lo system.lo
 libMol_la_OBJECTS = $(am_libMol_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -263,7 +264,8 @@ noinst_LTLIBRARIES = libMol.la
 libMol_la_SOURCES = point3D.cc point3D.h \
 	atom.h atom.cc atomPDB.cc atomPQR.cc \
 	bond.h bond.cc \
-	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc \
+	angle.h angle.cc \
+	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc moleculeBonds.cc moleculeAngles.cc \
 	monatomic.h \
 	system.h system.cc
 
@@ -324,11 +326,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/angle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomPDB.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomPQR.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bond.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molecule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculeAngles.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculeBonds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculePDB.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/moleculePQR.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point3D.Plo@am__quote@

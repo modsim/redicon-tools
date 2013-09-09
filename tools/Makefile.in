@@ -253,7 +253,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = analyze-xyz.py 
+bin_SCRIPTS = analyze-xyz.py average-me.py
 EXTRA_DIST = $(bin_SCRIPTS)
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
 AM_LDFLAGS = -pedantic -ansi 

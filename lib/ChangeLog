@@ -1,4 +1,38 @@
-2013-08-07 : CEST  version 0.1.12  <s.kondrat@fz-juelich.de>
+2013-09-04  version 0.1.22  <s.kondrat@fz-juelich.de>
+
+	* molecule.cc: calculate the size of a molecule read from the
+	PDB/PQR files.
+
+2013-08-29  version 0.1.20  <s.kondrat@fz-juelich.de>
+
+	* tests/testMolecule.cc: tests setAngleLinear() ok.
+
+	* moleculeAngle.cc: setAngleLinear(): create angle bonds in a
+	molecule walking along the 'chain'.
+
+	* angle.cc atom.cc molecule.cc: angle stuff addded.
+
+	* molecule.cc -> molecule.cc, moleculeBonds.cc:
+
+2013-08-26  18:30 CET  version 0.1.19  <s.kondrat@fz-juelich.de>
+
+	* angle.cc: get angle ok, check atoms ok.
+
+	* point3D.cc: angleBetween(): bugfix.
+
+2013-08-26  17:30 CET  version 0.1.18  <s.kondrat@fz-juelich.de>
+
+	* point3D.cc: angleBetween(): tests seem ok.
+
+2013-08-26  version 0.1.17  <s.kondrat@fz-juelich.de>
+
+	* tests/testAtom.cc: bond angle valgrind ok, more tests needed.
+
+2013-08-23  version 0.1.16  <s.kondrat@fz-juelich.de>
+
+	* angle.{cc,h}: bond angles, compiles ok tests needed.
+
+2013-08-07  version 0.1.12  <s.kondrat@fz-juelich.de>
 
 	* bond.{cc,h}: constructor changes the interface to have shift
 	eps and constant H.
