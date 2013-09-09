@@ -123,9 +123,13 @@ for line in fileinput.input(filename):
 	iline += 1
 
 # Add the last step to positions
-rx.append (xo/(n-k)); 	
-ry.append (yo/(n-k)); 
-rz.append (zo/(n-k)); 
+if natoms != n:
+	print 'Internal error, number of atoms read %i and expected %i are not the same :(' % (natoms, n)
+    	sys.exit()
+else:
+	rx.append (xo/(n));
+	ry.append (yo/(n));
+	rz.append (zo/(n));
 
 # reference point (t = itime = 0)
 x0 = rx[0]
