@@ -365,6 +365,6 @@ int main (int argc, char ** argv)
 
 	S.tryDelete();
 
-	return 1;
+	return 0;
 }
 

@@ -1,27 +1,216 @@
 #!/bin/bash
 #
-# bd-run (c) S. Kondrat (aka Valiska)  2013 run BD_BOX
-# run: bd-run input.prm
+# bdbox-run (c) S. Kondrat (aka Valiska)  2013 run BD_BOX
+# 
+# This script is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# my dear self
+myname=$(basename $0)
+# others
+bdbox=@BDBOX@
+molsys=@BCPT_MOLSYS@
 
-SOFT=$HOME/soft/bin
-bdbox=$SOFT/bd_flex
-myname=$0
+# Default values
+nrun=1
 
-if test -z "$1"; then
-	echo "$myname: run $myname <file>"
-exit -1;
+#
+# Functions
+#
+function usage()
+{
+  echo "Run BD_BOX simulations."
+  echo "Usage: $1 options "
+  echo "Where options are:"
+  echo "  -d DIR                  working directory."
+  echo "  -B BD_FLEX              use BD_BOX binary BD_FLEX."
+  echo "  -i FILE                 input parameter file."
+  echo "	   rand_seed and *_filename options will be skipped."
+  echo "Molecular system options:"
+  echo "  -H Hx,Hy,Hz             box size."
+  echo "  -n N1,N2,..             particle's names."
+  echo "  -r R1,R2,..             particle's radii."
+  echo "  -N N1,N2,..             number of particles."
+
+  echo "Simulation options:"
+  echo "  -R N                    number of runs."
+#  echo "  -p                      run in parallel."
+#  echo "  -s                      run in series."
+#  echo "  -q \"OPTIONS\"            queue using qsub with options OPTIONS."
+
+  echo
+  echo "  -v                      print version information and exit."
+  echo "  -?                      print this help message and exit."
+
+  echo
+}
+
+# generate a random seed number (from ttmp)
+function random()
+{    
+	od -d /dev/urandom |\
+		sed -e 's/^[0-9]* //' -e 's/ //g' |\
+		while read L ; do echo -n $L ; done |\
+			dd bs=1 count=${1:-10} 2>/dev/null
+}
+
+# Process BD_BOX PRM  file
+# List of arguments:
+#  $1 input file name
+#  $1 output file name
+function prm_strip ()
+{
+	local infile=$1
+	local outfile=$2
+
+	cat $infile | grep -v filename | grep -v rand_seed > $outfile
+}
+
+# Add file names and random seed
+# Arguments:
+# 	$1 Input file name
+#	$2 STR file name
+#	$3 basename for BD_BOX output files
+function prm_prepare ()
+{
+	local infile=$1
+	local strfile=$2
+	local base=$3
+
+	cat $infile
+
+	echo "xyz_filename $base.xyz"
+	echo "dcd_filename $base.dcd"
+	echo "enr_filename $base.enr"
+	echo "str_filename $strfile"
+	echo "out_filename $base.out"
+	echo "pqr_filename $base.pqr"
+	echo "rst_filename $base.rst"
+
+	echo rand_seed $(random 5)
+}
+
+#
+# Options
+#
+while getopts "d:B:i:H:n:r:N:R:spq:v?:" Option
+do
+  case $Option in
+
+    d  ) directory="$OPTARG"
+         cmd="${cmd} -d $OPTARG";;
+
+    B  ) bdbox="$OPTARG"
+         cmd="${cmd} -B $OPTARG";;
+
+    i  ) input="$OPTARG"
+         cmd="${cmd} -i $OPTARG";;
+
+    H  ) molsys_opt="$molsys_opt -H$OPTARG"
+         cmd="${cmd} -H $OPTARG";;
+
+    n  ) molsys_opt="$molsys_opt -n$OPTARG"
+         cmd="${cmd} -n $OPTARG";;
+
+    r  ) molsys_opt="$molsys_opt -r$OPTARG"
+         cmd="${cmd} -r $OPTARG";;
+
+    N  ) molsys_opt="$molsys_opt -N$OPTARG"
+         cmd="${cmd} -N $OPTARG";;
+
+    R  ) nrun="$OPTARG"
+         cmd="${cmd} -R $OPTARG";;
+
+    :  ) echo "$myname: option -$OPTARG requires an argument." >&2
+         exit 1 ;;
+
+    v  ) echo "$myname from @PACKAGE@ @VERSION@"
+  	 exit 0;;
+
+    '?'  |  h) usage ${myname}
+	   exit $OPTERROR;;
+   
+     *  ) echo "${myname}: unimplemented option chosen.";;   # DEFAULT
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+
+#
+# Check options
+#
+# Working directory
+if test -z "$directory"; then
+	echo "$myname: no directory, use $myname -d DIR"
+	exit 1;
+fi
+if test -d "$directory"; then
+	echo "$myname: error: directory '$directory' exists"
+	exit 1;
+fi
+mkdir -p $directory
+
+# Input file
+if test -z "$input"; then
+	echo "$myname: error: no input file, use $myname -i FILE"
+	exit 1;
+fi
+if test ! -f "$input"; then
+	echo "$myname: error: file '$input' does not exists"
+	exit 1;
 fi
 
-if test -f "$1"; then
-	base=$(basename $1 .prm)
-	log=$base.log
-	$bdbox $1 >> $log 2>&1 &
-	pid=$!
-	echo $pid > $base.pid
-else
-	echo "$myname: $1: no such file"
-	exit -1;
+# get base name for cmd, info str etc files
+base=$(basename $input .prm)
+
+# save command line
+echo $myname $cmd > $directory/$base.cmd
+
+# save 'stripped' PRM file
+prm_strip $input $directory/$base.prm
+baseprm=$(readlink -f $directory/$base.prm)
+
+# create STR file
+molsys_opt="$molsys_opt -R0,0,0 -m1,1 -j0,0 -q0,0 "
+echo $molsys $molsys_opt
+$molsys $molsys_opt > $directory/$base.str
+if test $? != 0; then
+	echo "$myname: `basename $molsys` failed, see error above"
+	exit 1
 fi
 
-exit 1;
+# do the job
+cd $directory
+irun=0
+while test $irun -lt $nrun; 
+do
+	idir=run_$irun
+	mkdir -p $idir
+	prm_prepare $baseprm ../$base.str $base > $idir/$base.prm
+	olddir=`$pwd` && cd $idir
+
+	# run the BD beast
+	$bdbox $base.prm 
+
+	# FIXME: for running in parallel save pid number to know whome to kill
+	#echo $! > $base.pid
+	
+	# FIXME: full path and cd olddir?
+	cd ../
+	irun=$[$irun+1]
+done
+
+exit 0;
 

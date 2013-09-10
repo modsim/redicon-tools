@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([bcp-tools], [0.2.1], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.2], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -22,6 +22,15 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_PROG_LIBTOOL
 
+
+# Check towhee binary
+AC_ARG_WITH(bdbox,
+            [  --with-bdbox=DIR        Directory where BD_BOX is installed (optional)],
+            BDBOX_DIR="$withval")
+
+BDBOX=
+AC_PATH_PROG([BDBOX], [bd_flex],, [$BDBOX_DIR/:$BDBOX_DIR/bin:$PATH])
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -34,6 +43,27 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
+
+
+# Scripts substitute
+# dnl adl_RECURSIVE_EVAL
+# see http://ac-archive.sourceforge.net/adl/relpaths.html
+AC_DEFUN([adl_RECURSIVE_EVAL],
+[_lcl_receval="$1"
+$2=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+     test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+    _lcl_receval_old=''
+     while test "[$]_lcl_receval_old" != "[$]_lcl_receval"; do
+       _lcl_receval_old="[$]_lcl_receval"
+       eval _lcl_receval="\"[$]_lcl_receval\""
+     done
+     echo "[$]_lcl_receval")`])
+
+AC_SUBST(BINDIR)
+adl_RECURSIVE_EVAL($bindir, BINDIR)
+
+AC_SUBST(BCPT_MOLSYS)
+BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 
 AC_CONFIG_FILES([Makefile
                  lib/Makefile
