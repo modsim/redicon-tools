@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# bd-run (c) S. Kondrat (aka Valiska)  2013 run BD_BOX
+# run: bd-run input.prm
+
+SOFT=$HOME/soft/bin
+bdbox=$SOFT/bd_flex
+myname=$0
+
+if test -z "$1"; then
+	echo "$myname: run $myname <file>"
+exit -1;
+fi
+
+if test -f "$1"; then
+	base=$(basename $1 .prm)
+	log=$base.log
+	$bdbox $1 >> $log 2>&1 &
+	pid=$!
+	echo $pid > $base.pid
+else
+	echo "$myname: $1: no such file"
+	exit -1;
+fi
+
+exit 1;
+
