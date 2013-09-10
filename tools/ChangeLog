@@ -1,3 +1,7 @@
+2013-09-09  version 0.1.24  <s.kondrat@fz-juelich.de>
+
+	* analyze-xyz.py: bug fixed (n-k -> n).
+
 2013-09-04  version 0.1.23  <s.kondrat@fz-juelich.de>
 
 	* pdb2str: -i (molecule info) option added.
@@ -10,6 +14,7 @@
 2013-08-22  version 0.1.21  <s.kondrat@fz-juelich.de>
 
 	* pdb2str.cc: -a angle, add angle bonds 'in series'.
+>>>>>>> 3378b137624801d2fb0cfc62d4dac1ff9c559c0f
 
 2013-08-22  version 0.1.15  <s.kondrat@fz-juelich.de>
 
