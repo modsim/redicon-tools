@@ -1,3 +1,16 @@
+10-09-2013 version 0.2
+
+    * tools/average-me.py: average (coarse-grain) data files over a
+    given time/space interval.
+
+    * tools/analyze-xyz.py: create a data file with positions,
+    deviations, and MSD and diffusion coefficient as functions of time.
+
+    * tools/pdb2str: convert pdb/pqr files into BD_BOX str.
+
+    * lib/libMol.so (uninst): Bond, Angle etc classes, various
+    improvenments and bug fixes.
+
 01-08-2013 version 0.1
 
     * tools/molsys-create: create a system of uni-atom molecules of
