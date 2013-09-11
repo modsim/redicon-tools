@@ -1,0 +1,129 @@
+#!/bin/bash
+#
+# bdbox-run (c) S. Kondrat (aka Valiska)  2013 run BD_BOX
+# 
+# This script is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# my dear self
+myname=$(basename $0)
+# others
+bdbox=@BDBOX@
+analysexyz=@BCPT_XYZ@
+average=@BCPT_AVERAGE@
+
+#
+# Functions
+#
+function usage()
+{
+  echo "Scan for .xyz file in the diven directory,"
+  echo "extract dr2 and average over the given time window."
+  echo "Usage: $1 options "
+  echo "Where options are:"
+  echo "  -d DIR                  working directory."
+  echo "  -o FILE                 output file."
+  echo "  -n VAL                  size of a molecule (natoms)."
+  echo "  -k K1,K2,..             first atom serials when more then one molecule"
+  echo "                          in a system see `basename $analysexyz`)."
+  echo "  -w VAL                  time window for averaging."
+  echo
+  echo "  -v                      print version information and exit."
+  echo "  -?                      print this help message and exit."
+
+  echo
+}
+#
+# Options
+#
+while getopts "d:o:k:n:w:v?:" Option
+do
+  case $Option in
+
+    d  ) directory="$OPTARG"
+         cmd="${cmd} -d $OPTARG";;
+
+    o  ) output="$OPTARG"
+         cmd="${cmd} -o $OPTARG";;
+
+    n  ) analysexyz_opt="$analysexyz_opt -n$OPTARG"
+         cmd="${cmd} -n $OPTARG";;
+
+    k  ) OLD_IFS="$IFS";
+	 IFS=","
+	 nmolslist=( ${OPTARG} )
+         mols="${nmolslist[@]}"
+         IFS="$OLD_IFS"
+         cmd="${cmd} -k $OPTARG";;
+
+    w  ) window=" -w$OPTARG"
+         cmd="${cmd} -w $OPTARG";;
+
+    :  ) echo "$myname: option -$OPTARG requires an argument." >&2
+         exit 1 ;;
+
+    v  ) echo "$myname from @PACKAGE@ @VERSION@"
+  	 exit 0;;
+
+    '?'  |  h) usage ${myname}
+	   exit $OPTERROR;;
+   
+     *  ) echo "${myname}: unimplemented option chosen.";;   # DEFAULT
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+
+#
+# Check options
+#
+# Working directory
+if test -z "$directory"; then
+	echo "$myname: no directory, use $myname -d DIR"
+	exit 1;
+fi
+if test ! -d "$directory"; then
+	echo "$myname: error: '$directory' does not exists"
+	exit 1;
+fi
+
+cd $directory
+for d in `ls`; do
+	if test -d $d; then
+		echo "Scanning directory $d:"
+		for f in `ls $d/*.xyz`; do
+			for imol in $mols; do
+				ofile=$(dirname $f)/$(basename $f .xyz).mol$imol
+				echo "Extracting data from '$f'"
+				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
+				$analysexyz $analysexyz_opt -f $f -n$imol > $ofile.dat
+				if test -z "$files"; then
+					files=$ofile.dat
+				else
+					files="$files,$ofile.dat"
+				fi
+			done
+		done
+	fi
+done
+
+echo
+echo "Avereging:"
+echo $average -f $files -k 0,5 $window
+$average -f $files -k 0,5 $window > $output
+echo "All done in '$directory'!"
+
+exit 0;
+

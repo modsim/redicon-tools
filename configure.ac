@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([bcp-tools], [0.2.2], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.3], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -65,10 +65,17 @@ adl_RECURSIVE_EVAL($bindir, BINDIR)
 AC_SUBST(BCPT_MOLSYS)
 BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 
+AC_SUBST(BCPT_XYZ)
+BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
+AC_SUBST(BCPT_AVERAGE)
+BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+
 AC_CONFIG_FILES([Makefile
                  lib/Makefile
                  lib/tests/Makefile
                  tools/Makefile
 		 contrib/Makefile
-		 contrib/bdbox-run])
+		 contrib/bdbox-run
+		 contrib/bdbox-xyz
+		 ])
 AC_OUTPUT

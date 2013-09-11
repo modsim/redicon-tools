@@ -203,8 +203,10 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BCPT_AVERAGE = @BCPT_AVERAGE@
 BCPT_MAINTAINER = @BCPT_MAINTAINER@
 BCPT_MOLSYS = @BCPT_MOLSYS@
+BCPT_XYZ = @BCPT_XYZ@
 BDBOX = @BDBOX@
 BINDIR = @BINDIR@
 CC = @CC@
@@ -318,7 +320,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = lib tools
+SUBDIRS = lib tools contrib
 ACLOCAL_AMFLAGS = -I m4
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
