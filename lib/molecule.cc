@@ -201,10 +201,10 @@ bool Molecule::translateBy (const Point3D& T)
 	for (unsigned int i = 0; i < getNAtoms(); i++)
 	{
 		Atom * a = Atoms.at (i);
+#endif
 		if (!AtomAttorney::translateBy(*a, T))
 			throw "Translating atom failed in translateBy()";
 	}
-#endif
 	return true;
 }
 bool Molecule::moveTo (const Point3D& R) 
