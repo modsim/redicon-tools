@@ -1,3 +1,8 @@
+2013-09-30  version 0.2.4  <s.kondrat@fz-juelich.de>
+
+	* molecule.cc system.cc etc: support for non CXX-11 compilant
+	compilers (gcc).
+
 2013-09-04  version 0.1.22  <s.kondrat@fz-juelich.de>
 
 	* molecule.cc: calculate the size of a molecule read from the

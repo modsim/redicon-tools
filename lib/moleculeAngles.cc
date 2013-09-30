@@ -32,9 +32,14 @@ bool Molecule::setAnglesLinear (AnglePotType type, double H)
 {
 	unsigned long int ia = 0;
 	unsigned int na = getNAtoms();
-
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 	{
+#else
+	for (int i = 0; i < getNAtoms(); i++)
+	{ 
+		Atom * a = Atoms.at (i);
+#endif
 		unsigned int s = a->getSerial ();
 		DPRINT ("Atom '%s' (serial %lu, #%lu/%i):\n", a->getName(), s, ia, na);
 

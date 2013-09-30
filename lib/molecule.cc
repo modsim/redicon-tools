@@ -23,6 +23,9 @@
 
 #include<molecule.h>
 
+// for C++11 from autoconf
+#include <config.h>
+
 //#define DEBUG
 #include "defines.h"
 
@@ -62,8 +65,13 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 			{
 				stream.close();
 				free (Molecule::name);
+#ifdef HAVE_CXX11
 				for (auto &a : Atoms)
 					delete a;
+#else
+				for (unsigned int i = 0; i < getNAtoms(); i++)
+					delete Atoms.at (i);
+#endif
 				throw "Molecule::Molecule(): Reading a PDB file failed";
 			}
 			break;
@@ -73,8 +81,13 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 			{
 				free (Molecule::name);
 				stream.close();
+#ifdef HAVE_CXX11
 				for (auto &a : Atoms)
 					delete a;
+#else
+				for (unsigned int i = 0; i < getNAtoms(); i++)
+					delete Atoms.at (i);
+#endif
 				throw "Molecule::Molecule(): Reading a PQR file failed";
 			}
 			break;
@@ -94,8 +107,14 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 	double hmin[3] = {0., 0., 0.};
 	double hmax[3] = {0., 0., 0.};
 	charge = 0;
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		if (a->positionIsSet())
 		{
 			Point3D * Ra = a->positionPtr ();
@@ -112,7 +131,7 @@ Molecule::Molecule (unsigned int ft, const char * file) : owner (NULL)
 		}
 		else
 		{
-			BCPT_WARNING ("atom's position not set for atom '%s' (serial %i), molecule size might be incorrect",
+			BCPT_WARNING ("atom's position not set for atom '%s' (serial %li), molecule size might be incorrect",
 				a->getName(), a->getSerial());
 		}
 		charge += a->getCharge();
@@ -132,13 +151,21 @@ Molecule::~Molecule ()
 		throw "You cannot destroy me, I have an owner";
 
 	free (name);
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 		delete a;
 	for (auto &b : Bonds) // C++0x
 		delete b;
 	for (auto &a : Angles) // C++0x
 		delete a;
-
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+		delete Atoms.at (i);
+	for (unsigned int i = 0; i < getNBonds(); i++)
+		delete Bonds.at (i);
+	for (unsigned int i = 0; i < getNAngles(); i++)
+		delete Angles.at (i);
+#endif // HAVE_CXX11
 };
 
 // Position
@@ -167,10 +194,17 @@ bool Molecule::translateBy (const Point3D& T)
 
 	// if the head position is set, we expect athe other atoms' positions to be set
 	// so throw an exception if this is not so
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
 		if (!AtomAttorney::translateBy(*a, T))
 			throw "Translating atom failed in translateBy()";
-
+	}
+#endif
 	return true;
 }
 bool Molecule::moveTo (const Point3D& R) 
@@ -195,8 +229,16 @@ bool Molecule::moveTo (const Point3D& R)
 unsigned int Molecule::shiftSerial (unsigned int serial)
 {
 	// FIXME: this is assuming atoms are arranged in order of their sirial numbers
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		AtomAttorney::setSerial (*a, serial++);
+	}
 
 	return serial;
 }
@@ -210,10 +252,17 @@ bool Molecule::overlap (const Atom & ta) const
 
 	if (!head->positionIsSet())
 		throw "Molecule::overlap(): Molecule's position is not set." ;
-
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		if ( a->overlap(ta) )
 			return true;
+	}
 
 	return false;
 }
@@ -226,9 +275,17 @@ bool Molecule::overlap (const Molecule & M) const
 	if (!head->positionIsSet())
 		throw "Molecule::overlap(): Moleculke's position is not set." ;
 
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		if ( M.overlap(*a) )
 			return true;
+	}
 
 	return false;
 }
@@ -236,9 +293,18 @@ bool Molecule::overlap (const Molecule & M) const
 // For each loop
 bool Molecule::foreachAtom (AtomFunction func, void * data) const
 {
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		if (!func(*a, data))
 			return false;
+	}
+
 	return true;
 }
 
@@ -272,6 +338,7 @@ void Molecule::printBBStr (const char * name) const
 
 void Molecule::printBBStr (std::ostream * stream) const
 {
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 		a->printBBStr (stream);
 
@@ -280,6 +347,24 @@ void Molecule::printBBStr (std::ostream * stream) const
 
 	for (auto &a : Angles) // C++0x
 		a->printBBStr (stream);
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+		a->printBBStr (stream);
+	}
+	for (unsigned int i = 0; i < getNBonds(); i++)
+	{
+		Bond * b = Bonds.at (i);
+		b->printBBStr (stream);
+	}
+	for (unsigned int i = 0; i < getNAngles(); i++)
+	{
+		Angle * a = Angles.at (i);
+		a->printBBStr (stream);
+	}
+#endif // HAVE_CXX11
+
 
 }
 

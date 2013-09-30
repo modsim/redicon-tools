@@ -30,8 +30,14 @@ System::System (Coord3D &R0, Coord3D & size) : R0(R0), H(size), charge (0.0), la
 
 System::~System () 
 {
+#ifdef HAVE_CXX11
 	for (auto &m : Molecules) // C++0x
 	{
+#else
+	for (int i = 0; i < getNMolecules(); i++)
+	{
+		Molecule * m = Molecules.at (i);
+#endif
 		MoleculeAttorney::releaseOwnership (*m, *this);
 		if (trydelete)
 		{
@@ -115,12 +121,20 @@ bool System::addMolecule (Molecule& M)
 		return false;
 	}
 
+#ifdef HAVE_CXX11
 	for (auto &m : Molecules)
+	{
+#else
+	for (int i = 0; i < getNMolecules(); i++)
+	{
+		Molecule * m = Molecules.at (i);
+#endif
 		if (m == &M)
 		{
 			BCPT_ERROR ("Molecule '%s' already added, skipping", M.getName());
 			return false;
 		}
+	}
 
 	// if M in box
 	if (!moleculeInBox (M))
@@ -157,9 +171,17 @@ bool System::addMolecule (Molecule& M)
 // For each loop
 bool System::foreachMolecule (MoleculeFunction func, void * data) const
 {
+#ifdef HAVE_CXX_11
 	for (auto &m : Molecules)
+	{
+#else
+	for (int i = 0; i < getNMolecules(); i++)
+	{
+		Molecule * m = Molecules.at (i);
+#endif
 		if (!func(*m, data))
 			return false;
+	}
 	return true;
 }
 
@@ -183,7 +205,12 @@ void System::printInfo (std::ostream * stream) const
 
 void System::printBBStr (std::ostream * stream) const
 {
+#ifdef HAVE_CXX11
 	for (auto &m : Molecules)
 		m->printBBStr (stream);
+#else
+	for (int i = 0; i < getNMolecules(); i++)
+		(Molecules.at(i))->printBBStr (stream);
+#endif
 }
 

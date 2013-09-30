@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
-AC_INIT([bcp-tools], [0.2.3], [s.kondrat@fz-juelich.de])
+AC_PREREQ([2.63])
+AC_INIT([bcp-tools], [0.2.4], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -21,6 +21,10 @@ AC_PROG_MAKE_SET
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_PROG_LIBTOOL
+
+
+AX_CXX_COMPILE_STDCXX_11(ext,optional)
+#		[AC_MSG_ERROR(upgrade your compiler to 0x11 compatible)])
 
 
 # Check towhee binary

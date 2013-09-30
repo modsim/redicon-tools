@@ -29,8 +29,14 @@
 bool Molecule::setBondsLinear (double eps, double H)
 {
 	unsigned long int ia = 0;
+#ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 	{
+#else 
+	for (int i = 0; i< getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
 		DPRINT ("Atom '%s' (serial %lu, #%lu) is not bonded\n", a->getName(), a->getSerial(), ia);
 
 		if ( a->getNBonds() == 0 )
