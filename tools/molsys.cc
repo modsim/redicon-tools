@@ -52,6 +52,8 @@ void usage ()
 	fprintf (stderr, " -n, --names=NAME,NAME...   names of atoms.\n");
 	fprintf (stderr, " -r, --radia=VAL,VAL...     radia (in A).\n");
 	fprintf (stderr, " -N, --numbers=VAL,VAL,...  number of particles.\n");
+	fprintf (stderr, " -T, --type=VAL,VAL,...     placement type (rand, cent, lat).\n");
+	fprintf (stderr, "                  cent can be used once for a single particle.");
 
 	fprintf (stderr, " -q, --charge=VAL,VAL,...   charges (in e).\n");
 	fprintf (stderr, " -m, --masses=VAL,VAL,...   masses (arbitrary units).\n");
@@ -92,6 +94,7 @@ Point3D getRandomPosition (const Point3D & H, const Point3D & R, double a)
 	return p;
 }
 
+
 int main (int argc, char ** argv) 
 {
 	Point3D * H = NULL;
@@ -109,16 +112,23 @@ int main (int argc, char ** argv)
 	 * unsigned int * N = (unsigned int*) malloc ( sizeof(unsigned int) );
 	unsigned int nN = 0;*/
 	double * N = (double*) malloc ( sizeof(double) );
+
 	unsigned int nN = 0;
 
 	double * charges = NULL;
 	unsigned int ncharges = 0;
+
 	double * HDradia = NULL;
 	unsigned int nHDradia = 0;
+
 	double * masses = NULL;
 	unsigned int nmasses = 0;
+
 	double * LJ = NULL;
 	unsigned int nLJ = 0;
+
+	char ** types = NULL;
+	unsigned int ntypes = 0 ;
 
 	//char * arrangment = NULL;
 
@@ -130,11 +140,11 @@ int main (int argc, char ** argv)
 
 	/* 
 	 * Command-line parser 
-	 */  
+	 */ 
 
 	int c = 0;
 
-#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:"
+#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:T:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -158,6 +168,7 @@ int main (int argc, char ** argv)
 			{"hd-radia", required_argument, NULL, 'd'},
 			{"lj", required_argument, NULL, 'j'},
 			{"masses", required_argument, NULL, 'm'},
+			{"type",required_argument, NULL,'T'},
 
 			//{"arrangment", no_argument, NULL, 'a'},
 			//{"tries", no_argument, NULL, 't'},
@@ -254,6 +265,10 @@ int main (int argc, char ** argv)
 				case '?': /* wrong options */
 					  fprintf (stderr, "Try `%s --help' for more information.\n", myname);
 					  return 1; /* failure */
+			
+                case 'T':  types = str2strlist (&optarg, ",", &ntypes);break;
+
+
 			}  
 	}  	
 
@@ -266,7 +281,7 @@ int main (int argc, char ** argv)
 		return 1; /* failure */
 	}
 	
-	if ( (nradii != nN) || (nN != nnames))
+	if ( (nradii != nN) || (nN != nnames) )
 	{
 		cerr << myname << ": error: number of molecule's names, radii, and their numbers in the system must be the same."  << endl;
 		return 1; /* failure */
@@ -294,25 +309,71 @@ int main (int argc, char ** argv)
 		return 1; /* failure */
 	}
 
-	// Create system
+	if ( (types) && (ntypes != nnames) )
+	{
+		cerr << myname << ": error: number of placement types must equal the number of molecule types (see -n, -r and -N)."  << endl;
+		return 1; /* failure */
+	}
+
+
+// Create system
 	System S (*R, *H);
 	unsigned int nMols = 0;
 	for (unsigned int i = 0; i < nN; i++)
 		nMols += N[i];
 
-	int imol = 0;
 	int ntries = 10;
 
-	for (unsigned int i = 0; i < nN; i++)
+	int have_centr = 0;
+	if (types) 
 	{
+		for (unsigned int i = 0;i<ntypes;i++)
+			if (strstr (types[i], "cent"))
+			{	
+				if( N[i] != 1 ) 
+				{
+					cerr << myname << ": error: placement "<< types[i] << ": more than one (" << N[i] << ") molecule of type " << names[i] << " must be one."  << endl;
+					return 1;	
+				}	
+				if (have_centr)
+				{
+					cerr << myname << ": error: there is already a molecule in the center"  << endl;
+					return 1;	
+				}	
+
+				Atom a (names[i], radii[i]);
+				if (charges) a.setCharge (charges[i]);
+				Monatomic * M = new Monatomic (names[i], a);
+				M->setPosition (*R);
+				if ( !S.addMolecule (*M) )
+				{
+					cerr << myname << ": error: cannot add a molecule in the center, giving up."  << endl;
+					return 1;	
+				}		
+				have_centr++;
+
+			}
+			else if (!strstr (types[i],"rand"))
+			{
+				cerr << myname << ": error: unknown or unimplemented placement type."  << endl;
+				return 1;
+			}
+	}
+
+	for (unsigned int i = 0; i < nN; i++)
+	{	
 		Atom a (names[i], radii[i]);
 		if (charges) a.setCharge (charges[i]);
 		for (int j = 0; j < N[i]; j++)
 		{
+			// "cent" molecule is already in the box, skip
+			if (strstr (types[i], "cent"))
+				break;
+
 			Monatomic * M = new Monatomic (names[i], a);
 			int counter = 0;
 			while (1)
-			{
+			{			
 				Point3D p = getRandomPosition (*H, *R, radii[i]);
 				M->setPosition (p);
 				counter++;
@@ -325,9 +386,8 @@ int main (int argc, char ** argv)
 					break;
 				}
 			}
-			imol++;
 		}
-	}
+	}	
 
 	std::cerr << "Packing info: " << nMols << " molecules given, " << S.getNMolecules() << " packed in a box." << std::endl;
 	S.printInfo(&std::cerr);
@@ -351,6 +411,11 @@ int main (int argc, char ** argv)
 	if (masses) free (masses);
 	if (HDradia) free (HDradia);
 	if (LJ) free (LJ);
+
+	for (int i = 0; i < ntypes; i++)
+		free (types[i]);
+	if (types) free (types);
+
 
 	if (pdb_file)
 		free (pdb_file);

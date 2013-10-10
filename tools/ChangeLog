@@ -1,3 +1,7 @@
+2013-10-10  version 0.2.6  <p.burla@fz-juelich.de>
+
+	* molsys.cc: -T (types) option for rand/cent molecule placement.
+
 2013-09-09  version 0.1.24  <s.kondrat@fz-juelich.de>
 
 	* analyze-xyz.py: bug fixed (n-k -> n).
