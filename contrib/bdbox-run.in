@@ -42,7 +42,8 @@ function usage()
   echo "  -n N1,N2,..             particle's names."
   echo "  -r R1,R2,..             particle's radii."
   echo "  -N N1,N2,..             number of particles."
-
+  echo "  -T VAL,VAL,..           placement type(rand,cent,lat)."
+ 
   echo "Simulation options:"
   echo "  -R N                    number of runs."
 #  echo "  -p                      run in parallel."
@@ -104,7 +105,7 @@ function prm_prepare ()
 #
 # Options
 #
-while getopts "d:B:i:H:n:r:N:R:spq:v?:" Option
+while getopts "d:B:i:H:n:r:N:R:T:spq:v?:" Option
 do
   case $Option in
 
@@ -132,12 +133,17 @@ do
     R  ) nrun="$OPTARG"
          cmd="${cmd} -R $OPTARG";;
 
+    T  ) molsys_opt="$molsys_opt -T$OPTARG"
+         cmd="${cmd} -T $OPTARG";;
+
+
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
          exit 1 ;;
 
     v  ) echo "$myname from @PACKAGE@ @VERSION@"
-  	 exit 0;;
+         exit 0;;
 
+    
     '?'  |  h) usage ${myname}
 	   exit $OPTERROR;;
    

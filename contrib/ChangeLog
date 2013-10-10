@@ -1,3 +1,7 @@
+2013-10-10  version 0.2.6  <p.burla@fz-juelich.de>
+
+	* bdbox-run.in: -T (placement type) option added .
+
 2013-09-11  version 0.2.3  <s.kondrat@fz-juelich.de>
 
 	* bdbox-xyz.in: scan for xyz files, calculate and average dr2.
