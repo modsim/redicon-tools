@@ -19,11 +19,12 @@
 # my dear self
 myname=$(basename $0)
 # others
-bdbox=@BDBOX@
+bdbox=@BDFLEX_RUN@
 molsys=@BCPT_MOLSYS@
 
 # Default values
 nrun=1
+
 
 #
 # Functions
@@ -34,9 +35,16 @@ function usage()
   echo "Usage: $1 options "
   echo "Where options are:"
   echo "  -d DIR                  working directory."
-  echo "  -B BD_FLEX              use BD_BOX binary BD_FLEX."
-  echo "  -i FILE                 input parameter file."
-  echo "	   rand_seed and *_filename options will be skipped."
+  echo "  -B BD_FLEX              use BD_FLEX binary."
+  echo "  -i FILE                 input parameter file for all runs."
+  echo "        rand_seed and *_filename options will be skipped."
+  echo "  -c                      scan directory DIR for unfinished runs and continue."
+  echo "  -s SCRIPT               run/queue each run via custom script."
+  echo "        SCRIPT must accept options -d DIR -B FLEX -i INPUT -p NPROC -c COUNT"
+  echo "        where COUNT says the continuation number, see '`basename @BDFLEX_RUN@` -h'"
+  echo "        For an example see contrib/@BDFLEX_MSUB@"
+  echo
+
   echo "Molecular system options:"
   echo "  -H Hx,Hy,Hz             box size."
   echo "  -n N1,N2,..             particle's names."
@@ -45,10 +53,8 @@ function usage()
   echo "  -T VAL,VAL,..           placement type(rand,cent,lat)."
  
   echo "Simulation options:"
-  echo "  -R N                    number of runs."
-#  echo "  -p                      run in parallel."
-#  echo "  -s                      run in series."
-#  echo "  -q \"OPTIONS\"            queue using qsub with options OPTIONS."
+  echo "  -R NUM                  number of runs."
+  echo "  -p NPROC                number of procs (for OpenMP)."
 
   echo
   echo "  -v                      print version information and exit."
@@ -105,15 +111,20 @@ function prm_prepare ()
 #
 # Options
 #
-while getopts "d:B:i:H:n:r:N:R:T:spq:v?:" Option
+while getopts "d:B:i:H:n:r:N:R:T:s:p:cv?:" Option
 do
   case $Option in
 
     d  ) directory="$OPTARG"
          cmd="${cmd} -d $OPTARG";;
 
-    B  ) bdbox="$OPTARG"
+    B  ) bdbin="-B $OPTARG"
          cmd="${cmd} -B $OPTARG";;
+
+    c  ) cont="yes";;
+
+    s  ) script="$OPTARG"
+	cmd="${cmd} -s $OPTARG";;
 
     i  ) input="$OPTARG"
          cmd="${cmd} -i $OPTARG";;
@@ -135,6 +146,9 @@ do
 
     T  ) molsys_opt="$molsys_opt -T$OPTARG"
          cmd="${cmd} -T $OPTARG";;
+
+    p  ) nproc="-p $OPTARG"
+         cmd="${cmd} -p $OPTARG";;
 
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
@@ -158,43 +172,102 @@ shift $(($OPTIND - 1))
 # Check options
 #
 # Working directory
-if test -z "$directory"; then
+if test -z "$directory" -a "x$cont" != "xyes"; then
 	echo "$myname: no directory, use $myname -d DIR"
 	exit 1;
 fi
-if test -d "$directory"; then
+if test -d "$directory" -a "x$cont" != "xyes"; then
 	echo "$myname: error: directory '$directory' exists"
 	exit 1;
 fi
 mkdir -p $directory
 
-# Input file
-if test -z "$input"; then
-	echo "$myname: error: no input file, use $myname -i FILE"
-	exit 1;
+# PRM and STR files (depends if continue or not)
+if test "x$cont" == "xyes"; then
+
+	prms=`ls $directory/ | grep .prm`
+	nprm=0
+	for f in $prms; do
+		nprm=$[$nprm+1]
+	done
+	if test "$nprm" == "0"; then
+		echo "$myname: error: no BD_BOX parameter file found in '$directory'"
+		exit 1;
+	elif test "$nprm" -gt "1"; then
+		echo "$myname: error: more than one BD_BOX parameter file found, candidates are '$prms'"
+		exit 1;
+	fi
+	#checks done, we have and only one .prm file
+	input=$prms
+	base=$(basename $input .prm)
+	baseprm=$(readlink -f $directory/$input)
+	echo "Using '$baseprm'"
+
+	# now check for .str file
+	strs=`ls $directory | grep .str`
+	nstr=0
+	for f in $nstr; do
+		nstr=$[$nstr+1]
+	done
+	if test "$nstr" == "0"; then
+		echo "$myname: error: no BD_BOX .str file found in '$directory'"
+		exit 1;
+	elif test "$nstr" -gt "1"; then
+		echo "$myname: error: more than one BD_BOX .str file found, candidates are '$strs'"
+		exit 1;
+	fi
+	# all fine, we have one str file
+	strfile=$directory/$strs
+	strfile=$(readlink -f $strfile)
+	echo "Using '$strfile'"
+
+else # We do not continue, check for prm and create str
+	
+	# Check in input exists
+	if test -z "$input" -a "x$cont" != "xyes"; then
+		echo "$myname: error: no input file, use $myname -i FILE"
+		exit 1;
+	fi
+	if test ! -f "$input"; then
+		echo "$myname: error: file '$input' does not exists"
+		exit 1;
+	fi
+	# get base name for cmd, info str etc files
+	base=$(basename $input .prm)
+
+	# save command line
+	echo $myname $cmd > $directory/$base.cmd
+
+	# save 'stripped' PRM file
+	prm_strip $input $directory/$base.prm
+	baseprm=$(readlink -f $directory/$base.prm)
+	strfile=$directory/$base.str
+
+	# create STR file
+	molsys_opt="$molsys_opt -R0,0,0 -m1,1 -j0,0 -q0,0 "
+	echo $molsys $molsys_opt
+	$molsys $molsys_opt > $strfile
+	if test $? != 0; then
+		echo "$myname: `basename $molsys` failed, see error above"
+		exit 1
+	fi
+	strfile=$(readlink -f $strfile)
 fi
-if test ! -f "$input"; then
-	echo "$myname: error: file '$input' does not exists"
-	exit 1;
-fi
 
-# get base name for cmd, info str etc files
-base=$(basename $input .prm)
-
-# save command line
-echo $myname $cmd > $directory/$base.cmd
-
-# save 'stripped' PRM file
-prm_strip $input $directory/$base.prm
-baseprm=$(readlink -f $directory/$base.prm)
-
-# create STR file
-molsys_opt="$molsys_opt -R0,0,0 -m1,1 -j0,0 -q0,0 "
-echo $molsys $molsys_opt
-$molsys $molsys_opt > $directory/$base.str
-if test $? != 0; then
-	echo "$myname: `basename $molsys` failed, see error above"
-	exit 1
+# Check for script and set runme
+if test -n "$script"; then
+	if test ! -f "$script"; then
+		echo "$myname: error: cannot find script '$script'"
+		exit 1;
+	fi
+	script=`readlink -f $script`
+	if test -x "$script"; then
+		runme=$script
+	else
+		runme="bash $script"
+	fi
+else
+	runme=$bdbox
 fi
 
 # do the job
@@ -204,11 +277,38 @@ while test $irun -lt $nrun;
 do
 	idir=run_$irun
 	mkdir -p $idir
-	prm_prepare $baseprm ../$base.str $base > $idir/$base.prm
+	prm_prepare $baseprm $strfile $base > $idir/$base.prm
 	olddir=`$pwd` && cd $idir
 
-	# run the BD beast
-	$bdbox $base.prm 
+	if test -f "@DONE@"; then
+		echo "Run #$irun done, skipping..."
+		cd ..
+		irun=$[$irun+1] 
+		continue;
+	fi
+
+	# Check the cont number 
+	if test "x$cont" == "xyes"; then
+		icont=0
+		if test -f "@INTERRUPTED@.$icont"; then
+			while true; do
+				if test ! -f "@INTERRUPTED@.$icont"; then
+					break
+				fi
+				icont=$[$icont+1]
+			done
+			cont_opt="-c $[$icont-1]"
+		else
+			cont_opt=
+		fi
+	fi
+
+	# run the BD beast (runme is either a script or )
+	echo
+	echo "Starting/continuing run #$irun:"
+	echo $runme $bdbin -i $base.prm $nproc $cont_opt >> $base.cmd
+	$runme $bdbin -i $base.prm $nproc $cont_opt
+	echo "Run #$irun done!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill
 	#echo $! > $base.pid

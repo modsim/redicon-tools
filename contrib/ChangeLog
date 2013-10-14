@@ -1,4 +1,10 @@
-2013-10-14  version 0.2.7  <p.burla@fz-juelich.de>
+2013-10-14 17:45 CEST  version 0.2.8  <s.kondrat@fz-juelich.de>
+
+	* bdbox-run: -c (continue stopped calculations) option added.
+
+	* bd_flex-run.in: bug fixes.
+
+2013-10-14  version 0.2.7  <s.kondrat@fz-juelich.de>
 
 	* bd_flex-run.in: bd_flex wrapper, creates running, interrupted
 	and done files.

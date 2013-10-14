@@ -33,7 +33,7 @@ function usage()
   echo "Usage: $1 options "
   echo "Where options are:"
   echo "  -d DIR                  run in directory DIR (optional)."
-  echo "  -B BD_FLEX              use BD_FLEX."
+  echo "  -B BD_FLEX              use BD_FLEX binary."
   echo "  -i FILE                 input parameter file."
   echo "  -c COUNT                continue (count to keep track on reruns)."
   echo "  -p NUM                  number of processes (for OpenMP)."
@@ -108,20 +108,19 @@ if test -n "$count"; then
 
 	# Determine restart file
 	rstfile=$directory/`cat $input | grep rst_filename | cut -d " " -f 2`
-	echo $rstfile
 	if test ! -f "$rstfile"; then
 		i=0;
 		haverst="no"
 		while test "$i" -le "5"; 
 		do
-			if test -f $rstfile$i; then
-				rstfile=$rstfile$i;
+			if test -f "$rstfile$i"; then
 				haverst="yes"
 				break;
 			else
 				i=$[$i+1]
 			fi
 		done
+		rstfile=$rstfile$i;
 	fi
 	if test "$haverst" == "no"; then
 		echo "$myname: error: cannot determine restart file"
@@ -133,21 +132,22 @@ if test -n "$count"; then
 else
 	count=0
 fi
-interrupted=$directory/.INTERRUPTED.$count
+interrupted=$directory/@INTERRUPTED@.$count
 if test -f $interrupted; then
 	echo "$myname: error: previous job was interrupted, check '$interrupted' for resuming."
 	exit 1;
 fi
 
 # Check if a job is running
-running=$directory/.RUNNING
+running=$directory/@RUNNING@
+stopped=$directory/.stopped.info
 if test -f "$running"; then
 	echo "$myname: error: job is running in this directory. If this in not the case, clean up and rerun."
 	exit 1;
 fi
 
 # Check if done, done means done
-done=$directory/.DONE
+done=$directory/@DONE@
 if test -f "$done"; then
 	echo "$myname: good or bad, but everything's been done before me, I go to have a rest."
 	exit 0;
@@ -155,9 +155,9 @@ fi
 
 # Set traps
 if test -x "$script"; then
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted && $script $cmd -c$count && rm -f $running && exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted && $script $cmd -c$count && mv $running $stopped && echo  'Stopped on `date`' >> $stopping && echo $stopped && exit" SIGINT SIGTERM
 else
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted && echo '	$myname -c $count $cmd' >> $interrupted && echo >> ${interrupted} && rm -f $running && exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted && echo '	$myname -c $count $cmd' >> $interrupted && mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && exit" SIGINT SIGTERM
 fi
 
 # Check for an input file
@@ -179,8 +179,13 @@ if test -f "$queue"; then
 fi
 
 # Set running file
-echo "Started on `date`" > $running
-echo $bdflex $input --restart=$rstfile >> $running
+if test -f "$stopped"; then
+	mv $stopped $running
+	echo "Resumed on `date`" >> $running
+else
+	echo "Started on `date`" >> $running
+fi
+echo $bdflex $input $bdflex_opts >> $running
 
 OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
 
