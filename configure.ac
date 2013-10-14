@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.6], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.7], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -79,6 +79,7 @@ AC_CONFIG_FILES([Makefile
                  lib/tests/Makefile
                  tools/Makefile
 		 contrib/Makefile
+		 contrib/bd_flex-run
 		 contrib/bdbox-run
 		 contrib/bdbox-xyz
 		 ])
