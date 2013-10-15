@@ -1,4 +1,4 @@
-bin_SCRIPTS= bdbox-run  bdbox-xyz
+noinst_SCRIPTS = bd_flex-echo bd_flex-msub
 
-EXTRA_DIST = $(bin_SCRIPTS)
-CLEANFILES = $(bin_SCRIPTS)
+CLEANFILES = $(noinst_SCRIPTS)
+#EXTRA_DIST = ChangeLog

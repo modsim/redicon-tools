@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.6], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.12], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -74,12 +74,28 @@ BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
 AC_SUBST(BCPT_AVERAGE)
 BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
 
+AC_SUBST(BDFLEX_RUN)
+BDFLEX_RUN=$(echo ${BINDIR}/bd_flex-run)
+
+# SUBST DONE, INTERRUPT and RUNNING
+AC_SUBST(DONE)
+DONE=.DONE
+AC_SUBST(INTERRUPTED)
+INTERRUPTED=.INTERRUPTED
+AC_SUBST(RUNNING)
+RUNNING=.RUNNING
+
+
 AC_CONFIG_FILES([Makefile
                  lib/Makefile
                  lib/tests/Makefile
                  tools/Makefile
+		 scripts/Makefile
+		 scripts/bd_flex-run
+		 scripts/bdbox-run
+		 scripts/bdbox-xyz
 		 contrib/Makefile
-		 contrib/bdbox-run
-		 contrib/bdbox-xyz
+		 contrib/bd_flex-echo
+		 contrib/bd_flex-msub
 		 ])
 AC_OUTPUT

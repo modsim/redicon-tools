@@ -1,0 +1,198 @@
+#!/bin/bash
+#
+# bd_flex-run (c) S. Kondrat (aka Valiska)  2013 run bd_flex binary
+# 
+# This script is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# my dear self
+myname=$(basename $0)
+# others
+bdflex=@BDBOX@
+nproc=1 # this is OpenMP
+
+# Default values
+
+#
+# Functions
+#
+function usage()
+{
+  echo "Run bd_flex binary with OpenMP."
+  echo "Usage: $1 options "
+  echo "Where options are:"
+  echo "  -d DIR                  run in directory DIR (optional)."
+  echo "  -B BD_FLEX              use BD_FLEX binary."
+  echo "  -i FILE                 input parameter file."
+  echo "  -c COUNT                continue (count to keep track on reruns)."
+  echo "  -p NUM                  number of processes (for OpenMP)."
+  echo "  -r SCRIPT               run script on SIGTERM (eg requeue)."
+  echo "       SCRIPT must accept options -d DIR -B FLEX -i INPUT -c COUNT -p NUM"
+
+  echo
+  echo "  -v                      print version information and exit."
+  echo "  -?                      print this help message and exit."
+
+  echo
+}
+
+#
+# Options
+#
+while getopts "d:B:i:p:r:c:v?:" Option
+do
+  case $Option in
+
+    d  ) directory="$OPTARG"
+         cmd="${cmd} -d $OPTARG";;
+
+    B  ) bdflex="$OPTARG"
+         cmd="${cmd} -B $OPTARG";;
+
+    i  ) input="$OPTARG"
+         cmd="${cmd} -i $OPTARG";;
+
+    p  ) nproc="$OPTARG"
+         cmd="${cmd} -p $OPTARG";;
+
+    c  ) count="$OPTARG";;
+#         cmd="${cmd} -c $OPTARG";;
+
+    r  ) script="$OPTARG"
+         cmd="${cmd} -k $OPTARG";;
+
+    :  ) echo "$myname: option -$OPTARG requires an argument." >&2
+         exit 1 ;;
+
+    v  ) echo "$myname from @PACKAGE@ @VERSION@"
+         exit 0;;
+
+    
+    '?'  |  h) usage ${myname}
+	   exit $OPTERROR;;
+   
+     *  ) echo "${myname}: unimplemented option chosen.";;   # DEFAULT
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+#
+# Check options
+#
+# Working directory
+if test -z "$directory"; then
+	directory="$(pwd)"
+else
+	mkdir -p $directory
+fi
+
+# Check if we continue and set the interrupt and restart files
+if test -n "$count"; then
+	interrupted=$directory/.INTERRUPTED.$count
+	if test ! -f "$interrupted"; then
+		echo "$myname: error: no '`basename $interrupted`' in working directory, cannot continue"
+		exit 1;
+	fi
+
+	# Determine restart file
+	rstfile=$directory/`cat $input | grep rst_filename | cut -d " " -f 2`
+	if test ! -f "$rstfile"; then
+		i=0;
+		haverst="no"
+		while test "$i" -le "5"; 
+		do
+			if test -f "$rstfile$i"; then
+				haverst="yes"
+				break;
+			else
+				i=$[$i+1]
+			fi
+		done
+		rstfile=$rstfile$i;
+	fi
+	if test "$haverst" == "no"; then
+		echo "$myname: error: cannot determine restart file"
+		exit 1
+	else
+		bdflex_opts="--restart=$rstfile"
+	fi
+	count=$[$count+1]
+else
+	count=0
+fi
+interrupted=$directory/@INTERRUPTED@.$count
+if test -f $interrupted; then
+	echo "$myname: error: previous job was interrupted, check '$interrupted' for resuming."
+	exit 1;
+fi
+
+# Check if a job is running
+running=$directory/@RUNNING@
+stopped=$directory/.stopped.info
+if test -f "$running"; then
+	echo "$myname: error: job is running in this directory. If this in not the case, clean up and rerun."
+	exit 1;
+fi
+
+# Check if done, done means done
+done=$directory/@DONE@
+if test -f "$done"; then
+	echo "$myname: good or bad, but everything's been done before me, I go to have a rest."
+	exit 0;
+fi
+
+# Set traps
+if test -x "$script"; then
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted && $script $cmd -c$count && mv $running $stopped && echo  'Stopped on `date`' >> $stopping && echo $stopped && exit" SIGINT SIGTERM
+else
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted && echo '	$myname -c $count $cmd' >> $interrupted && mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && exit" SIGINT SIGTERM
+fi
+
+# Check for an input file
+if test -z "$input"; then
+	echo "$myname: error: no input file, use $myname -i FILE"
+	exit 1;
+fi
+if test ! -f "$input"; then
+	echo "$myname: error: file '$input' does not exists"
+	exit 1;
+fi
+input=$(readlink -f $input)
+
+# Remove queue file if created by a queuer
+cd $directory
+queue=$directory/.QUEUE
+if test -f "$queue"; then
+	rm $queue
+fi
+
+# Set running file
+if test -f "$stopped"; then
+	mv $stopped $running
+	echo "Resumed on `date`" >> $running
+else
+	echo "Started on `date`" >> $running
+fi
+echo $bdflex $input $bdflex_opts >> $running
+
+OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
+
+# Uh, we've done
+cat $running > $done
+echo "Finished on `date`" >> $done
+rm $running
+
+exit 0;
+
