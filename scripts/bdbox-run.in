@@ -306,9 +306,9 @@ do
 	# run the BD beast (runme is either a script or )
 	echo
 	echo "Starting/continuing run #$irun:"
-	echo $runme $bdbin -i $base.prm $nproc $cont_opt >> $base.cmd
-	$runme $bdbin -i $base.prm $nproc $cont_opt
-	echo "Run #$irun done!"
+	echo $runme $bdbin -i $(readlink -f $base.prm) $nproc $cont_opt >> $base.cmd
+	$runme $bdbin -i $(readlink -f $base.prm) $nproc $cont_opt
+	echo "Run #$irun done/queued!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill
 	#echo $! > $base.pid
