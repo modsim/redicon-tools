@@ -80,7 +80,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = contrib
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(srcdir)/bd_flex-echo.in ChangeLog
+	$(srcdir)/bd_flex-echo.in $(srcdir)/bd_flex-msub.in ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -91,7 +91,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = bd_flex-echo
+CONFIG_CLEAN_FILES = bd_flex-echo bd_flex-msub
 CONFIG_CLEAN_VPATH_FILES =
 SCRIPTS = $(noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -245,7 +245,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_SCRIPTS = bd_flex-echo
+noinst_SCRIPTS = bd_flex-echo bd_flex-msub
 CLEANFILES = $(noinst_SCRIPTS)
 all: all-am
 
@@ -281,6 +281,8 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 bd_flex-echo: $(top_builddir)/config.status $(srcdir)/bd_flex-echo.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+bd_flex-msub: $(top_builddir)/config.status $(srcdir)/bd_flex-msub.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
@@ -439,7 +441,6 @@ uninstall-am:
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags-am uninstall uninstall-am
-
 
 #EXTRA_DIST = ChangeLog
 
