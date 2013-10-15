@@ -1,3 +1,7 @@
+2013-10-15  version 0.2.10  <s.kondrat@fz-juelich.de>
+
+	* contrib/ -> scripts/:
+
 2013-09-10 14:30 CEST  version 0.2.1  <s.kondrat@fz-juelich.de>
 
 	* configure.ac: --with-bdbox option, AC_SUBST() for BDBOX and
