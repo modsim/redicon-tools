@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# bd_flex-echo (c) S. Kondrat (aka Valiska)  2013 custom bd_flex script 
+# this is for testing, see bd_flex-msub for a more useful script
+# 
+# This script is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# my dear self
+myname=$(basename $0)
+# others
+bdflex=@BDFLEX_RUN@
+
+#
+# Functions
+#
+function usage()
+{
+  echo "Echo bd_flex-run (for testing)."
+  echo "Usage: $1 options "
+  echo "Where options are:"
+  echo "  -d DIR                  run in directory DIR (optional)."
+  echo "  -B BD_FLEX              use BD_FLEX binary."
+  echo "  -i FILE                 input parameter file."
+  echo "  -c COUNT                continue (count to keep track on reruns)."
+  echo "  -p NUM                  number of processes (for OpenMP)."
+  echo
+  echo "  -v                      print version information and exit."
+  echo "  -?                      print this help message and exit."
+
+  echo
+}
+
+#
+# Options
+#
+while getopts "d:B:i:p:c:v?:" Option
+do
+  case $Option in
+
+    d  ) directory="$OPTARG"
+         cmd="${cmd} -d $OPTARG";;
+
+    B  ) bdflex="$OPTARG"
+         cmd="${cmd} -B $OPTARG";;
+
+    i  ) input="$OPTARG"
+         cmd="${cmd} -i $OPTARG";;
+
+    p  ) nproc="$OPTARG"
+         cmd="${cmd} -p $OPTARG";;
+
+    c  ) count="$OPTARG"
+         cmd="${cmd} -c $OPTARG";;
+
+    r  ) script="$OPTARG"
+         cmd="${cmd} -k $OPTARG";;
+
+    :  ) echo "$myname: option -$OPTARG requires an argument." >&2
+         exit 1 ;;
+
+    v  ) echo "$myname from @PACKAGE@ @VERSION@"
+         exit 0;;
+
+    
+    '?'  |  h) usage ${myname}
+	   exit $OPTERROR;;
+   
+     *  ) echo "${myname}: unimplemented option chosen.";;   # DEFAULT
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+# We just echo the flohe command
+echo $bdflex $cmd
+
+exit 0;
+

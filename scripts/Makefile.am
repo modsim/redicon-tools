@@ -1,4 +1,4 @@
 bin_SCRIPTS= bd_flex-run bdbox-run  bdbox-xyz
 
-EXTRA_DIST = $(bin_SCRIPTS)
+EXTRA_DIST = 
 CLEANFILES = $(bin_SCRIPTS)

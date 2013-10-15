@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.10], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.11], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -95,5 +95,6 @@ AC_CONFIG_FILES([Makefile
 		 scripts/bdbox-run
 		 scripts/bdbox-xyz
 		 contrib/Makefile
+		 contrib/bd_flex-echo
 		 ])
 AC_OUTPUT
