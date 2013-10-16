@@ -69,8 +69,8 @@ do
     c  ) count="$OPTARG";;
 #         cmd="${cmd} -c $OPTARG";;
 
-    r  ) script="$OPTARG"
-         cmd="${cmd} -k $OPTARG";;
+    r  ) script="$OPTARG" ;;
+#         cmd="${cmd} -k $OPTARG";;
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
          exit 1 ;;
@@ -154,9 +154,19 @@ if test -f "$done"; then
 	exit 0;
 fi
 
+# check if re-run/queue script exists
+if test -n "$script"; then
+	if test ! -f "$script"; then
+		echo "$myname: warning: no script '$script', try giving the fullpath; ignoring rerun option"
+		script=
+	elif test ! -x "$script"; then
+		script="bash $script"
+	fi
+fi
+
 # Set traps
-if test -x "$script"; then
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted && $script $cmd -c$count && mv $running $stopped && echo  'Stopped on `date`' >> $stopping && echo $stopped && exit" SIGINT SIGTERM
+if test -n "$script"; then
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted &&  mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && sleep 5 && $script $cmd -c$count && exit" SIGINT SIGTERM
 else
 	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted && echo '	$myname -c $count $cmd' >> $interrupted && mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && exit" SIGINT SIGTERM
 fi

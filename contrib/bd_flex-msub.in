@@ -19,6 +19,8 @@
 #
 # my dear self
 myname=$(basename $0)
+# my full path
+myself=$(realpath $0)
 # others
 bdflex=@BDFLEX_RUN@
 
@@ -83,6 +85,7 @@ done
 
 shift $(($OPTIND - 1))
 
+
 # Check if there is msub
 msub=`which msub`
 if test -n "$msub"; then
@@ -111,7 +114,7 @@ if test -f "$qsubfile"; then
 		count=$[$count+1]
 	done
 fi
-echo $bdflex $cmd > $qsubfile
+echo $bdflex $cmd -r $myself > $qsubfile
 
 # Run/submit a job
 $msub $qsubfile

@@ -1,3 +1,7 @@
+2013-10-16  version 0.2.13  <s.kondrat@fz-juelich.de>
+
+	* bd_flex-msub.in: pass full itself to bd_flux-run.
+
 2013-10-15 13:15 CEST  version 0.2.12  <s.kondrat@fz-juelich.de>
 
 	* bd_flex-msub.in: job submitter for judge@gz-juelich.de

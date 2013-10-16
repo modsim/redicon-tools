@@ -1,3 +1,7 @@
+2013-10-16  version 0.2.13  <s.kondrat@fz-juelich.de>
+
+	* bd_flex-run: bug fix: check for re-run/queue script.
+
 2013-10-14 17:45 CEST  version 0.2.8  <s.kondrat@fz-juelich.de>
 
 	* bdbox-run: -c (continue stopped calculations) option added.
