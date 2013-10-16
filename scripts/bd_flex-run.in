@@ -188,6 +188,8 @@ else
 fi
 echo $bdflex $input $bdflex_opts >> $running
 
+# Run from working directory
+cd $directory
 OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
 
 # Uh, we've done
