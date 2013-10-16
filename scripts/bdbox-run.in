@@ -277,6 +277,7 @@ while test $irun -lt $nrun;
 do
 	idir=run_$irun
 	mkdir -p $idir
+	idir_opt="-d $(readlink -f $idir)"
 	prm_prepare $baseprm $strfile $base > $idir/$base.prm
 	olddir=`$pwd` && cd $idir
 
@@ -306,8 +307,8 @@ do
 	# run the BD beast (runme is either a script or )
 	echo
 	echo "Starting/continuing run #$irun:"
-	echo $runme $bdbin -i $(readlink -f $base.prm) $nproc $cont_opt >> $base.cmd
-	$runme $bdbin -i $(readlink -f $base.prm) $nproc $cont_opt
+	echo $runme $bdbin $idir_opt -i $(readlink -f $base.prm) $nproc $cont_opt >> $base.cmd
+	$runme $bdbin $idir_opt -i $(readlink -f $base.prm) $nproc $cont_opt
 	echo "Run #$irun done/queued!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill

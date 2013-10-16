@@ -97,6 +97,7 @@ if test -z "$directory"; then
 else
 	mkdir -p $directory
 fi
+directory=$(readlink -f $directory)
 
 # Check if we continue and set the interrupt and restart files
 if test -n "$count"; then
