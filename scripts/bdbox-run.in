@@ -44,6 +44,7 @@ function usage()
   echo "        where COUNT says the continuation number, see '`basename @BDFLEX_RUN@` -h'"
   echo "        For an example see contrib/@BDFLEX_MSUB@"
   echo
+  echo "  -b BASE                  custom base name for files (default input file)."
 
   echo "Molecular system options:"
   echo "  -H Hx,Hy,Hz             box size."
@@ -51,7 +52,8 @@ function usage()
   echo "  -r R1,R2,..             particle's radii."
   echo "  -N N1,N2,..             number of particles."
   echo "  -T VAL,VAL,..           placement type(rand,cent,lat)."
- 
+  echo
+
   echo "Simulation options:"
   echo "  -R NUM                  number of runs."
   echo "  -p NPROC                number of procs (for OpenMP)."
@@ -111,7 +113,7 @@ function prm_prepare ()
 #
 # Options
 #
-while getopts "d:B:i:H:n:r:N:R:T:s:p:cv?:" Option
+while getopts "d:B:i:H:n:r:N:R:T:s:p:b:cv?:" Option
 do
   case $Option in
 
@@ -149,6 +151,9 @@ do
 
     p  ) nproc="-p $OPTARG"
          cmd="${cmd} -p $OPTARG";;
+
+    b  ) custom_base="$OPTARG"
+         cmd="${cmd} -b $OPTARG";;
 
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
@@ -279,7 +284,12 @@ do
 	mkdir -p $idir
 	idir_opt="-d $(readlink -f $idir)"
 	# local base name (for local run)
-	lbase=${base}_r$irun
+	if test -z "$custom_base"; then
+		lbase=${base}_r$irun
+	else
+		lbase=${custom_base}_r$irun
+	fi
+
 	prm_prepare $baseprm $strfile $lbase > $idir/$lbase.prm
 	olddir=`$pwd` && cd $idir
 

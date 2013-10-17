@@ -1,6 +1,7 @@
 2013-10-17  version 0.2.14  <s.kondrat@fz-juelich.de>
 
-	* bdbox-run: insert run number to local file names.
+	* bdbox-run.in: -b (custom base name) option; insert the run
+	number in the local file names (in run_n/).
 
 2013-10-16  version 0.2.13  <s.kondrat@fz-juelich.de>
 
