@@ -166,9 +166,9 @@ fi
 
 # Set traps
 if test -n "$script"; then
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted && echo 'Running custom script:' >> $interrupted && echo '	$script $cmd -c $count' >> $interrupted &&  mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && sleep 5 && $script $cmd -c$count && exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted ; echo 'Running custom script:' >> $interrupted ; echo '	$script $cmd -c $count' >> $interrupted ;  mv $running $stopped ; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; $script $cmd -c$count ; exit" SIGINT SIGTERM
 else
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted && echo '	$myname -c $count $cmd' >> $interrupted && mv $running $stopped && echo 'Stopped on `date`' >> $stopped && echo >> $stopped && exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted ; echo '	$myname -c $count $cmd' >> $interrupted ; mv $running $stopped ; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; exit" SIGINT SIGTERM
 fi
 
 # Check for an input file
@@ -184,8 +184,9 @@ input=$(readlink -f $input)
 
 # Remove queue file if created by a queuer
 cd $directory
-queue=$directory/.QUEUE
+queue="$directory/@QUEUE@"
 if test -f "$queue"; then
+	cat $queue >> $directory/.queue.info
 	rm $queue
 fi
 

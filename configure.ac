@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.14], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.15], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -84,7 +84,8 @@ AC_SUBST(INTERRUPTED)
 INTERRUPTED=.INTERRUPTED
 AC_SUBST(RUNNING)
 RUNNING=.RUNNING
-
+AC_SUBST(QUEUE)
+QUEUE=.QUEUED
 
 AC_CONFIG_FILES([Makefile
                  lib/Makefile

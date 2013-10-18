@@ -85,6 +85,11 @@ done
 
 shift $(($OPTIND - 1))
 
+# Check if already queued
+if test -f "$directory/@QUEUE@"; then
+	echo "$myname: error: job is queued already; if this is not the case, remove '$directory/@QUEUE@' and run again."
+	exit 1;
+fi
 
 # Check if there is msub
 msub=`which msub`
@@ -103,7 +108,9 @@ if test ! -f "$input"; then
 	echo "$myname: error: no input file '$input'"
 	exit 1;
 fi
-qsubfile="`basename $input .prm`.qsub"
+
+# Get the qsub file name
+qsubfile="$directory/`basename $input .prm`.qsub"
 if test -f "$qsubfile"; then
 	count=1
 	while true; do
@@ -115,6 +122,12 @@ if test -f "$qsubfile"; then
 	done
 fi
 echo $bdflex $cmd -r $myself > $qsubfile
+
+# Write queue info and submit
+echo "Queued on `date` by $myname @VERSION@" > $directory/@QUEUE@
+echo "qsub command: $msub" >> $directory/@QUEUE@
+echo "qsub file: $qsubfile" >> $directory/@QUEUE@
+echo >> $directory/@QUEUE@
 
 # Run/submit a job
 $msub $qsubfile
