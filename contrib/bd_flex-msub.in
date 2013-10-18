@@ -20,7 +20,7 @@
 # my dear self
 myname=$(basename $0)
 # my full path
-myself=$(realpath $0)
+myself=$(readlink -f $0)
 # others
 bdflex=@BDFLEX_RUN@
 
