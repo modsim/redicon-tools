@@ -1,3 +1,8 @@
+2013-10-22  version 0.2.15  <s.kondrat@fz-juelich.de>
+
+	* molecule.cc system.cc: save more info (volume, packing fraction
+	etc).
+
 2013-09-30  version 0.2.4  <s.kondrat@fz-juelich.de>
 
 	* molecule.cc system.cc etc: support for non CXX-11 compilant

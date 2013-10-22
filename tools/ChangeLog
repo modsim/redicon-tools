@@ -1,3 +1,8 @@
+2013-10-2  version 0.2.15  <s.kondrat@fz-juelich.de>
+
+	* molsys.cc: -t (number of tries with random placement), -s (str
+	file), and save system info.
+
 2013-10-10  version 0.2.6  <p.burla@fz-juelich.de>
 
 	* molsys.cc: -T (types) option for rand/cent molecule placement.
@@ -18,7 +23,6 @@
 2013-08-22  version 0.1.21  <s.kondrat@fz-juelich.de>
 
 	* pdb2str.cc: -a angle, add angle bonds 'in series'.
->>>>>>> 3378b137624801d2fb0cfc62d4dac1ff9c559c0f
 
 2013-08-22  version 0.1.15  <s.kondrat@fz-juelich.de>
 

@@ -61,8 +61,9 @@ void usage ()
 	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (units?).\n");
 
 //	fprintf (stderr, " -a, --arrangment=rand/latt  arrangment (random/latt).\n");
-//	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
+	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
 
+	fprintf (stderr, " -s, --str-file=FILE      STR output file.\n");
 	fprintf (stderr, " -v, --version            print version iformation and exit.\n");
 	fprintf (stderr, " -h, --help               print this message and exit.\n");
 
@@ -132,11 +133,12 @@ int main (int argc, char ** argv)
 
 	//char * arrangment = NULL;
 
-	char * str = (char*) NULL;
-	FILE * str_file = (FILE*) NULL;
+	string str_file;
 	
 	char * pdb = (char*) NULL;
 	FILE * pdb_file = (FILE*) NULL;
+
+	int ntries = 100;
 
 	/* 
 	 * Command-line parser 
@@ -144,7 +146,7 @@ int main (int argc, char ** argv)
 
 	int c = 0;
 
-#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:T:"
+#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:T:t:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -154,7 +156,7 @@ int main (int argc, char ** argv)
 			{"version", no_argument, NULL, 'v'},
 
 			//{"pdb-file", required_argument, NULL, 'p'},
-			//{"str-file", no_argument, NULL, 's'},
+			{"str-file", required_argument, NULL, 's'},
 
 			{"size", required_argument, NULL, 'H'},
 			{"location", required_argument, NULL, 'R'},
@@ -171,7 +173,7 @@ int main (int argc, char ** argv)
 			{"type",required_argument, NULL,'T'},
 
 			//{"arrangment", no_argument, NULL, 'a'},
-			//{"tries", no_argument, NULL, 't'},
+			{"tries", required_argument, NULL, 't'},
 		};
 
 		switch ((c = getopt_long (argc, argv, ARGS, long_options, &option_index))) 
@@ -189,14 +191,7 @@ int main (int argc, char ** argv)
 					  }
 					  break;
 
-				case 's': 
-					  str = strdup (optarg);
-					  str_file = fopen (pdb, "r");
-					  if (!str_file)
-					  {
-						  fprintf (stderr, "%s: error: caanot open file '%s' for writing.\n", myname, str);
-						  return 1;
-					  }
+				case 's': str_file = strdup (optarg);
 					  break;
 
 				case 'H': {
@@ -256,6 +251,8 @@ int main (int argc, char ** argv)
 
 				case 'j':  LJ = (double *) malloc (sizeof (double) );
 					nLJ = str2dlist (&optarg, ",", &LJ); break;
+
+				case 't':  ntries = atoi (optarg); break;
 
 				// usage/version
 				case 'h': usage (); exit (1); break;
@@ -322,7 +319,6 @@ int main (int argc, char ** argv)
 	for (unsigned int i = 0; i < nN; i++)
 		nMols += N[i];
 
-	int ntries = 10;
 
 	int have_centr = 0;
 	if (types) 
@@ -390,9 +386,18 @@ int main (int argc, char ** argv)
 	}	
 
 	std::cerr << "Packing info: " << nMols << " molecules given, " << S.getNMolecules() << " packed in a box." << std::endl;
-	S.printInfo(&std::cerr);
 
-	S.printBBStr(&std::cout);
+	if ( !str_file.empty()) 
+	{
+		string info_file = str_file + ".info";
+		S.printInfo ((char*) info_file.c_str());
+		S.printBBStr (str_file.c_str());
+	}
+	else
+	{
+		S.printInfo(&std::cerr);
+		S.printBBStr(&std::cout);
+	}
 
 	//
 	// Free everything
@@ -412,7 +417,7 @@ int main (int argc, char ** argv)
 	if (HDradia) free (HDradia);
 	if (LJ) free (LJ);
 
-	for (int i = 0; i < ntypes; i++)
+	for (unsigned int i = 0; i < ntypes; i++)
 		free (types[i]);
 	if (types) free (types);
 
@@ -420,13 +425,8 @@ int main (int argc, char ** argv)
 	if (pdb_file)
 		free (pdb_file);
 
-	if (str_file)
-		fclose (str_file);
-
 	if (pdb)
 		free (pdb);
-	if (str)
-		free (str);
 
 	S.tryDelete();
 

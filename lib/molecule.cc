@@ -21,6 +21,9 @@
 #include <string.h>
 #include <iostream> 
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include<molecule.h>
 
 // for C++11 from autoconf
@@ -241,6 +244,27 @@ unsigned int Molecule::shiftSerial (unsigned int serial)
 	}
 
 	return serial;
+}
+
+// serial number shift
+double Molecule::getVolume (void) const
+{
+
+	double volume = 0.;
+
+#ifdef HAVE_CXX11
+	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
+		double r = a->getHSRadius ();
+		volume += (4. * M_PI / 3. ) * r * r * r;
+	}
+
+	return volume;
 }
 
 // Overlap 

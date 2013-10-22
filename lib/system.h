@@ -26,6 +26,18 @@
 
 #include <molecule.h>
 
+class molType 
+{
+
+	public:
+		molType (const char * name, int nmols) : name(name), nmols(nmols) {};
+		~molType ();
+
+		std::string name;
+		unsigned int nmols;
+		double volume;
+};
+
 class System
 {
 	public:
@@ -39,11 +51,12 @@ class System
 		int getNMolecules () const {return Molecules.size();};
 
 		// print general info
-		void printInfo (char*) const;
+		void printInfo (const char*) const;
 		void printInfo (std::ostream *) const;
 		
 		// Output BD_BOX str line
 		void printBBStr (std::ostream *) const;
+		void printBBStr (const char *) const;
 
 	private:
 
@@ -57,6 +70,8 @@ class System
 		std::vector<Molecule*> Molecules;
 		bool foreachMolecule (MoleculeFunction, void * user_params) const;
 		unsigned int last_serial; // serial of the last atom of th elast molecule (lergest serial)
+
+		std::vector<molType*> mol_types;
 
 		bool trydelete;
 

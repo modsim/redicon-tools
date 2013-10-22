@@ -161,6 +161,31 @@ bool System::addMolecule (Molecule& M)
 		Molecules.push_back (&M);
 		last_serial = MoleculeAttorney::shiftSerial (M, last_serial);
 		charge += M.getCharge();
+
+		// Check molecule type in a system
+		bool have_type = false;
+
+#ifdef HAVE_CXX11
+		for (auto &mt : mol_types)
+		{
+#else
+		for (unsigned int i = 0; i < mol_types.size (); i++)
+		{
+			molType * mt = mol_types.at (i);
+#endif
+			if ( mt->name.find(M.getName()) != std::string::npos)
+			{
+				mt->nmols++;
+				have_type = true;
+				break;
+			}
+		}
+		if (have_type == false)
+		{
+			molType * mt = new molType (M.getName(), 1);
+			mt->volume = M.getVolume ();
+			mol_types.push_back (mt);
+		}
 		return true;
 	}
 	
@@ -188,7 +213,7 @@ bool System::foreachMolecule (MoleculeFunction func, void * data) const
 //
 // print System's info
 //
-void System::printInfo (char * name) const
+void System::printInfo (const char * name) const
 {
 	std::ostream * stream = new std::ofstream (name);
 	printInfo (stream);
@@ -197,10 +222,59 @@ void System::printInfo (char * name) const
 
 void System::printInfo (std::ostream * stream) const
 {
-	*stream << "System has " << getNMolecules() << " molecules in a box of size ";
-	H.print (stream);
-	*stream << " centered at "; R0.print (stream);
-	*stream  << "and its total charge is " << charge << std::endl ;
+	*stream << "Box size: " ; H.print (stream); *stream << std::endl;
+	*stream << "Box center: "; R0.print (stream);*stream << std::endl;
+
+	double volume = 1;
+	for (int i = 0; i < 3; i++)
+		volume *= H.get (i);
+	*stream << "Volume: " << volume; *stream << std::endl;
+	*stream << std::endl;
+
+	*stream << "Total number of molecules: " << getNMolecules(); *stream << std::endl;
+	*stream  << "Total charge: " << charge << std::endl ;
+	*stream << "Total density: " << getNMolecules()/volume << std::endl;
+
+	double eta = 0., molvol = 0.;
+
+#ifdef HAVE_CXX_11
+	for (auto &mt : mol_types)
+	{
+#else
+	for (unsigned int i = 0; i < mol_types.size(); i++)
+	{
+		molType * mt = mol_types.at (i);
+#endif
+		molvol += mt->nmols * mt->volume;
+		eta += mt->nmols * mt->volume / volume;
+	}
+	*stream << "Total packing fraction: " << eta << std::endl;
+	*stream << std::endl;
+
+#ifdef HAVE_CXX_11
+	for (auto &mt : mol_types)
+	{
+#else
+	for (unsigned int i = 0; i < mol_types.size(); i++)
+	{
+		molType * mt = mol_types.at (i);
+#endif
+		*stream << "Molecules type: " << mt->name << std::endl;
+		*stream << "Molecular volume: " << mt->volume << " (A3)" <<std::endl;
+		*stream << "Number of molecules: " << mt->nmols << std::endl;
+		*stream << "Number denisty: " << mt->nmols / volume << " (#/A3)" << std::endl;
+		*stream << "Concentration:" << (double) mt->nmols / (double) getNMolecules() << std::endl;
+		*stream << "Packing fraction: " << mt->nmols * mt->volume / volume << std::endl;
+		*stream << "Volume fraction: " << mt->nmols * mt->volume / molvol << std::endl;
+		*stream << std::endl;
+	}
+}
+
+void System::printBBStr (const char * name) const
+{
+	std::ostream * stream = new std::ofstream (name);
+	printBBStr (stream);
+	delete stream;
 }
 
 void System::printBBStr (std::ostream * stream) const

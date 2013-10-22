@@ -17,6 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+#
+# 
+msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+#msub="bash"
+
 # my dear self
 myname=$(basename $0)
 # my full path
@@ -92,12 +97,14 @@ if test -f "$directory/@QUEUE@"; then
 fi
 
 # Check if there is msub
-msub=`which msub`
-if test -n "$msub"; then
-	msub="$msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
-else
-	msub="bash"
-fi
+# There is a submiter on a master but no submiter on nodes
+# just set it by hands (see file's top)
+#msub=`which msub`
+#if test -n "$msub"; then
+#	msub="$msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+#else
+#	msub="bash"
+#fi
 
 # Check input file and create qsub file
 if test -z "$input"; then
