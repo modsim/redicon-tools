@@ -309,7 +309,6 @@ int main (int argc, char ** argv)
 		return 1; /* failure */
 	}
 
-
 // Create system
 	System S (*R, *H);
 	unsigned int nMols = 0;
@@ -335,7 +334,12 @@ int main (int argc, char ** argv)
 				}	
 
 				Atom a (names[i], radii[i]);
+
 				if (charges) a.setCharge (charges[i]);
+				if (LJ) a.setLJ (LJ[i]);
+				if (HDradia) a.setHDRadius (HDradia[i]);
+				if (masses) a.setMass (masses[i]);
+
 				Monatomic * M = new Monatomic (names[i], a);
 				M->setPosition (*R);
 				if ( !S.addMolecule (*M) )
@@ -357,6 +361,10 @@ int main (int argc, char ** argv)
 	{	
 		Atom a (names[i], radii[i]);
 		if (charges) a.setCharge (charges[i]);
+		if (LJ) a.setLJ (LJ[i]);
+		if (HDradia) a.setHDRadius (HDradia[i]);
+		if (masses) a.setMass (masses[i]);
+
 		for (int j = 0; j < N[i]; j++)
 		{
 			// "cent" molecule is already in the box, skip

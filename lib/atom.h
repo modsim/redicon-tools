@@ -70,6 +70,7 @@ class Atom
 		void setCharge (double val) { charge = val;};
 		void setLJ (double val) {LJ = val;};
 		void setMass (double val) { mass = val;};
+		void setHDRadius (double val) { hd_radius = val;};
 
 		// Get methods
 		const char * getName () const {return name;};

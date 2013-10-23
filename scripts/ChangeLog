@@ -1,4 +1,8 @@
-2013-10-22  version 0.2.16  <s.kondrat@fz-juelich.de>
+2013-10-23 15:00 CEST  version 0.2.17  <s.kondrat@fz-juelich.de>
+
+	* bdbox-run: -a option implemented.
+
+2013-10-23  version 0.2.16  <s.kondrat@fz-juelich.de>
 
 	* bdbox-run: -j, -q, -S etc options (for molsys-create).
 

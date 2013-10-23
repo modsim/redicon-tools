@@ -48,6 +48,17 @@ System::~System ()
 			}
 		}
 	}
+#ifdef HAVE_CXX11
+	for (auto &mt : mol_types) // C++0x
+	{
+#else
+	for (int i = 0; i < mol_types.size(); i++)
+	{
+		molType * mt = mol_types.at (i);
+#endif
+		delete mt;
+	}
+
 };
 
 // For System::moleculeInBox

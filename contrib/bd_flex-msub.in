@@ -19,9 +19,9 @@
 #
 #
 # 
-msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
-msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
-#msub="bash"
+#msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+#msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+msub="bash"
 
 # my dear self
 myname=$(basename $0)

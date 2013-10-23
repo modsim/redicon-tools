@@ -31,7 +31,7 @@ class molType
 
 	public:
 		molType (const char * name, int nmols) : name(name), nmols(nmols) {};
-		~molType ();
+		~molType () {};
 
 		std::string name;
 		unsigned int nmols;
