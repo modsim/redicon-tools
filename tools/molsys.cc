@@ -43,7 +43,6 @@ void usage ()
 {
 	fprintf (stderr, "Usage: %s \n", myname);
 	fprintf (stderr, "create a system of uni-atom molecules and output to an .str file.\n");
-	fprintf (stderr, "Molecules are placed randomly.\n");
 	fprintf (stderr, "Options are\n");
 
 	fprintf (stderr, " -H, --size=X,Y,Z        system size (in A).\n");
@@ -52,16 +51,14 @@ void usage ()
 	fprintf (stderr, " -n, --names=NAME,NAME...   names of atoms.\n");
 	fprintf (stderr, " -r, --radia=VAL,VAL...     radia (in A).\n");
 	fprintf (stderr, " -N, --numbers=VAL,VAL,...  number of particles.\n");
-	fprintf (stderr, " -T, --type=VAL,VAL,...     placement type (rand, cent, lat).\n");
-	fprintf (stderr, "                  cent can be used once for a single particle.");
 
 	fprintf (stderr, " -q, --charge=VAL,VAL,...   charges (in e).\n");
 	fprintf (stderr, " -m, --masses=VAL,VAL,...   masses (arbitrary units).\n");
 	fprintf (stderr, " -d, --hd-radia=VAL,VAL,... hydrodynamic radia (in A).\n");
-	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (units?).\n");
-
-//	fprintf (stderr, " -a, --arrangment=rand/latt  arrangment (random/latt).\n");
-	fprintf (stderr, " -t, --tries=N           number of tries (for -a rand) before giving up.\n");
+	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (in kcal/mol).\n");
+	fprintf (stderr, " -T, --type=VAL,VAL,...     placement type (rand, cent, lat).\n");
+	fprintf (stderr, "                  cent can be used once for a single particle.\n");
+	fprintf (stderr, " -t, --tries=N            number of tries (for -a rand) before giving up.\n");
 
 	fprintf (stderr, " -s, --str-file=FILE      STR output file.\n");
 	fprintf (stderr, " -v, --version            print version iformation and exit.\n");
@@ -430,6 +427,9 @@ int main (int argc, char ** argv)
 
 	S.tryDelete();
 
-	return 0;
+	if (nMols != S.getNMolecules())
+		return 1;
+	else
+		return 0;
 }
 

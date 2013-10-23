@@ -1,8 +1,12 @@
+2013-10-22  version 0.2.16  <s.kondrat@fz-juelich.de>
+
+	* bdbox-run: -j, -q, -S etc options (for molsys-create).
+
 2013-10-18  version 0.2.15  <s.kondrat@fz-juelich.de>
 
 	* bd_flex-run.in: check queue file and save to .queue.info.
 
-2013-10-17  version 0.2.14  <s.kondrat@fz-juelich.de>
+12013-10-17  version 0.2.14  <s.kondrat@fz-juelich.de>
 
 	* bdbox-run.in: -b (custom base name) option; insert the run
 	number in the local file names (in run_n/).

@@ -20,6 +20,7 @@
 #
 # 
 msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
 #msub="bash"
 
 # my dear self
@@ -118,6 +119,7 @@ fi
 
 # Get the qsub file name
 qsubfile="$directory/`basename $input .prm`.qsub"
+
 if test -f "$qsubfile"; then
 	count=1
 	while true; do
@@ -130,6 +132,11 @@ if test -f "$qsubfile"; then
 fi
 echo $bdflex $cmd -r $myself > $qsubfile
 
+# add err/out files
+if test "$msub" != "bash"; then
+	msub="$msub -e ${qsubfile}.err -o ${qsubfile}.out "
+fi
+
 # Write queue info and submit
 echo "Queued on `date` by $myname @VERSION@" > $directory/@QUEUE@
 echo "qsub command: $msub" >> $directory/@QUEUE@
@@ -138,6 +145,5 @@ echo >> $directory/@QUEUE@
 
 # Run/submit a job
 $msub $qsubfile
-
 exit 0;
 

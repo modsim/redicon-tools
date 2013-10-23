@@ -251,7 +251,7 @@ double Molecule::getVolume (void) const
 {
 
 	double volume = 0.;
-
+	//FIXME: this is untrue when atoms overlap!!!
 #ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 	{
