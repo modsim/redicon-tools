@@ -72,7 +72,7 @@ do
     H  ) OLD_IFS="$IFS";
 	 IFS=","
 	 Hlist=( ${OPTARG} )
-         Hval="${nmolslist[@]}"
+         Hval="${Hlist[@]}"
          IFS="$OLD_IFS"
 	analysexyz_opt="$analysexyz_opt -H $Hval"
 
