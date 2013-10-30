@@ -34,9 +34,11 @@ function usage()
   echo "Where options are:"
   echo "  -d DIR                  working directory."
   echo "  -o FILE                 output file."
-  echo "  -n VAL                  size of a molecule (natoms)."
-  echo "  -k K1,K2,..             first atom serials when more then one molecule"
-  echo "                          in a system see `basename $analysexyz`)."
+  echo "  -k K1,K2,..             coma-separated serial numbers of first atoms/beads"
+  echo "                          of tracking molecules, see `basename $analysexyz`)."
+  echo "  -n VAL                  size of a molecule (number of atoms in series)."
+  echo "  -H Hx,Hy,Hz             periodic box size (default no box = 0,0,0)."
+
   echo "  -w VAL                  time window for averaging."
   echo
   echo "  -v                      print version information and exit."
@@ -47,7 +49,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:o:k:n:w:v?:" Option
+while getopts "d:o:k:n:w:H:v?:" Option
 do
   case $Option in
 
@@ -66,6 +68,15 @@ do
          mols="${nmolslist[@]}"
          IFS="$OLD_IFS"
          cmd="${cmd} -k $OPTARG";;
+
+    H  ) OLD_IFS="$IFS";
+	 IFS=","
+	 Hlist=( ${OPTARG} )
+         Hval="${nmolslist[@]}"
+         IFS="$OLD_IFS"
+	analysexyz_opt="$analysexyz_opt -H $Hval"
+
+         cmd="${cmd} -H $OPTARG";;
 
     w  ) window=" -w$OPTARG"
          cmd="${cmd} -w $OPTARG";;

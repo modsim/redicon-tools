@@ -18,9 +18,14 @@ import string
 import time
 import datetime
 
+# Store value for cmd line parser
 def store_value(option, opt_str, value, parser):
     setattr(parser.values, option.dest, value)
 
+# Check if we leave the box of size H, and 
+# update/shift the box along the coresponding
+# axis; ra and rb are the two subsequent points
+# before and after a move
 def check_box (H, ra, rb, box):
 	d = [0 for col in range(3)] 
 
@@ -112,8 +117,9 @@ Rx = [[0 for col in range(ntime)] for row in range(n)]
 Ry = [[0 for col in range(ntime)] for row in range(n)]
 Rz = [[0 for col in range(ntime)] for row in range(n)]
 
-# Integer denoting the box where the traced atoms are;
-# Start from 0,0,0
+# Integer denoting the box whith the traced atoms
+# Start from 0,0,0 and shift if leaving the box 
+# in one of three directions
 box = [[0 for col in range(3)] for row in range(n)]
 
 # Check if we have PBC
@@ -122,6 +128,7 @@ if H[0] != 0 or H[1] != 0 or H[2] != 0:
 else:
 	PBC = False
 
+# Parse the input file
 for line in fileinput.input(filename):
 	if debug:
 		print '***************************'
@@ -166,7 +173,7 @@ for line in fileinput.input(filename):
 		else:
 			time.append ( float(itime) )
 
-	# if atom's position lines of interest
+	# if atom's position == lines of interest
 	elif iline - itime * (size + 2) - 2 >= k and iline - itime * (size + 2) - 2 < k + n:
 		natoms = natoms + 1
 		
