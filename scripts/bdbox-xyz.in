@@ -117,9 +117,10 @@ for d in `ls`; do
 		for f in `ls $d/*.xyz`; do
 			for imol in $mols; do
 				ofile=$(dirname $f)/$(basename $f .xyz).mol$imol
-				echo "Extracting data from '$f'"
-				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
-				$analysexyz $analysexyz_opt -f $f -n$imol > $ofile.dat
+				echo "Extracting data from '$f' to $ofile"
+				echo "$analysexyz $analysexyz_opt -f $f -k$imol"
+				#echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
+				$analysexyz $analysexyz_opt -f $f -k$imol > $ofile.dat
 				if test -z "$files"; then
 					files=$ofile.dat
 				else
