@@ -211,31 +211,53 @@ Data.sort();
 # N is number of point within the interval, X data to average
 N = 0; 
 X = [0.0] * Data.length
+inInterval = False
+#debug = True
 
 for j in range (0, Data.size, 1):
 
 	if debug:
 		printf ('t = %g, interval (%f, %f)\n', Data.data[j][0], t0, t0 + dt)
+	inInterval = False
 
-	# if within an interval, sum up
-	if Data.data[j][0] >= t0 and Data.data[j][0] <= t0 + dt:
-		N = N + 1
-		for i in range (0, Data.length, 1):
-			X[i] = X[i] + Data.data[j][i]
+	while not inInterval:
 
-	else:
-		# if we have some points withing the interval, average and print out
-		if N != 0:
+		if debug:
+			printf ('inInterval loop: t = %g, interval (%f, %f)\n', Data.data[j][0], t0, t0 + dt)
+
+		# if within an interval, sum up
+		if Data.data[j][0] >= t0 and Data.data[j][0] < t0 + dt:
+			N = N + 1
+			inInterval = True
 			for i in range (0, Data.length, 1):
-				X[i] = X[i] / N
-				printf (' %f ', X[i])
-			printf ('\n')
+				if debug:
+					printf ('Adding %g to X[%i]\n', Data.data[j][i], i)
+				X[i] = X[i] + Data.data[j][i]
 
-		# reset
-		for i in range (0, Data.length, 1):
-			X[i] = Data.data[j][i]
-		t0 = t0 + dt; N = 1
+		else:
+			# if we have some points within the interval, average and print out
+			if N != 0:
+				if debug:
+					printf ('N = %i\n', N)
+				for i in range (0, Data.length, 1):
+					X[i] = X[i] / N
+					printf (' %f ', X[i])
 
+				printf ('\n')
+
+			# reset/clear
+			if debug:
+				printf ('\n************ Clearing/resetting:\n')
+
+			while Data.data[j][0] > t0:
+				t0 = t0 + dt
+
+			N = 1
+			inInterval = True
+			for i in range (0, Data.length, 1):
+				X[i] = Data.data[j][i]
+				if debug:
+					printf ('Adding %g to X[%i]\n', Data.data[j][i], i)
 # Look maybe we have something left
 if N != 0:
 	for i in range (0, Data.length, 1):

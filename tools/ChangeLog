@@ -3,6 +3,8 @@
 	* analyze-xyz.py: try/except for int() for catching broken BD_BOX
 	files.
 
+	* average-me.py: averaging 'time' interval bug fixed.
+
 2013-10-30  version 0.2.17  <p.burla@fz-juelich.de>  <s.kondrat@fz-juelich.de>
 
 	* analyze-xyz.py: -H (box size), periodic box aware.
