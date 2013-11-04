@@ -144,7 +144,20 @@ for line in fileinput.input(filename):
 			if n == 0:
 				n = size;
 		else:
-			if int(tokens[0]) != size:
+			# FIXME:  do same for all splits etc?
+			size_read = 0
+			try:
+				size_read = int(tokens[0])
+			except ValueError:
+				print '# ***        Exception        ***' 
+				print '# Error reading line %i' % (iline)
+				print '# Cannot convert to integer, I give up reading the file'
+				print '# The data is analyzed only up to the above line' 
+				print '# *** End of exception message ***' 
+				print
+				break
+
+			if size_read != size:
 				print 'Error reading line %i, wrong number of atoms, %i, expected %s.' % (iline, size, tokens[0])
 			    	sys.exit()
 

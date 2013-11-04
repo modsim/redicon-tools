@@ -1,8 +1,13 @@
+2013-11-04  version 0.2.18  <s.kondrat@fz-juelich.de>
+
+	* analyze-xyz.py: try/except for int() for catching broken BD_BOX
+	files.
+
 2013-10-30  version 0.2.17  <p.burla@fz-juelich.de>  <s.kondrat@fz-juelich.de>
 
 	* analyze-xyz.py: -H (box size), periodic box aware.
 
-2013-10-2  version 0.2.15  <s.kondrat@fz-juelich.de>
+12013-10-2  version 0.2.15  <s.kondrat@fz-juelich.de>
 
 	* molsys.cc: -t (number of tries with random placement), -s (str
 	file), and save system info.
