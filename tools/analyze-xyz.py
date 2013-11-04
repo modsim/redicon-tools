@@ -154,7 +154,7 @@ for line in fileinput.input(filename):
 				print '# Cannot convert to integer, I give up reading the file'
 				print '# The data is analyzed only up to the above line' 
 				print '# *** End of exception message ***' 
-				print
+				print '#'
 				break
 
 			if size_read != size:

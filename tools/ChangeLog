@@ -1,4 +1,4 @@
-2013-11-04  version 0.2.18  <s.kondrat@fz-juelich.de>
+2013-11-04  version 0.2.19  <s.kondrat@fz-juelich.de>
 
 	* analyze-xyz.py: try/except for int() for catching broken BD_BOX
 	files.

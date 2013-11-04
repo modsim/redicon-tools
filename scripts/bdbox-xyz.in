@@ -40,6 +40,8 @@ function usage()
   echo "  -H Hx,Hy,Hz             periodic box size (default no box = 0,0,0)."
 
   echo "  -w VAL                  time window for averaging."
+  echo "  -O                      Overwrite .dat files (created by analyze-xyz.py) "
+  echo "                          in subdirectories with .xyz files (default no)."
   echo
   echo "  -v                      print version information and exit."
   echo "  -?                      print this help message and exit."
@@ -49,7 +51,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:o:k:n:w:H:v?:" Option
+while getopts "d:o:k:n:w:H:Ov?:" Option
 do
   case $Option in
 
@@ -77,6 +79,9 @@ do
 	analysexyz_opt="$analysexyz_opt -H $Hval"
 
          cmd="${cmd} -H $OPTARG";;
+
+    O  ) overwrite="yes"
+         cmd="${cmd} -O";;
 
     w  ) window=" -w$OPTARG"
          cmd="${cmd} -w $OPTARG";;
@@ -113,19 +118,23 @@ fi
 cd $directory
 for d in `ls`; do
 	if test -d $d; then
-		echo "Scanning directory $d:"
-		for f in `ls $d/*.xyz`; do
-			for imol in $mols; do
-				ofile=$(dirname $f)/$(basename $f .xyz).mol$imol
-				echo "Extracting data from '$f' to $ofile"
+	echo "Scanning directory $d:"
+	for f in `ls $d/*.xyz`; do
+			 for imol in $mols; do
+			 ofile=$(dirname $f)/$(basename $f .xyz).mol$imol
+			 if test ! -f $ofile.dat -o ! -s $ofile.dat -o "x$overwrite" == "xyes"; then
+			 	echo "Extracting data from '$f' to $ofile"
 				echo "$analysexyz $analysexyz_opt -f $f -k$imol"
-				#echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
+				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
 				$analysexyz $analysexyz_opt -f $f -k$imol > $ofile.dat
-				if test -z "$files"; then
-					files=$ofile.dat
-				else
-					files="$files,$ofile.dat"
-				fi
+			 else
+			 	echo "File '$ofile.dat' exists, skipping"
+			fi	
+			if test -z "$files"; then
+				files=$ofile.dat
+			else
+				files="$files,$ofile.dat"
+			fi
 			done
 		done
 	fi

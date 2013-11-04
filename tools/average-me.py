@@ -161,7 +161,7 @@ for f in files:
 			printf ('line: %s\n', line)
 
 		tokens = line.split()
-		if tokens[0] == "#":
+		if len (tokens) == 0 or tokens[0] == "#":
 			continue
 
 		if debugRead:
