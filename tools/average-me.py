@@ -217,7 +217,7 @@ inInterval = False
 for j in range (0, Data.size, 1):
 
 	if debug:
-		printf ('t = %g, interval (%f, %f)\n', Data.data[j][0], t0, t0 + dt)
+		printf ('\nt = %g, interval (%f, %f)\n', Data.data[j][0], t0, t0 + dt)
 	inInterval = False
 
 	while not inInterval:
@@ -249,8 +249,10 @@ for j in range (0, Data.size, 1):
 			if debug:
 				printf ('\n************ Clearing/resetting:\n')
 
-			while Data.data[j][0] > t0:
+			while Data.data[j][0] >= t0 + dt:
 				t0 = t0 + dt
+			if debug:
+				printf ('t = %g, interval (%f, %f)\n', Data.data[j][0], t0, t0 + dt)
 
 			N = 1
 			inInterval = True
