@@ -23,7 +23,7 @@ bdbox=@BDFLEX_RUN@
 molsys=@BCPT_MOLSYS@
 
 # Default values
-nrun=1
+#nrun=1
 
 
 #
@@ -212,6 +212,15 @@ if test -d "$directory" -a "x$cont" != "xyes"; then
 fi
 mkdir -p $directory
 
+# various admin data files
+controldir=$directory/control
+mkdir -p $controldir
+custom_base_file=$controldir/"custom_base_name"
+sepstr_file=$controldir/"sep_str_files"
+runme_file=$controldir/"runner"
+nrun_file=$controldir/"nruns"
+nproc_file=$controldir/"openmp_cores"
+
 # PRM and STR files (depends if continue or not)
 if test "x$cont" == "xyes"; then
 
@@ -233,8 +242,18 @@ if test "x$cont" == "xyes"; then
 	baseprm=$(readlink -f $directory/$input)
 	echo "Using '$baseprm'"
 
+	# Check if we use separate str files 
+	# (and update the control file)
+	if test -z "$sepstr"; then
+		if test -f "$sepstr_file"; then
+			sepstr=$(cat $sepstr_file)
+		fi
+	else
+		echo $sepstr > $sepstr_file
+	fi
+
 	# now check for .str file
-	strs=`ls $directory | grep .str`
+	strs=`ls $directory | grep .str.cmd`
 	nstr=0
 	for f in $nstr; do
 		nstr=$[$nstr+1]
@@ -248,15 +267,35 @@ if test "x$cont" == "xyes"; then
 	fi
 	# all fine, we have one str file
 	strfile=$directory/$strs
-	strfile=$(readlink -f $strfile)
-	strcmd=${strfile}.cmd
+	strcmd=$(readlink -f $strfile)
 	if test "x$sepstr" == "xyes"; then
 		if test ! -f "${strcmd}"; then
-			echo "$myname: error: no '${strcmd}' do not know how to cleare system."
+			echo "$myname: error: no '${strcmd}' do not know how to create the system."
 			exit 1;
 		fi
 	fi
 	echo "Using '$strfile'"
+
+	# Check if we stored the custom base file name
+	if test -z "$custom_base"; then
+		if test -f "$custom_base_file"; then
+			custom_base=$(cat "$custom_base_file")
+		fi
+	fi
+
+	# Check for number of runs
+	if test -z "$nrun"; then
+		if test -f "$nrun_file"; then
+			nrun=$(cat "$nrun_file")
+		fi
+	fi
+
+	# check ncores OpenMP
+	if test -z "$nproc"; then
+		if test -f "$nproc_file"; then
+			nproc=$(cat "$nproc_file")
+		fi
+	fi
 
 else # We do not continue, check for prm and create str
 	
@@ -291,6 +330,24 @@ else # We do not continue, check for prm and create str
 		exit 1
 	fi
 	strfile=$(readlink -f $strfile)
+
+	# Save (some) control files
+	if test -n "$custom_base"; then
+		echo $custom_base > $custom_base_file
+	fi
+
+	echo $sepstr > $sepstr_file
+
+	if test -z "$nrun"; then
+		nrun=1
+	fi
+	echo $nrun > $nrun_file
+
+	if test -z "$nproc"; then
+		nproc="-p 1"
+	fi
+	echo $nproc > $nproc_file
+
 fi
 
 # Check for script and set runme
@@ -306,8 +363,13 @@ if test -n "$script"; then
 		runme="bash $script"
 	fi
 else
-	runme=$bdbox
+	if test -f "$runme_file"; then
+		runme=$(cat $runme_file)
+	else
+		runme=$bdbox
+	fi
 fi
+echo $runme > $runme_file
 
 # do the job
 cd $directory
@@ -326,19 +388,26 @@ do
 
 	if test "x$sepstr" == "xyes"; then
 		strfile=$idir/$lbase.str
-		molsysrun="`cat $strcmd` -s $strfile"
-		echo $molsysrun
-		$molsysrun
-		if test $? != 0; then
-			echo "$myname: `basename $molsys` failed, skipping run $irun."
-			continue;
+		# create a file if it was not by the previous run
+		if test ! -f "$strfile"; then
+			molsysrun="`cat $strcmd` -s $strfile"
+			echo $molsysrun
+			$molsysrun
+			if test $? != 0; then
+				echo "$myname: `basename $molsys` failed, skipping run $irun."
+				continue;
+			fi
 		fi
 		strfile=$(readlink -f $strfile)
 	fi
 
-	prm_prepare $baseprm $strfile $lbase > $idir/$lbase.prm
-	olddir=`$pwd` && cd $idir
+	# if no prm file from previous run, create it
+	prmfile=$idir/$lbase.prm
+	if test ! -f "$prmfile"; then
+		prm_prepare $baseprm $strfile $lbase > $prmfile
+	fi
 
+	olddir=`$pwd` && cd $idir
 	if test -f "@DONE@"; then
 		echo "Run #$irun done, skipping..."
 		cd ..
@@ -360,6 +429,11 @@ do
 		else
 			cont_opt=
 		fi
+	fi
+
+	if test -f "@ERROR@"; then
+		echo
+		echo "*** Run #$irun finished with error, restarting ***"
 	fi
 
 	# run the BD beast (runme is either a script or )

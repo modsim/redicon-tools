@@ -154,6 +154,10 @@ if test -f "$done"; then
 	exit 0;
 fi
 
+# If bd-flex exists unproperly, save info to an error file
+errorfile=$directory/@ERROR@
+errorlog=$directory/.errors.log
+
 # check if re-run/queue script exists
 if test -n "$script"; then
 	if test ! -f "$script"; then
@@ -166,9 +170,9 @@ fi
 
 # Set traps
 if test -n "$script"; then
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted ; echo 'Running custom script:' >> $interrupted ; echo '	$script $cmd -c $count' >> $interrupted ;  mv $running $stopped ; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; $script $cmd -c$count ; exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted ; echo 'Running custom script:' >> $interrupted ; echo '	$script $cmd -c $count' >> $interrupted ;  mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; $script $cmd -c$count ; exit" SIGINT SIGTERM
 else
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted ; echo '	$myname -c $count $cmd' >> $interrupted ; mv $running $stopped ; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; exit" SIGINT SIGTERM
+	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted ; echo '	$myname -c $count $cmd' >> $interrupted ; mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; exit" SIGINT SIGTERM
 fi
 
 # Check for an input file
@@ -202,11 +206,29 @@ echo $bdflex $input $bdflex_opts >> $running
 # Run from working directory
 cd $directory
 OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
+exitcode=$?
 
-# Uh, we've done
-cat $running > $done
-echo "Finished on `date`" >> $done
-rm $running
+# Uh, we've done; heh, not so fast :)
+if test "$exitcode" == "0"; then
+	if test -f "$errorfile"; then
+		cat $errorfile > $done
+		mv $errorfile $errorlog
+		echo >> $done
+		cat $running >> $done
+	else
+		cat $running > $done
+	fi
+	echo "Finished on `date`" >> $done
+	rm $running
+else
+	# just to separate lines for clarity
+	if test -f "$errorfile"; then
+		echo >> $errorfile
+	fi
+	cat $running >> $errorfile
+	echo "Received error $exitcode from '$bdflex' (`date`)" >> $errorfile
+	rm $running
+fi
 
-exit 0;
+exit $exitcode;
 

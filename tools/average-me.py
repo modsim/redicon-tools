@@ -243,7 +243,7 @@ for j in range (0, Data.size, 1):
 					X[i] = X[i] / N
 					printf (' %f ', X[i])
 
-				printf ('\n')
+				printf ('%i \n', N)
 
 			# reset/clear
 			if debug:

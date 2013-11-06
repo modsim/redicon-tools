@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.19], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.20], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -22,10 +22,8 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_PROG_LIBTOOL
 
-
 AX_CXX_COMPILE_STDCXX_11(ext,optional)
 #		[AC_MSG_ERROR(upgrade your compiler to 0x11 compatible)])
-
 
 # Check towhee binary
 AC_ARG_WITH(bdbox,
@@ -80,6 +78,8 @@ BDFLEX_RUN=$(echo ${BINDIR}/bd_flex-run)
 # SUBST DONE, INTERRUPT and RUNNING
 AC_SUBST(DONE)
 DONE=.DONE
+AC_SUBST(ERROR)
+ERROR=.ERROR
 AC_SUBST(INTERRUPTED)
 INTERRUPTED=.INTERRUPTED
 AC_SUBST(RUNNING)
