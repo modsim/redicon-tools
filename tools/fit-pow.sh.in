@@ -1,0 +1,186 @@
+#!/bin/bash
+#
+# fit-pow.sh (c) S Kondrat (aka Valiska)  <valiska@gmail.com>
+# 		 Pradeep Burla <pradeepburla91@gmail.com>
+# This script is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# my dear self
+myname=$(basename $0)
+# others
+#gnuplot=@GNUPLOT@
+gnuplot=gnuplot
+
+#
+# Functions
+#
+function usage()
+{
+  echo "Fit data by a power-law function y = k x^a using gnuplot"
+  echo "Usage: $1 -f FILE -x N -y M OTHER_OPTIONS"
+  echo "Where options are:"
+  echo "  -f FILE                 input file"
+  echo "  -x COL                  take COL column for x ."
+  echo "  -y COL                  take COL column for y."
+  echo "  -l                      linear fit (y = k x)."
+
+  # not implemented
+  echo "  -i INTERVAL             fit on a given interval (use gnuplot syntax)."
+  echo "  -k VAL                  initial value for k."
+  echo "  -a VAL                  initial value for a (no -l option)."
+  # end not implemented options
+
+  echo 
+  echo "  -g FILE                 save gnuplot code to file FILE."
+  echo "  -p FILE                 create a PS file comparing the fit with the data."
+  echo "  -v                      print version information and exit."
+  echo "  -?                      print this help message and exit."
+
+  echo
+}
+#
+# Options
+#
+while getopts "f:lx:y:i:k:a:g:p:v?:" Option
+do
+  case $Option in
+
+    f  ) filename="$OPTARG"
+         cmd="${cmd} -f $OPTARG";;
+
+    l  ) linear="yes"
+         cmd="${cmd} -l";;
+
+    x  ) column1="$OPTARG"
+         cmd="${cmd} -x $OPTARG";;
+
+    y  ) column2="$OPTARG"
+         cmd="${cmd} -x $OPTARG";;
+
+    i  ) interval="$OPTARG"
+         cmd="${cmd} -i $OPTARG";;
+
+    k  ) k0="$OPTARG"
+         cmd="${cmd} -k $OPTARG";;
+
+    a  ) a0="$OPTARG"
+         cmd="${cmd} -a $OPTARG";;
+
+    g  ) gfile="$OPTARG"
+         cmd="${cmd} -g $OPTARG";;
+
+    p  ) psfile="$OPTARG"
+         cmd="${cmd} -p $OPTARG";;
+
+    :  ) echo "$myname: option -$OPTARG requires an argument." >&2
+         exit 1 ;;
+
+    v  ) echo "$myname from @PACKAGE@ @VERSION@"
+  	 exit 0;;
+
+    '?'  |  h) usage ${myname}
+	   exit $OPTERROR;;
+   
+     *  ) echo "${myname}: unimplemented option chosen.";;   # DEFAULT
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+
+#
+# Check options
+#
+# Check if gnuplot exists
+if test -z "$gnuplot"; then
+	echo "$myname: error: no GNUPLOT found by configure script, please install gnuplot first."
+	exit 1
+fi
+
+# We need to have columns specified
+if test -z "$column1"; then
+	echo "$myname: error: use -x COL for x-column."
+	exit 1
+fi
+if test -z "$column2"; then
+	echo "$myname: error: use -y COL for y-column."
+	exit 1
+fi
+
+# Get the gnuplot file name
+if test -z "$gfile"; then
+	gfile=`mktemp --suffix=.gp $myname-XXXXXX`
+	rmfiles="$rmfiles $gfile"
+fi
+
+# gnuplot fill append to fit.log
+# which we remove in the end, if the file exists
+# save and copy back in the end
+if test -f "fit.log"; then
+	oldfitlog=$(readlink -f fit.log)
+	tmpfitlog=$oldfitlog.tmp
+	mv $oldfitlog $tmpfitlog
+fi
+rmfiles="$rmfiles $fit.log"
+
+#
+# Create the gnuplot file
+#
+echo "# Created by $myname @VERSION@ on `date`" > $gfile
+echo "# Command line:" >> $gfile
+echo "# 	$myname $cmd" >> $gfile
+
+if test -n "$psfile"; then
+	touch $psfile
+	psfile=$(readlink -f $psfile)
+	echo "set term postscript" >> $gfile
+	echo "set output \"$psfile\"" >> $gfile
+fi
+
+if test "x$linear" == "xyes"; then
+	echo "f(x)=D*x" >> $gfile
+	echo "D=1.0" >> $gfile
+	echo "fit f(x) \"$filename\" using $column1:$column2 via D" >> $gfile
+else
+	echo "f(x)=D * x**a" >> $gfile
+	echo "D=1.0; a=1.0" >> $gfile
+	echo "fit f(x) \"$filename\" using $column1:$column2 via D,a" >> $gfile
+fi
+
+if test -n "$psfile"; then
+	echo "plot f(x), \"$filename\" w lp" >> $gfile
+fi
+
+# Run the beast...
+$gnuplot $gfile > /dev/null 2>&1
+
+# ...grep the fit.log
+D=`cat fit.log | grep "D " | grep "+/-" | xargs | cut -d" " -f 3`
+dD=`cat fit.log | grep "D " | grep "+/-" | xargs | cut -d" " -f 5`
+if test "x$linear" != "xyes"; then
+	a=`cat fit.log | grep "a " | grep "+/-" | xargs | cut -d" " -f 3`
+	da=`cat fit.log | grep "a " | grep "+/-" | xargs | cut -d" " -f 5`
+	echo "$D  $dD		$a  $da"
+else
+	echo "$D  $dD		$a  $da"
+fi
+
+# ...and clean up
+rm -f $rmfiles
+if test -f "$tmpfitlog"; then
+	mv $tmpfitlog $oldfitlog
+fi
+
+exit 0
+
