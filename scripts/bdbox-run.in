@@ -63,8 +63,10 @@ function usage()
 
   echo "Simulation options:"
   echo "  -R NUM                  number of runs."
-  echo "  -p NPROC                number of procs (for OpenMP)."
-
+  echo "  -p NPROC                use OpenMP with NPROX threads."
+  echo "  -M NPROC,NCOL,NROW,NBLOCKS"
+  echo "                          use MPI with NPROC processes, NCOL x NROW"
+  echo "                          and NBLOCKS blocks."
   echo
   echo "  -v                      print version information and exit."
   echo "  -?                      print this help message and exit."
@@ -115,12 +117,33 @@ function prm_prepare ()
 	echo "rst_filename $base.rst"
 
 	echo rand_seed $(random 5)
+
+	if test -n "$mpirow"; then
+		echo "MPI_nprow  $mpirow"
+	fi
+	if test -n "$mpicol"; then
+		echo "MPI_npcol  $mpicol"
+	fi
+	if test -n "$mpiblock"; then
+		echo "MPI_block  $mpiblock"
+	fi
+}
+
+# Save MPI data to file
+function MPI_save_control ()
+{
+	local file=$1
+
+	echo "mpiproc=$mpiproc" > $file
+	echo "mpirow=$mpirow" >> $file
+	echo "mpicol=$mpicol" >> $file
+	echo "mpiblock=$mpiblock" >> $file
 }
 
 #
 # Options
 #
-while getopts "d:B:i:cs:H:n:r:N:j:q:m:S:T:t:aR:p:b:v?:" Option
+while getopts "d:B:i:cs:H:n:r:N:j:q:m:S:T:t:aR:p:M:b:v?:" Option
 do
   case $Option in
 
@@ -174,6 +197,20 @@ do
     p  ) nproc="-p $OPTARG"
          cmd="${cmd} -p $OPTARG";;
 
+    M  ) OLD_IFS="$IFS";
+	 IFS=","
+	 MPI_list=( ${OPTARG} )
+	 if test "${#MPI_list[@]}" != 4; then
+	 	echo "$myname: -M required 4 comma-separated arguments. Use '$myname -h' for help."
+		exit 1;
+	 fi
+         mpiproc="${MPI_list[0]}"
+         mpicol="${MPI_list[1]}"
+         mpirow="${MPI_list[2]}"
+         mpiblock="${MPI_list[3]}"
+         IFS="$OLD_IFS"
+         cmd="${cmd} -M $OPTARG";;
+
     a  ) sepstr="yes"
          cmd="${cmd} -a";;
 
@@ -220,6 +257,7 @@ sepstr_file=$controldir/"sep_str_files"
 runme_file=$controldir/"runner"
 nrun_file=$controldir/"nruns"
 nproc_file=$controldir/"openmp_cores"
+mpi_file=$controldir/"mpi_data"
 
 # PRM and STR files (depends if continue or not)
 if test "x$cont" == "xyes"; then
@@ -290,11 +328,23 @@ if test "x$cont" == "xyes"; then
 		fi
 	fi
 
-	# check ncores OpenMP
+	# check ncores OpenMP/MPI
 	if test -z "$nproc"; then
 		if test -f "$nproc_file"; then
 			nproc=$(cat "$nproc_file")
 		fi
+	fi
+
+	if test -z "$mpiproc"; then
+		if test -f "$mpi_file"; then
+			. $mpi_file
+			mpiopt="-M $mpiproc"
+		fi
+	fi
+	if test -n "$nproc" -a -n "$mpiproc"; then
+		echo "$myname: error: OpenMP with MPI is not implemented."
+		echo "Use either -p or -M option (check control files)."
+		exit 1;
 	fi
 
 else # We do not continue, check for prm and create str
@@ -343,11 +393,28 @@ else # We do not continue, check for prm and create str
 	fi
 	echo $nrun > $nrun_file
 
-	if test -z "$nproc"; then
+	# OpenMPI vs MPI
+	if test -n "$nproc" -a -n "$mpiproc"; then
+		echo "$myname: error: OpenMP with MPI is not implemented."
+		echo "Use either -p or -M option."
+		exit 1;
+	fi
+
+	# default
+	if test -z "$mpiproc" -a -z "$nproc"; then
 		nproc="-p 1"
 	fi
-	echo $nproc > $nproc_file
 
+	# Save OpenMP/MPI data to control file
+	if test -n "$nproc"; then
+		echo $nproc > $nproc_file
+	elif test -n "$mpiproc"; then
+		MPI_save_control $mpi_file
+		mpiopt="-M $mpiproc"
+	else
+		echo "$myname: internal error: OpenMP or MPI? "
+		exit 1
+	fi
 fi
 
 # Check for script and set runme
@@ -439,8 +506,8 @@ do
 	# run the BD beast (runme is either a script or )
 	echo
 	echo "Starting/continuing run #$irun:"
-	echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $cont_opt >> $lbase.cmd
-	$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $cont_opt
+	echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt >> $lbase.cmd
+	$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt
 	echo "Run #$irun done/queued!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill

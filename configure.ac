@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.21], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.22], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -46,6 +46,20 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
+# Check for gnuplot
+GNUPLOT=
+AC_PATH_PROG([GNUPLOT], [gnuplot],, [$PATH:$GNUPLOTDIR])
+if test ! -e "$GNUPLOT"; then
+	AC_MSG_RESULT(*** GNUplot is not found, some scripts will not work ***)
+fi
+AC_SUBST(GNUPLOT)
+
+MPIRUN=
+AC_PATH_PROG([MPIRUN], [mpirun],, [$PATH:$MPIDIR])
+if test ! -e "$MPIRUN"; then
+	AC_MSG_RESULT(*** MPI is not installed or not in the path ***)
+fi
+AC_SUBST(MPIRUN)
 
 # Scripts substitute
 # dnl adl_RECURSIVE_EVAL

@@ -20,7 +20,7 @@
 myname=$(basename $0)
 # others
 bdflex=@BDBOX@
-nproc=1 # this is OpenMP
+mpirun=@MPIRUN@
 
 # Default values
 
@@ -36,9 +36,11 @@ function usage()
   echo "  -B BD_FLEX              use BD_FLEX binary."
   echo "  -i FILE                 input parameter file."
   echo "  -c COUNT                continue (count to keep track on reruns)."
-  echo "  -p NUM                  number of processes (for OpenMP)."
+  echo "  -p NUM                  use OpenMPI with NUM threads."
+  echo "  -M NUM                  use MPI with NUM processes."
+
   echo "  -r SCRIPT               run script on SIGTERM (eg requeue)."
-  echo "       SCRIPT must accept options -d DIR -B FLEX -i INPUT -c COUNT -p NUM"
+  echo "       SCRIPT must accept options -d DIR -B FLEX -i INPUT -c COUNT -p NUM | -m"
 
   echo
   echo "  -v                      print version information and exit."
@@ -50,7 +52,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:B:i:p:r:c:v?:" Option
+while getopts "d:B:i:p:M:r:c:v?:" Option
 do
   case $Option in
 
@@ -65,6 +67,9 @@ do
 
     p  ) nproc="$OPTARG"
          cmd="${cmd} -p $OPTARG";;
+
+    M  ) mpiproc="$OPTARG"
+         cmd="${cmd} -M $OPTARG";;
 
     c  ) count="$OPTARG";;
 #         cmd="${cmd} -c $OPTARG";;
@@ -91,6 +96,21 @@ shift $(($OPTIND - 1))
 #
 # Check options
 #
+if test -n "$nproc" -a -n "$mpiproc"; then
+	echo "$myname: error: OpenMP with MPI is not implemented, use eithr -p or -m".
+	exit 1
+fi
+# default is OpenMP with 1 thread
+if test -z "$nproc" -a -z "$mpiproc"; then
+	nproc=1
+fi
+
+# Check if MPI is there
+if test -n "$mpiproc" -a ! -x "$mpirun"; then
+	echo "$myname: error: no mpirun, either install MPI or use OpenMP/no parallelization."
+	exit 1;
+fi
+
 # Working directory
 if test -z "$directory"; then
 	directory="$(pwd)"
@@ -201,12 +221,21 @@ if test -f "$stopped"; then
 else
 	echo "Started on `date`" >> $running
 fi
-echo $bdflex $input $bdflex_opts >> $running
 
 # Run from working directory
 cd $directory
-OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
-exitcode=$?
+if test -n "$nproc"; then
+	echo "OMP_NUM_THREADS=$nproc  $bdflex $input $bdflex_opts" >> $running
+	OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
+	exitcode=$?
+elif test -n "$mpiproc"; then
+	echo "$mpirun -np $mpiproc  $bdflex $input $bdflex_opts" >> $running
+	$mpirun -np $mpiproc $bdflex $input $bdflex_opts
+	exitcode=$?
+else
+	echo "$myname: internal error: do not know how to run"
+	exit 1;
+fi
 
 # Uh, we've done; heh, not so fast :)
 if test "$exitcode" == "0"; then

@@ -1,3 +1,7 @@
+2013-11-07  version 0.2.22  <s.kondrat@fz-juelich.de>
+
+	* bdbox-run, bd_flex-run: -M (MPI) option. Some more tests needed.
+
 2013-11-06  version 0.2.20  <s.kondrat@fz-juelich.de>
 
 	* bdbox-run.in: save control files for -c (continue) option.
