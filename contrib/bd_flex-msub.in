@@ -43,6 +43,8 @@ function usage()
   echo "  -i FILE                 input parameter file."
   echo "  -c COUNT                continue (count to keep track on reruns)."
   echo "  -p NUM                  number of processes (for OpenMP)."
+  echo "  -M PROC,COL,ROW,BLOCK   number of processes, collons, rows and blocks for MPI."
+
   echo
   echo "  -v                      print version information and exit."
   echo "  -?                      print this help message and exit."
@@ -53,7 +55,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:B:i:p:c:v?:" Option
+while getopts "d:B:i:p:M:c:v?:" Option
 do
   case $Option in
 
@@ -68,6 +70,9 @@ do
 
     p  ) nproc="$OPTARG"
          cmd="${cmd} -p $OPTARG";;
+
+    M  ) mpiopt="$OPTARG"
+         cmd="${cmd} -M $OPTARG";;
 
     c  ) count="$OPTARG"
          cmd="${cmd} -c $OPTARG";;

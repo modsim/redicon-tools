@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.22], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.23], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -48,16 +48,20 @@ AC_FUNC_REALLOC
 
 # Check for gnuplot
 GNUPLOT=
-AC_PATH_PROG([GNUPLOT], [gnuplot],, [$PATH:$GNUPLOTDIR])
+AC_PATH_PROG([GNUPLOT], [gnuplot],, [$PATH])
 if test ! -e "$GNUPLOT"; then
 	AC_MSG_RESULT(*** GNUplot is not found, some scripts will not work ***)
 fi
 AC_SUBST(GNUPLOT)
 
+# Check for mpirun/exec (FIXME: better code)
 MPIRUN=
-AC_PATH_PROG([MPIRUN], [mpirun],, [$PATH:$MPIDIR])
+AC_PATH_PROG([MPIRUN], [mpiexec],, [$PATH])
 if test ! -e "$MPIRUN"; then
-	AC_MSG_RESULT(*** MPI is not installed or not in the path ***)
+	AC_PATH_PROG([MPIRUN], [mpirun],, [$PATH])
+	if test ! -e "$MPIRUN"; then
+		AC_MSG_RESULT(*** MPI is not installed or not in the path ***)
+	fi
 fi
 AC_SUBST(MPIRUN)
 
