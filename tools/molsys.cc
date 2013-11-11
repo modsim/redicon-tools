@@ -162,14 +162,12 @@ int main (int argc, char ** argv)
 			{"radia", required_argument, NULL, 'r'},
 			{"numbers", required_argument, NULL, 'N'},
 
-
 			{"charges", required_argument, NULL, 'q'},
 			{"hd-radia", required_argument, NULL, 'd'},
 			{"lj", required_argument, NULL, 'j'},
 			{"masses", required_argument, NULL, 'm'},
 			{"type",required_argument, NULL,'T'},
 
-			//{"arrangment", no_argument, NULL, 'a'},
 			{"tries", required_argument, NULL, 't'},
 		};
 

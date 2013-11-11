@@ -220,7 +220,8 @@ bool Atom::overlap (const Atom & a) const
 	delete ra;
 	
 	DPRINT ("dist_min=%1.15e, dist=%1.15e\n", dist_min, dist);
-	if (dist < dist_min)
+	// FIXME: add some small eps?? -- cannot touch me, oh-oo-ho
+	if (dist - 2.e-2 * dist_min <= dist_min )
 		return true;
 	else
 		return false;
@@ -268,7 +269,7 @@ void Atom::printBBStr (std::ostream * stream) const
 		r->print(stream);
 	else
 	{
-		BCPT_WARNING ("atom %s (%i): no coordinates, setting to zeros!", name, serial);
+		BCPT_WARNING ("atom %s (%li): no coordinates, setting to zeros!", name, serial);
 		*stream << " 0.0 0.0 0.0 " ;
 	}
 	*stream << hd_radius << " " << charge <<  " " << 2. * hs_radius << " " << LJ << " " << mass << std::endl ;
