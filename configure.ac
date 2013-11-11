@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.24], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.25], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -89,9 +89,12 @@ AC_SUBST(BCPT_XYZ)
 BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
 AC_SUBST(BCPT_AVERAGE)
 BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+AC_SUBST(BCPT_FIT)
+BCPT_FIT=$(echo ${BINDIR}/fit-pow.sh)
 
 AC_SUBST(BDFLEX_RUN)
 BDFLEX_RUN=$(echo ${BINDIR}/bd_flex-run)
+
 
 # SUBST DONE, INTERRUPT and RUNNING
 AC_SUBST(DONE)

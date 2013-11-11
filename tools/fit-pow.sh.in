@@ -35,8 +35,8 @@ function usage()
   echo "  -y COL                  take COL column for y."
   echo "  -l                      linear fit (y = k x)."
 
+  echo "  -i \"INTERVAL\"           fit on a given interval (use gnuplot syntax)."
   # not implemented
-  echo "  -i INTERVAL             fit on a given interval (use gnuplot syntax)."
   echo "  -k VAL                  initial value for k."
   echo "  -a VAL                  initial value for a (no -l option)."
   # end not implemented options
@@ -132,7 +132,7 @@ if test -f "fit.log"; then
 	tmpfitlog=$oldfitlog.tmp
 	mv $oldfitlog $tmpfitlog
 fi
-rmfiles="$rmfiles $fit.log"
+rmfiles="$rmfiles fit.log"
 
 #
 # Create the gnuplot file
@@ -151,11 +151,11 @@ fi
 if test "x$linear" == "xyes"; then
 	echo "f(x)=D*x" >> $gfile
 	echo "D=1.0" >> $gfile
-	echo "fit f(x) \"$filename\" using $column1:$column2 via D" >> $gfile
+	echo "fit $interval f(x) \"$filename\" using $column1:$column2 via D" >> $gfile
 else
 	echo "f(x)=D * x**a" >> $gfile
 	echo "D=1.0; a=1.0" >> $gfile
-	echo "fit f(x) \"$filename\" using $column1:$column2 via D,a" >> $gfile
+	echo "fit $interval f(x) \"$filename\" using $column1:$column2 via D,a" >> $gfile
 fi
 
 if test -n "$psfile"; then

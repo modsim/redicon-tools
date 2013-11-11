@@ -1,3 +1,7 @@
+2013-11-11  version 0.2.25  <s.kondrat@fz-juelich.de>
+
+	* bdbox-xyz: -f/-p (fit/create ps) to fit data for diffusion coeff.
+
 2013-11-07  version 0.2.22  <s.kondrat@fz-juelich.de>
 
 	* bdbox-run, bd_flex-run: -M (MPI) option. Some more tests needed.

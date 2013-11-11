@@ -1,3 +1,7 @@
+2013-11-11  version 0.2.25  <s.kondrat@fz-juelich.de>
+
+	* fit-pow.sh.in: -i (interval) option.
+
 2013-11-07  version 0.2.21  <p.burla@fz-juelich.de> <s.kondrat@fz-juelich.de>
 
 	* fit-pow.sh.in: fit the data file with power function using gnuplot.

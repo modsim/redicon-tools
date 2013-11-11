@@ -22,6 +22,7 @@ myname=$(basename $0)
 bdbox=@BDBOX@
 analysexyz=@BCPT_XYZ@
 average=@BCPT_AVERAGE@
+fitter=@BCPT_FIT@
 
 #
 # Functions
@@ -42,6 +43,9 @@ function usage()
   echo "  -w VAL                  time window for averaging."
   echo "  -O                      Overwrite .dat files (created by analyze-xyz.py) "
   echo "                          in subdirectories with .xyz files (default no)."
+  echo "  -f                      linear fit using `basename $fitter` to get diff.coeff."
+  echo "  -p                      create PS comparing data with fitting function."
+
   echo
   echo "  -v                      print version information and exit."
   echo "  -?                      print this help message and exit."
@@ -51,7 +55,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:o:k:n:w:H:Ov?:" Option
+while getopts "d:o:k:n:w:H:fpOv?:" Option
 do
   case $Option in
 
@@ -85,6 +89,12 @@ do
 
     w  ) window=" -w$OPTARG"
          cmd="${cmd} -w $OPTARG";;
+
+    f  ) dofit="yes"
+         cmd="${cmd} -f";;
+
+    p  ) fitps="-p"
+         cmd="${cmd} -p";;
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
          exit 1 ;;
@@ -144,7 +154,21 @@ echo
 echo "Avereging:"
 echo $average -f $files -k 0,5 $window
 $average -f $files -k 0,5 $window > $output
+
+if test "z$dofit" = "zyes"; then
+	infofile=`ls | grep .info`
+	if test -n "$infofile"; then
+		eta=`cat $infofile | grep "Total packing fraction:" | cut -f 2 -d ":"`
+	fi
+	if test -n "$fitps"; then
+		fitps="$fitps $output.ps"
+	fi
+	D=`$fitter -f $output -x1 -y2 -l $fitps`
+	echo "$eta	$D"
+fi
+
 echo "All done in '$directory'!"
+
 
 exit 0;
 
