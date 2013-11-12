@@ -86,10 +86,10 @@ function scan_directory ()
 			fi
 
 			 if test "$redo" == "yes" -o "x$overwrite" == "xyes"; then
-		 		echo "Extracting data from '$f' to $ofile.dat"
-				echo "$analysexyz $analysexyz_opt -f $f -k$imol"
-				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
-				$analysexyz $analysexyz_opt -f $f -k$imol > $ofile.dat
+		 		echo "Extracting data from '$dir/$f' to $ofile.dat"
+				echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol"
+				echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol" > $ofile.cmd
+				$analysexyz $analysexyz_opt -f $dir/$f -k$imol > $ofile.dat
 			 else
 		 		echo "File '$ofile.dat' is up to date, skipping"
 			 fi	
