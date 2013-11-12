@@ -160,7 +160,7 @@ else
 fi
 
 if test -n "$psfile"; then
-	echo "plot f(x), \"$filename\" w lp" >> $gfile
+	echo "plot $interval f(x), \"$filename\" w lp" >> $gfile
 fi
 
 # Run the beast...
