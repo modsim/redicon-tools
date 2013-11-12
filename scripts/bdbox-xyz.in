@@ -45,6 +45,7 @@ function usage()
   echo "                          in subdirectories with .xyz files (default no)."
   echo "  -f                      linear fit using `basename $fitter` to get diff.coeff."
   echo "  -p                      create PS comparing data with fitting function."
+  echo "  -i INTERVAL             fir on the INTERVAL (gnuplot syntax)."
 
   echo
   echo "  -v                      print version information and exit."
@@ -105,7 +106,7 @@ function scan_directory ()
 #
 # Options
 #
-while getopts "d:o:k:n:w:H:fpOv?:" Option
+while getopts "d:o:k:n:w:H:fpi:Ov?:" Option
 do
   case $Option in
 
@@ -145,6 +146,9 @@ do
 
     p  ) fitps="-p"
          cmd="${cmd} -p";;
+
+    i  ) fitinterval="-i $OPTARG"
+         cmd="${cmd} -i $OPTARG";;
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
          exit 1 ;;
@@ -193,7 +197,7 @@ if test "z$dofit" = "zyes"; then
 	if test -n "$fitps"; then
 		fitps="$fitps $output.ps"
 	fi
-	D=`$fitter -f $output -x1 -y2 -l $fitps`
+	D=`$fitter -f $output -x1 -y2 -l $fitps $fitinterval`
 	echo "$eta	$D"
 	echo "Fitting done."
 fi
