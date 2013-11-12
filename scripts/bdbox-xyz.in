@@ -52,6 +52,56 @@ function usage()
 
   echo
 }
+
+# Scan directory for .xyz files and run analyze-xyz
+# first and th eonly argument is direcotry name
+function scan_directory ()
+{
+	local dir=$1
+	echo "Scanning directory $dir:"
+	
+	local dirs=
+	if test -d $dir; then
+		dirs=$(ls $dir)
+	fi
+
+	for d in $dirs; do
+		if test -d $dir/$d; then
+			scan_directory $dir/$d
+		fi
+	done
+
+	xyzfiles=$(ls $dir | grep .xyz)
+	for f in $xyzfiles; do
+
+		xyz_mod=$(stat -c %Y $dir/$f)
+		for imol in $mols; do
+			ofile=$dir/$(basename $f .xyz).mol$imol
+			redo="yes"
+			if test -f $ofile.dat; then
+			 	dat_mod=$(stat -c %Y $ofile.dat)
+				if test "$dat_mod" -gt "$xyz_mod"; then
+					redo="no"
+				fi
+			fi
+
+			 if test "$redo" == "yes" -o "x$overwrite" == "xyes"; then
+		 		echo "Extracting data from '$f' to $ofile.dat"
+				echo "$analysexyz $analysexyz_opt -f $f -k$imol"
+				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
+				$analysexyz $analysexyz_opt -f $f -k$imol > $ofile.dat
+			 else
+		 		echo "File '$ofile.dat' is up to date, skipping"
+			 fi	
+			if test -z "$files"; then
+				files=$ofile.dat
+			else
+				files="$files,$ofile.dat"
+			fi
+		done
+	done
+}
+
 #
 # Options
 #
@@ -125,37 +175,17 @@ if test ! -d "$directory"; then
 	exit 1;
 fi
 
-cd $directory
-for d in `ls`; do
-	if test -d $d; then
-	echo "Scanning directory $d:"
-	for f in `ls $d/*.xyz`; do
-			 for imol in $mols; do
-			 ofile=$(dirname $f)/$(basename $f .xyz).mol$imol
-			 if test ! -f $ofile.dat -o ! -s $ofile.dat -o "x$overwrite" == "xyes"; then
-			 	echo "Extracting data from '$f' to $ofile"
-				echo "$analysexyz $analysexyz_opt -f $f -k$imol"
-				echo "$analysexyz $analysexyz_opt -f $f -k$imol" > $ofile.cmd
-				$analysexyz $analysexyz_opt -f $f -k$imol > $ofile.dat
-			 else
-			 	echo "File '$ofile.dat' exists, skipping"
-			fi	
-			if test -z "$files"; then
-				files=$ofile.dat
-			else
-				files="$files,$ofile.dat"
-			fi
-			done
-		done
-	fi
-done
+cd $directory && scan_directory .
 
 echo
 echo "Avereging:"
 echo $average -f $files -k 0,5 $window
 $average -f $files -k 0,5 $window > $output
+echo "Avereging done."
 
 if test "z$dofit" = "zyes"; then
+	echo "Fitting:"
+
 	infofile=`ls | grep .info`
 	if test -n "$infofile"; then
 		eta=`cat $infofile | grep "Total packing fraction:" | cut -f 2 -d ":"`
@@ -165,10 +195,8 @@ if test "z$dofit" = "zyes"; then
 	fi
 	D=`$fitter -f $output -x1 -y2 -l $fitps`
 	echo "$eta	$D"
+	echo "Fitting done."
 fi
-
-echo "All done in '$directory'!"
-
 
 exit 0;
 

@@ -120,7 +120,8 @@ fi
 
 # Get the gnuplot file name
 if test -z "$gfile"; then
-	gfile=`mktemp --suffix=.gp $myname-XXXXXX`
+#	gfile=`mktemp --suffix=.gp $myname-XXXXXX`
+	gfile=`mktemp $myname-XXXXXX`
 	rmfiles="$rmfiles $gfile"
 fi
 

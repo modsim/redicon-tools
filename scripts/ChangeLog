@@ -1,3 +1,7 @@
+2013-11-12  version 0.2.26  <s.kondrat@fz-juelich.de>
+
+	* bdbox-xyz: scan_directory() top down, check files timestamp.
+
 2013-11-11  version 0.2.25  <s.kondrat@fz-juelich.de>
 
 	* bdbox-xyz: -f/-p (fit/create ps) to fit data for diffusion coeff.
