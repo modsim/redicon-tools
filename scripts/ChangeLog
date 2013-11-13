@@ -1,3 +1,7 @@
+2013-11-13  version 0.2.28  <s.kondrat@fz-juelich.de>
+
+	* bdbox-xyz: -k regexp as [k1-kn],km.
+
 2013-11-12  version 0.2.27  <s.kondrat@fz-juelich.de>
 
 	* bdbox-xyz: -i INTERVAL option for fitting.

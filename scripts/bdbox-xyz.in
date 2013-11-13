@@ -35,8 +35,9 @@ function usage()
   echo "Where options are:"
   echo "  -d DIR                  working directory."
   echo "  -o FILE                 output file."
-  echo "  -k K1,K2,..             coma-separated serial numbers of first atoms/beads"
-  echo "                          of tracking molecules, see `basename $analysexyz`)."
+  echo "  -k K1,K2,..             regex and coma-separated serial numbers of first"
+  echo "                    atoms/beads of tracking molecules (for `basename $analysexyz`)."
+  echo "                    Example -k [1-10],15,20 -- this is obviously for unimolecular only."
   echo "  -n VAL                  size of a molecule (number of atoms in series)."
   echo "  -H Hx,Hy,Hz             periodic box size (default no box = 0,0,0)."
 
@@ -52,6 +53,31 @@ function usage()
   echo "  -?                      print this help message and exit."
 
   echo
+}
+
+function expand_regex ()
+{	
+	local list=
+	
+	# Form an array of regex
+	OLD_IFS="$IFS";
+        IFS=","
+        local exps=( ${1} )
+	IFS="$OLD_IFS"
+	
+	# array size
+	local n=${#exps[@]}
+	# counting var
+	local i=0
+
+	while test "$i" -lt "$n"; do
+		# Sub [] to {} if any and add to the list using bash globbing
+		local p="`echo "${exps[$i]}" | sed 's/\[/{/g' |  sed 's/\]/}/g'|  sed 's/-/../g'`"
+		list="$list `eval echo $p`"
+		i=$[$i+1]
+	done
+
+	echo "$list"
 }
 
 # Scan directory for .xyz files and run analyze-xyz
@@ -76,6 +102,7 @@ function scan_directory ()
 	for f in $xyzfiles; do
 
 		xyz_mod=$(stat -c %Y $dir/$f)
+		echo "mols=$mols"
 		for imol in $mols; do
 			ofile=$dir/$(basename $f .xyz).mol$imol
 			redo="yes"
@@ -119,11 +146,8 @@ do
     n  ) analysexyz_opt="$analysexyz_opt -n$OPTARG"
          cmd="${cmd} -n $OPTARG";;
 
-    k  ) OLD_IFS="$IFS";
-	 IFS=","
-	 nmolslist=( ${OPTARG} )
-         mols="${nmolslist[@]}"
-         IFS="$OLD_IFS"
+    k  ) mols=$(expand_regex $OPTARG)
+    	echo "mols=$mols"
          cmd="${cmd} -k $OPTARG";;
 
     H  ) OLD_IFS="$IFS";
