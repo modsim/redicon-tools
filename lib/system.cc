@@ -193,7 +193,7 @@ bool System::addMolecule (Molecule& M)
 		}
 		if (have_type == false)
 		{
-			molType * mt = new molType (M.getName(), 1);
+			molType * mt = new molType (M.getName(), 1, M.getSize());
 			mt->volume = M.getVolume ();
 			mol_types.push_back (mt);
 		}
@@ -271,6 +271,7 @@ void System::printInfo (std::ostream * stream) const
 		molType * mt = mol_types.at (i);
 #endif
 		*stream << "Molecules type: " << mt->name << std::endl;
+		*stream << "Molecules size: "; mt->size.print (stream);	*stream << std::endl;
 		*stream << "Molecular volume: " << mt->volume << " (A3)" <<std::endl;
 		*stream << "Number of molecules: " << mt->nmols << std::endl;
 		*stream << "Number denisty: " << mt->nmols / volume << " (#/A3)" << std::endl;

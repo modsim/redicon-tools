@@ -68,6 +68,7 @@ class Molecule
 		double getCharge () const {return charge;};
 		char * getName () const {return name;};
 		double getVolume () const;
+		Point3D getSize () const { return Point3D(radius[0], radius[1], radius[2]);};
 
 		// checks for overlaps
 		// throws an exception if atom/molecule's position not set

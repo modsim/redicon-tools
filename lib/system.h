@@ -30,12 +30,13 @@ class molType
 {
 
 	public:
-		molType (const char * name, int nmols) : name(name), nmols(nmols) {};
+		molType (const char * name, int nmols, Point3D size) : name(name), nmols(nmols), size(size) {};
 		~molType () {};
 
 		std::string name;
 		unsigned int nmols;
 		double volume;
+		Point3D size;
 };
 
 class System
