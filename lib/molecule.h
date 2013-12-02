@@ -42,6 +42,14 @@ class Molecule
 		~Molecule ();
 
 		bool isOwned () {if (owner) return true; else return false;};
+		
+		// add an atom and create a bond. The serial is incremented from 1 (head atom)
+		bool addAtom (Atom & a, unsigned int serial, double blength, double eps, double H);
+		
+		// create a bond betwen two Atoms
+		bool createBond (Atom * a, Atom * b, double blength, double eps, double H);
+		// create a bond between two atoms with serial s1 and s2
+		bool createBond (unsigned int s1, unsigned int s2, double blength, double eps, double H);
 
 		// Bind atoms with their neighbours (determined by the serial numbers)
 		// if they are not yet binded
@@ -50,12 +58,16 @@ class Molecule
 		bool setAnglesLinear (AnglePotType type, double H);
 
 		// Position
-		bool positionIsSet () const {return head->positionIsSet();};
+		bool positionIsSet () const {return PositionIsSet;};
 		Point3D * positionCopy () const { return head->positionCopy();};
-		Point3D * positionPtr () { return head->positionPtr();};
-
-		// this is initial position set, depends on th emolecule type (polymer, one atom
-		virtual bool setPosition (const Point3D & R); 		
+ 		Point3D * positionPtr () { return head->positionPtr();};
+                
+		//if the molecule has atom
+		bool hasAtom(Atom * a) const;
+		
+                Atom * getAtom(unsigned int s1) const;
+		// this is initial position set, depends on the molecule type (polymer, one atom
+		virtual bool setPosition (const Point3D & R);	
 		// move or translate a molecule
 		bool moveTo (const Point3D & R) ;
 		bool translateBy (const Point3D & T);
@@ -93,6 +105,8 @@ class Molecule
 		std::vector<Bond*> Bonds;
 		std::vector<Angle*> Angles;
 
+		bool PositionIsSet;
+
 		// TODO:
 		//addAtom (Atom &);
 		//bool createBond (i, j) {return true;};
@@ -111,7 +125,7 @@ class Molecule
 		//addBond (unsigned int, unsigned int);
 		//addAngle (unsigned int, unsigned int, unsigned int);
 		//addDihedral (unsigned int, unsigned int, unsigned int, unsigned int);
-		//checkClose () ; // check if all atoms involved in bonds etc
+		//checkComplete () ; // check if all atoms involved in bonds etc
 
 		unsigned int serial; // first atom's serial
 		unsigned int shiftSerial (unsigned int); // shift because it always set first atom to 1. Returns the serial of the last atom

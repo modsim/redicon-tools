@@ -5,12 +5,12 @@ libMol_la_SOURCES = point3D.cc point3D.h \
 	atom.h atom.cc atomPDB.cc atomPQR.cc \
 	bond.h bond.cc \
 	angle.h angle.cc \
-	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc moleculeBonds.cc moleculeAngles.cc \
+	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc moleculeBonds.cc moleculeAngles.cc moleculeAddAtom.cc\
 	monatomic.h \
 	system.h system.cc
 
 AM_CPPFLAGS= -std=c++0x -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
 AM_LDFLAGS = -pedantic -ansi -fwritable-strings
 
-EXTRA_DIST = defines.h 
+EXTRA_DIST = defines.h  TODO
 #BUGS TODO FIXMES

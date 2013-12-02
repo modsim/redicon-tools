@@ -1,0 +1,87 @@
+/*  molecule.cc 2013-07-30 valiska@gmail.com
+ *
+ * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+#include <stddef.h>
+#include <string.h>
+#include <iostream> 
+
+#include<molecule.h>
+
+// for C++11 from autoconf
+#include <config.h>
+
+//#define DEBUG
+#include "defines.h"
+
+// Create a bond when adding an atom, as an atom w/o bond in a molecule makes no sense
+// serial is the serial of an atom to bond with -- FIXME: add a comment in molecule.h
+/*
+bool Molecule::AddAtom (Atom & a, 
+	unsigned int s, double blength, double eps, double H) : owner(NULL);
+{
+	Atom * A = new Atom (a);
+    	Atoms.push_back (A);
+    	charge += A->getCharge();
+   
+    	// set radius to zero as positions
+	radius[0] = radius[1] = radius[2] = 0.0;
+
+	//
+	// FIXME: get next serial to assign to a new atom 
+	// in principle it is just NAtom(), but run a loop and check if atoms are in series
+	// 
+	
+    	// no need for throw/catch as Atom copy-constructor copies a free atom
+    	AtomAttorney::claimOwnership (*A, *this);
+    	AtomAttorney::setSerial (*A, SERIAL);
+	AtomAttorney::setType (*A, ATOM_TERMINAL);
+
+
+	// FIXME: check bonded atom for HEAD, number of bonds, and set the proper type
+    	AtomAttorney::setType (*BONDEDATOM, ATOM_XXX);
+
+	// FIXME finally create a bond
+	return createBond (SERIAL, s, ....);
+};
+*/
+bool Molecule::createBond (Atom * a, Atom * b, double blength, double eps, double H)
+{
+
+	BCPT_RET_VAL_IF_FAIL (a,false);
+	BCPT_RET_VAL_IF_FAIL (b,false);
+	BCPT_RET_VAL_IF_FAIL (a == b,false);
+
+	if (hasAtom(a) && hasAtom (b))
+		Bonds.push_back (new Bond (a, b, blength, eps, H));
+	else
+	{
+		BCPT_ERROR ("atoms not in a molecule, cannot create a bond");
+		return false; 
+	}
+	return true;
+};
+
+bool Molecule::createBond (unsigned int s1, unsigned int s2, double blength, double eps, double H)
+{
+
+	Atom * a1 = getAtom(s1);
+	Atom * a2 = getAtom(s2);
+  
+  	return createBond (a1, a2, blength, eps, H);
+}
