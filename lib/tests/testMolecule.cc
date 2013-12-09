@@ -55,12 +55,12 @@ int main (int argc, char ** argv)
 	    std::cerr << "pointer: " << MPDB << std::endl;
 	}
 
-	// Add bonds and angles
-	MPDB->setBondsLinear (1, 100.);
-	MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
-
 	if (MPDB)
 	{
+		// Add bonds and angles
+		MPDB->setBondsLinear (1, 100.);
+		MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
+
 		MPDB->printBBStr (&std::cout); 
 		MPDB->printInfo (&std::cout); 
 		MPDB->moveTo(P1);

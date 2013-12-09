@@ -1,10 +1,14 @@
+2013-12-02  version 0.2.30  <pradeepburla91@gmail.com>
+	
+	* moleculeAddAtom.cc: addAtom(). Tests needed.
+
 2013-12-02  version 0.2.29  <pradeepburla91@gmail.com>
 
 	* moleculeAddAtom.cc: createBond(),
 	
-	* molecule.{cc,h}: hasAtom(),getAtom()
+	* molecule.{cc,h}: hasAtom(), getAtom().
 	
-	* bond.{cc,h}: additional constructor
+	* bond.{cc,h}: additional constructor.
 
 2013-11-22  version 0.2.28  <s.kondrat@fz-juelich.de>
 

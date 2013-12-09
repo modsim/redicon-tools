@@ -44,6 +44,7 @@ class Molecule
 		bool isOwned () {if (owner) return true; else return false;};
 		
 		// add an atom and create a bond. The serial is incremented from 1 (head atom)
+		//serial is the serial of an atom to bond with
 		bool addAtom (Atom & a, unsigned int serial, double blength, double eps, double H);
 		
 		// create a bond betwen two Atoms

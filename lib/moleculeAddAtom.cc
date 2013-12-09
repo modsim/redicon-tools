@@ -31,35 +31,58 @@
 
 // Create a bond when adding an atom, as an atom w/o bond in a molecule makes no sense
 // serial is the serial of an atom to bond with -- FIXME: add a comment in molecule.h
-/*
-bool Molecule::AddAtom (Atom & a, 
-	unsigned int s, double blength, double eps, double H) : owner(NULL);
-{
+bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, double H)
+{	
 	Atom * A = new Atom (a);
     	Atoms.push_back (A);
     	charge += A->getCharge();
-   
+	
+	// Serial number of the head
+	unsigned int sh = Atoms.at(0)->getSerial();
+	unsigned int s1 = sh; // serial `counter` -- to be the new/added atom serial
+
     	// set radius to zero as positions
 	radius[0] = radius[1] = radius[2] = 0.0;
 
 	//
-	// FIXME: get next serial to assign to a new atom 
+	// Get next serial to assign to a new atom 
 	// in principle it is just NAtom(), but run a loop and check if atoms are in series
-	// 
-	
-    	// no need for throw/catch as Atom copy-constructor copies a free atom
+#ifdef HAVE_CXX11
+ 	for (auto &b : Atoms) 
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * b = Atoms.at (i); 
+#endif		
+		// skip the first/head atom
+		if (b->getSerial() == sh)
+			continue;
+		//
+		if (b->getSerial() == s1 + 1)
+			s1 = b->getSerial();
+		else
+			throw "Molecule::addAtom(): Serial numbers not in series as expected";
+	}
+	// the serial of the new/added atom
+	s1++;
+
+    	// Set atom properties
     	AtomAttorney::claimOwnership (*A, *this);
-    	AtomAttorney::setSerial (*A, SERIAL);
+    	AtomAttorney::setSerial (*A, s1);
 	AtomAttorney::setType (*A, ATOM_TERMINAL);
 
+	// Change bonded atom status
+	Atom * B = getAtom (s);
+	if ( strcmp (B->getTypeName(), "ATOM_TERMINAL") && s != sh )
+	    	AtomAttorney::setType (*B, ATOM_2BONDS);
+	else if ( strcmp (B->getTypeName(), "ATOM_2BONDS") && s != sh )
+		AtomAttorney::setType (*B, ATOM_BRANCH);
 
-	// FIXME: check bonded atom for HEAD, number of bonds, and set the proper type
-    	AtomAttorney::setType (*BONDEDATOM, ATOM_XXX);
-
-	// FIXME finally create a bond
-	return createBond (SERIAL, s, ....);
+	//finally create a bond
+	return createBond (s, s1, blength, eps, H);
 };
-*/
+
 bool Molecule::createBond (Atom * a, Atom * b, double blength, double eps, double H)
 {
 
@@ -84,4 +107,4 @@ bool Molecule::createBond (unsigned int s1, unsigned int s2, double blength, dou
 	Atom * a2 = getAtom(s2);
   
   	return createBond (a1, a2, blength, eps, H);
-}
+};
