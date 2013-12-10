@@ -126,6 +126,7 @@ function scan_directory ()
 			else
 				files="$files,$ofile.dat"
 			fi
+			nfiles=$[$nfiles+1]
 		done
 	done
 }
@@ -203,11 +204,22 @@ if test ! -d "$directory"; then
 	exit 1;
 fi
 
+nfiles=0
 cd $directory && scan_directory .
+
+maxargs=`getconf ARG_MAX`
+$maxargs=$[$maxfiles - 10]
+if test "$nfiles" -gt "$maxargs"; then
+	files_file=`mktemp $myname-xxxxxx`
+	echo $files > $files_file
+	average_files=" -F $files_file"
+else
+	average_files="-f $files"
+fi
 
 echo
 echo "Avereging:"
-echo $average -f $files -k 0,5 $window
+echo $average $average_files -k 0,5 $window
 $average -f $files -k 0,5 $window > $output
 echo "Avereging done."
 
@@ -224,6 +236,10 @@ if test "z$dofit" = "zyes"; then
 	D=`$fitter -f $output -x1 -y2 -l $fitps $fitinterval`
 	echo "$eta	$D"
 	echo "Fitting done."
+fi
+
+if test -f "$files_file"; then
+	rm $files_file
 fi
 
 exit 0;

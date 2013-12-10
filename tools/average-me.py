@@ -108,9 +108,10 @@ from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option("-f", "--files", help="comma-separated files with data.", metavar="FILE", type="string", dest="files")
-parser.add_option("-k", "--lines", help="comma-separated lines to process.", metavar="VAL", type="string", dest="lines")
-parser.add_option("-w", "--window", help="coarse-grain window, applies to the first line from -k option.", metavar="VAL", type="float", dest="dt")
-parser.add_option("-s", "--start", help="starting point, applies to the first line from -k option.", metavar="VAL", type="float", dest="t0")
+parser.add_option("-F", "--files-file", help="file with the list of data files.", metavar="FILE", type="string", dest="File")
+parser.add_option("-k", "--lines", help="comma-separated list of lines to process.", metavar="VAL", type="string", dest="lines")
+parser.add_option("-w", "--window", help="coarse-grain window (applies to the first line in -k option).", metavar="VAL", type="float", dest="dt")
+parser.add_option("-s", "--start", help="start avereging from this value of the first line from -k option.", metavar="VAL", type="float", dest="t0")
 
 #
 # Grab options
@@ -118,11 +119,23 @@ parser.add_option("-s", "--start", help="starting point, applies to the first li
 (options, args) = parser.parse_args()
 
 # Comma separated files 
+if options.files and options.File:
+	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
+    	sys.exit()
+
 if options.files:
 	files = options.files.split (',')
 
+elif options.File:
+	f = open (options.File);
+	line = f.readline();
+	printf ('line=%s\n', line)
+	files = line.split (',')
+	for f in files:
+		printf ('file=%s\n', f)
+	
 else:
-	printf ('The file names are missing (-f/--file)\n')
+	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
     	sys.exit()
 
 # Lines to process
@@ -147,7 +160,7 @@ else:
 
 debug = False
 #debug = True
-debugRead = False
+debugRead = True
 
 Data = MyData()
 
@@ -265,8 +278,7 @@ if N != 0:
 	for i in range (0, Data.length, 1):
 		X[i] = X[i] / N
 		printf (' %f ', X[i])
-	printf ('\n')
-
+	printf ('%i \n', N)
 
 # This would be the code if no BUG
 #for j in range (0, len(CoarseGrained.data), 1):
