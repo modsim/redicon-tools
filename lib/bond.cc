@@ -54,16 +54,13 @@ Bond::Bond (Atom * a, Atom * b, double eps, double H) : a(a), b(b), H(H), userDa
 	AtomAttorney::addBond (*b, *this);
 };
 
-Bond::Bond (Atom * a, Atom * b, double blength, double eps, double H) : r0(blength), a(a), b(b), H(H), userData (NULL)
+Bond::Bond (Atom * a, Atom * b, double blength, double eps, double H) :  a(a), b(b), r0(blength), H(H), userData (NULL)
 {
 	if (a == b)
-		throw "Cannot create a bond between the same atom.";
+		throw "Cannot create a bond between the same atoms.";
         
-	const Point3D * p1 = a->positionPtr();
-        const Point3D * p2 = b->positionPtr();
-        double d = p1->distanceTo (*p2);
-	rmin = d - eps * d;
-	rmax = d + eps * d;
+	rmin = r0 - eps * r0;
+	rmax = r0 + eps * r0;
 
 	AtomAttorney::setType (*a, ATOM_BONDED);
 	AtomAttorney::setType (*b, ATOM_BONDED);

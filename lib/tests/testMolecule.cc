@@ -20,7 +20,6 @@
 #include "molecule.h"
 #include "monatomic.h"
 
-
 bool PrintAtom (const Atom & a, void * data)
 {
 	double x = *((double*) data);
@@ -35,97 +34,104 @@ bool PrintAtom (const Atom & a, void * data)
 int main (int argc, char ** argv) 
 {
 	Atom A ("A", 1.);
-	Monatomic M ("M", A);
+	Molecule M ("M", A);
+	std::cerr << "Molecule created" << std::endl ;
 
-	Atom A2 ("A2", 1.);
-	A2.printInfo (&std::cout);
-	Monatomic M2 ("M2", A2);
-
-  	Coord3D P1 (10.,10.,10.);
-	M.setPosition (P1);
-
-	// Read PDB
-	Molecule * MPDB = NULL;
-	try {
-		MPDB = new Molecule (FILETYPE_PDB, "1.pdb");
-	} catch (const char * msg) {
-	    std::cerr << "Error creating a molecule from 1.pdb:  " << msg << std::endl;
-	    delete MPDB;
-	    MPDB = NULL;
-	    std::cerr << "pointer: " << MPDB << std::endl;
-	}
-
-	if (MPDB)
+	int natoms = 10;
+	for (int iatom = 1; iatom < natoms; iatom++)
 	{
-		// Add bonds and angles
-		MPDB->setBondsLinear (1, 100.);
-		MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
-
-		MPDB->printBBStr (&std::cout); 
-		MPDB->printInfo (&std::cout); 
-		MPDB->moveTo(P1);
-	}
-
-	// Read PQR
-	Molecule * MPQR = NULL;
-	try {
-		MPQR = new Molecule (FILETYPE_PQR, "dna.pqr");
-	} catch (const char * msg) {
-		std::cerr << "Error creating a molecule from dna.pqr:  " << msg << std::endl;
-		delete MPQR;
-		MPQR = NULL;
-		std::cerr << "pointer: " << MPQR << std::endl;
-	}
-	if (MPQR)
-	{
-		MPQR->printInfo (&std::cout); 
-		MPQR->printBBStr (&std::cout); 
-		MPQR->moveTo(P1);
-	}
-
-	// Test overlap 
-	try {
-		if (M.overlap (A))
-			std::cout << "Atom A overlaps with Molecule M" << std::endl;
-	} catch (const char * msg)	
-	{
-		std::cerr << "Exception thrown: " << msg << std::endl;
-	}
-
-	try {
-		if (M.overlap (M2))
-			std::cout << "Atom A overlaps with Molecule M" << std::endl;
-	} catch (const char * msg)	
-	{
-		std::cerr << "Exception thrown: " << msg << std::endl;
-	}
-
-	A.printInfo (&std::cout);
-	M.printInfo (&std::cout); 
-	if (MPDB)
-		MPDB->printInfo (&std::cout); 
-
-	std::cout << std::endl;
-
-	A.printBBStr (&std::cout);
-	M.printBBStr (&std::cout);
-	if (MPDB)
-	{
-		MPDB->printBBStr (&std::cout); 
-
 		try {
-			double x = 2.;
-			MPDB->foreachAtom (PrintAtom, (void*) &x);
-		} catch (const char* msg) {
-			std::cerr << msg << std::endl;
-		}
-	}
+			M.addAtom (A,iatom+1 , 1, 1.5, 0.5);
+			A.printInfo (&std::cout);
+		} catch (const char * msg) {
+			std::cerr << "Error adding atom %i:  " << msg << std::endl;
+		} 
+ 	}
+  	//Coord3D P1 (10.,10.,10.);
+ 	//M.setPosition (P1);
 
-	if (MPDB)
-		delete MPDB;
-
-	if (MPQR)
-		delete MPQR;
+// 	// Read PDB
+// 	Molecule * MPDB = NULL;
+// 	try {
+// 		MPDB = new Molecule (FILETYPE_PDB, "1.pdb");
+// 	} catch (const char * msg) {
+// 	    std::cerr << "Error creating a molecule from 1.pdb:  " << msg << std::endl;
+// 	    delete MPDB;
+// 	    MPDB = NULL;
+// 	    std::cerr << "pointer: " << MPDB << std::endl;
+// 	}
+// 
+// 	if (MPDB)
+// 	{
+// 		// Add bonds and angles
+// 		MPDB->setBondsLinear (1, 100.);
+// 		MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
+// 
+// 		MPDB->printBBStr (&std::cout); 
+// 		MPDB->printInfo (&std::cout); 
+// 		MPDB->moveTo(P1);
+// 	}
+// 
+// 	// Read PQR
+// 	Molecule * MPQR = NULL;
+// 	try {
+// 		MPQR = new Molecule (FILETYPE_PQR, "dna.pqr");
+// 	} catch (const char * msg) {
+// 		std::cerr << "Error creating a molecule from dna.pqr:  " << msg << std::endl;
+// 		delete MPQR;
+// 		MPQR = NULL;
+// 		std::cerr << "pointer: " << MPQR << std::endl;
+// 	}
+// 	if (MPQR)
+// 	{
+// 		MPQR->printInfo (&std::cout); 
+// 		MPQR->printBBStr (&std::cout); 
+// 		MPQR->moveTo(P1);
+// 	}
+// 
+// 	// Test overlap 
+// 	try {
+// 		if (M.overlap (A))
+// 			std::cout << "Atom A overlaps with Molecule M" << std::endl;
+// 	} catch (const char * msg)	
+// 	{
+// 		std::cerr << "Exception thrown: " << msg << std::endl;
+// 	}
+// /*
+// 	try {
+// 		if (M.overlap (M2))
+// 			std::cout << "Atom A overlaps with Molecule M" << std::endl;
+// 	} catch (const char * msg)	
+// 	{
+// 		std::cerr << "Exception thrown: " << msg << std::endl;
+// 	}
+// */
+// 	A.printInfo (&std::cout);
+// 	M.printInfo (&std::cout); 
+// 	if (MPDB)
+// 		MPDB->printInfo (&std::cout); 
+// 
+// 	std::cout << std::endl;
+// 
+// 	A.printBBStr (&std::cout);
+// 	M.printBBStr (&std::cout);
+// 	if (MPDB)
+// 	{
+// 		MPDB->printBBStr (&std::cout); 
+// 
+// 		try {
+// 			double x = 2.;
+// 			MPDB->foreachAtom (PrintAtom, (void*) &x);
+// 		} catch (const char* msg) {
+// 			std::cerr << msg << std::endl;
+// 		}
+// 	}
+// 
+// 	if (MPDB)
+// 		delete MPDB;
+// 
+// 	if (MPQR)
+// 		delete MPQR;
 
 	return 1;
 }

@@ -1,3 +1,11 @@
+2013-12-18  version 0.2.31  <pradeepburla91@gmail.com>
+	
+	* tests/testMolecules.cc: tests seem ok.
+
+	* moleculeAddAtom.cc: addAtom(): bug fix.
+
+	* bond.cc: constructor bug fix.
+
 2013-12-02  version 0.2.30  <pradeepburla91@gmail.com>
 	
 	* moleculeAddAtom.cc: addAtom(). Tests needed.

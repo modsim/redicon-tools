@@ -33,18 +33,12 @@
 // serial is the serial of an atom to bond with -- FIXME: add a comment in molecule.h
 bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, double H)
 {	
-	Atom * A = new Atom (a);
-    	Atoms.push_back (A);
-    	charge += A->getCharge();
-	
 	// Serial number of the head
-	unsigned int sh = Atoms.at(0)->getSerial();
-	unsigned int s1 = sh; // serial `counter` -- to be the new/added atom serial
+	unsigned int shead = Atoms.at(0)->getSerial();
+	unsigned int s1 = shead; // serial `counter` -- to be the new/added atom serial
 
-    	// set radius to zero as positions
-	radius[0] = radius[1] = radius[2] = 0.0;
+	bool hasSerial = false;
 
-	//
 	// Get next serial to assign to a new atom 
 	// in principle it is just NAtom(), but run a loop and check if atoms are in series
 #ifdef HAVE_CXX11
@@ -55,17 +49,34 @@ bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, do
 	{
 		Atom * b = Atoms.at (i); 
 #endif		
+		DPRINT ("shead=%i, s1=%i, s0=%i (natoms=%i)\n", shead, s1, b->getSerial(), getNAtoms());
+
+		if (b->getSerial() == s)
+		    hasSerial = true;
+		
 		// skip the first/head atom
-		if (b->getSerial() == sh)
+		if (b->getSerial() == shead)
 			continue;
-		//
+
 		if (b->getSerial() == s1 + 1)
+		{
 			s1 = b->getSerial();
+		}
 		else
 			throw "Molecule::addAtom(): Serial numbers not in series as expected";
 	}
 	// the serial of the new/added atom
 	s1++;
+
+	if (! hasSerial)
+	    BCPT_ERROR ("cannot add an atom: no atom with serial %i in the molecule to creat a bond", s);
+	
+	// now add an atom to the list, and reset the charge and radius
+	Atom * A = new Atom (a);
+ 	Atoms.push_back (A);
+    	charge += A->getCharge();
+	// set radius to zero as positions are not known yet
+	radius[0] = radius[1] = radius[2] = 0.0;
 
     	// Set atom properties
     	AtomAttorney::claimOwnership (*A, *this);
@@ -74,9 +85,9 @@ bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, do
 
 	// Change bonded atom status
 	Atom * B = getAtom (s);
-	if ( strcmp (B->getTypeName(), "ATOM_TERMINAL") && s != sh )
+	if ( strcmp (B->getTypeName(), "ATOM_TERMINAL") && s != shead )
 	    	AtomAttorney::setType (*B, ATOM_2BONDS);
-	else if ( strcmp (B->getTypeName(), "ATOM_2BONDS") && s != sh )
+	else if ( strcmp (B->getTypeName(), "ATOM_2BONDS") && s != shead )
 		AtomAttorney::setType (*B, ATOM_BRANCH);
 
 	//finally create a bond
@@ -86,9 +97,9 @@ bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, do
 bool Molecule::createBond (Atom * a, Atom * b, double blength, double eps, double H)
 {
 
-	BCPT_RET_VAL_IF_FAIL (a,false);
-	BCPT_RET_VAL_IF_FAIL (b,false);
-	BCPT_RET_VAL_IF_FAIL (a == b,false);
+	BCPT_RET_VAL_IF_FAIL (a, false);
+	BCPT_RET_VAL_IF_FAIL (b, false);
+	BCPT_RET_VAL_IF_FAIL (a != b,false);
 
 	if (hasAtom(a) && hasAtom (b))
 		Bonds.push_back (new Bond (a, b, blength, eps, H));
