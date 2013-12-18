@@ -69,7 +69,10 @@ bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, do
 	s1++;
 
 	if (! hasSerial)
-	    BCPT_ERROR ("cannot add an atom: no atom with serial %i in the molecule to creat a bond", s);
+	{
+		BCPT_ERROR ("cannot add an atom: no atom with serial %i in the molecule to creat a bond", s);
+		return false;
+	}
 	
 	// now add an atom to the list, and reset the charge and radius
 	Atom * A = new Atom (a);
