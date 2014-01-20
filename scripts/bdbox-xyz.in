@@ -101,10 +101,12 @@ function scan_directory ()
 	xyzfiles=$(ls $dir | grep .xyz)
 	for f in $xyzfiles; do
 
+		mkdir -p $dir/moldat
+
 		xyz_mod=$(stat -c %Y $dir/$f)
 		echo "mols=$mols"
 		for imol in $mols; do
-			ofile=$dir/$(basename $f .xyz).mol$imol
+			ofile=$dir/moldat/$(basename $f .xyz).mol$imol
 			redo="yes"
 			if test -f $ofile.dat; then
 			 	dat_mod=$(stat -c %Y $ofile.dat)
@@ -113,14 +115,14 @@ function scan_directory ()
 				fi
 			fi
 
-			 if test "$redo" == "yes" -o "x$overwrite" == "xyes"; then
+			if test "$redo" == "yes" -o "x$overwrite" == "xyes"; then
 		 		echo "Extracting data from '$dir/$f' to $ofile.dat"
 				echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol"
 				echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol" > $ofile.cmd
 				$analysexyz $analysexyz_opt -f $dir/$f -k$imol > $ofile.dat
-			 else
+			else
 		 		echo "File '$ofile.dat' is up to date, skipping"
-			 fi	
+			fi	
 			if test -z "$files"; then
 				files=$ofile.dat
 			else
