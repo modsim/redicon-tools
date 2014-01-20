@@ -72,20 +72,20 @@ def coarseGrain (orig, t0, dt):
 	X = [0.0] * orig.length
 
 	for j in range (0, orig.size, 1):
-		printf ('t = %g, interval (%f, %f)\n', orig.data[j][0], t0, t0 + dt)
+#		printf ('t = %g, interval (%f, %f)\n', orig.data[j][0], t0, t0 + dt)
 
 		if orig.data[j][0] >= t0 and orig.data[j][0] <= t0 + dt:
 			N = N + 1
 			for i in range (0, orig.length, 1):
 				X[i] = X[i] + orig.data[j][i]
-			printf ('N=%i:\n', N)
+			#printf ('N=%i:\n', N)
 
 		else:
 			if N != 0:
 				for i in range (0, orig.length, 1):
 					X[i] = X[i] / N
-					printf ('X%i=%f\n', i, X[i])
-				print (X);
+					#printf ('X%i=%f\n', i, X[i])
+				#print (X);
 				CoarseGrained.append (X);
 
 			# reset now
@@ -96,8 +96,8 @@ def coarseGrain (orig, t0, dt):
 		if N != 0:
 			for i in range (0, orig.length, 1):
 				X[i] = X[i] / N
-				printf ('X%i=%f\n', i, X[i])
-			print (X);
+				#printf ('X%i=%f\n', i, X[i])
+			#print (X);
 			self.append (X);
 
 	return CoarseGrained;
@@ -160,7 +160,8 @@ else:
 
 debug = False
 #debug = True
-debugRead = True
+#debugRead = True
+debugRead = False
 
 Data = MyData()
 
