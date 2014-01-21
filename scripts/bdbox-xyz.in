@@ -210,7 +210,7 @@ nfiles=0
 cd $directory && scan_directory .
 
 maxargs=`getconf ARG_MAX`
-$maxargs=$[$maxfiles - 10]
+$maxargs=$[$maxargs - 10]
 if test "$nfiles" -gt "$maxargs"; then
 	files_file=`mktemp $myname-xxxxxx`
 	echo $files > $files_file
