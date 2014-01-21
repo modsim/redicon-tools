@@ -123,17 +123,19 @@ if options.files and options.File:
 	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
     	sys.exit()
 
+files=[]
 if options.files:
 	files = options.files.split (',')
 
 elif options.File:
-	f = open (options.File);
-	line = f.readline();
-	printf ('line=%s\n', line)
-	files = line.split (',')
+	for line in fileinput.input(options.File):
+		fs = line.split (' ')
+		for f in fs:
+			f1 = f.strip('\r\n')
+			files.append(f1)
 	for f in files:
-		printf ('file=%s\n', f)
-	
+		printf ("f='%s'\n", f)
+
 else:
 	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
     	sys.exit()

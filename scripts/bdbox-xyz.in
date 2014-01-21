@@ -124,11 +124,7 @@ function scan_directory ()
 			else
 		 		echo "File '$ofile.dat' is up to date, skipping"
 			fi	
-			if test -z "$files"; then
-				files=$ofile.dat
-			else
-				files="$files,$ofile.dat"
-			fi
+			files="$files $ofile.dat"
 			nfiles=$[$nfiles+1]
 		done
 	done
@@ -212,7 +208,7 @@ cd $directory && scan_directory .
 
 files_file=`mktemp $myname-XXXXXX`
 if test -n "$files_file"; then
-    echo -n $files > $files_file
+    echo $files > $files_file
     average_files=" -F $files_file"
 else
     echo "$myname: cannot create a temporary file, sorry, I am giving up..."
