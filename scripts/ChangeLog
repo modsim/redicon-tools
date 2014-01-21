@@ -1,3 +1,8 @@
+2014-01-21  version 0.2.30  <s.kondrat@fz-juelich.de>
+
+	* bdbox-xyz: always use a file list a -F option to
+	average-me.py.
+
 2013-12-10  version 0.2.29  <s.kondrat@fz-juelich.de>
 
 	* bdbox-xyz: check max argumets and use -F option to
