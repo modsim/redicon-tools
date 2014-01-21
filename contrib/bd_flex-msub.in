@@ -101,6 +101,10 @@ if test -f "$directory/@QUEUE@"; then
 	echo "$myname: error: job is queued already; if this is not the case, remove '$directory/@QUEUE@' and run again."
 	exit 1;
 fi
+if test -f "$directory/@RUNNING@"; then
+	echo "$myname: error: job seems to be running; if this is not the case, remove '$directory/@RUNNING@' and run again."
+	exit 1;
+fi
 
 # Check if there is msub
 # There is a submiter on a master but no submiter on nodes

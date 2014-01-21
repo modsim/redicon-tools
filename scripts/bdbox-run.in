@@ -501,6 +501,8 @@ do
 	if test -f "@ERROR@"; then
 		echo
 		echo "*** Run #$irun finished with error, restarting ***"
+		cat @ERROR@ >> .errors
+		rm @ERROR@
 	fi
 
 	# run the BD beast (runme is either a script or )
