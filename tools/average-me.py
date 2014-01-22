@@ -133,8 +133,8 @@ elif options.File:
 		for f in fs:
 			f1 = f.strip('\r\n')
 			files.append(f1)
-	for f in files:
-		printf ("f='%s'\n", f)
+#	for f in files:
+#		printf ("f='%s'\n", f)
 
 else:
 	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
