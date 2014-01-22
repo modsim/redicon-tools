@@ -1,3 +1,8 @@
+2014-01-21 20:00 CET  version 0.2.31  <s.kondrat@fz-juelich.de>
+
+	* bdbox-xyz, bd_flex-run: -o/-O option to pass additional
+	options to bd_flex.
+
 2014-01-21  version 0.2.30  <s.kondrat@fz-juelich.de>
 
 	* bdbox-xyz: always use a file list a -F option to

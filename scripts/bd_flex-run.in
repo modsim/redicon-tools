@@ -36,6 +36,7 @@ function usage()
   echo "  -B BD_FLEX              use BD_FLEX binary."
   echo "  -i FILE                 input parameter file."
   echo "  -c COUNT                continue (count to keep track on reruns)."
+  echo "  -o \"OPTS\"              pass OPTS to BD_FLEX."
   echo "  -p NUM                  use OpenMPI with NUM threads."
   echo "  -M NUM                  use MPI with NUM processes."
 
@@ -52,7 +53,7 @@ function usage()
 #
 # Options
 #
-while getopts "d:B:i:p:M:r:c:v?:" Option
+while getopts "d:B:o:i:p:M:r:c:v?:" Option
 do
   case $Option in
 
@@ -61,6 +62,9 @@ do
 
     B  ) bdflex="$OPTARG"
          cmd="${cmd} -B $OPTARG";;
+
+    o  ) bdflex_custom_opts="$OPTARG"
+         cmd="${cmd} -o \"$OPTARG\"";;
 
     i  ) input="$OPTARG"
          cmd="${cmd} -i $OPTARG";;
@@ -190,9 +194,9 @@ fi
 
 # Set traps
 if test -n "$script"; then
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@).' >> $interrupted ; echo 'Running custom script:' >> $interrupted ; echo '	$script $cmd -c $count' >> $interrupted ;  mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; $script $cmd -c$count ; exit" SIGINT SIGTERM
+	trap "echo 'Terminated (run by $myname @VERSION@).' >> $interrupted ; echo 'Running custom script:' >> $interrupted ; echo '	$script $cmd -c $count' >> $interrupted ;  mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; $script $cmd -c$count ; exit" SIGINT SIGTERM
 else
-	trap "echo 'Terminated on `date` (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted ; echo '	$myname -c $count $cmd' >> $interrupted ; mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; exit" SIGINT SIGTERM
+	trap "echo 'Terminated (run by $myname @VERSION@). ' >> $interrupted && echo 'To resume run:' >> $interrupted ; echo '	$myname -c $count $cmd' >> $interrupted ; mv $running $stopped ; if test -f $errorfile; then mv $errorfile $errorlog; fi; echo 'Stopped on `date`' >> $stopped ; echo >> $stopped ; exit" SIGINT SIGTERM
 fi
 
 # Check for an input file
@@ -225,12 +229,12 @@ fi
 # Run from working directory
 cd $directory
 if test -n "$nproc"; then
-	echo "OMP_NUM_THREADS=$nproc  $bdflex $input $bdflex_opts" >> $running
-	OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts
+	echo "OMP_NUM_THREADS=$nproc  $bdflex $input $bdflex_opts $bdflex_custom_opts" >> $running
+	OMP_NUM_THREADS=$nproc $bdflex $input $bdflex_opts $bdflex_custom_opts
 	exitcode=$?
 elif test -n "$mpiproc"; then
-	echo "$mpirun -np $mpiproc  $bdflex $input $bdflex_opts" >> $running
-	$mpirun -np $mpiproc $bdflex $input $bdflex_opts
+	echo "$mpirun -np $mpiproc  $bdflex $input $bdflex_opts $bdflex_custom_opts" >> $running
+	$mpirun -np $mpiproc $bdflex $input $bdflex_opts $bdflex_custom_opts
 	exitcode=$?
 else
 	echo "$myname: internal error: do not know how to run"
