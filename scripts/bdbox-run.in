@@ -338,7 +338,9 @@ if test "x$cont" == "xyes"; then
 			custom_bdflex_opts=$(cat "$custom_bdflex_opts_file")
 		fi
 	fi
-	custom_bdflex_opts="$custom_bdflex_opts $custom_bdflex_opts_add"
+	if test -n "$custom_bdflex_opts" -o -n "$custom_bdflex_opts_add"; then
+		custom_bdflex_opts="$custom_bdflex_opts $custom_bdflex_opts_add"
+	fi
 
 	# Check for number of runs
 	if test -z "$nrun"; then
@@ -434,16 +436,19 @@ else # We do not continue, check for prm and create str
 		echo "$myname: internal error: OpenMP or MPI? "
 		exit 1
 	fi
-	# Check and save custom bdflex options
+
+	# Check custom bdflex options
 	if test -n "$custom_bdflex_opts" -o -n "$custom_bdflex_opts_add"; then
 		custom_bdflex_opts="$custom_bdflex_opts $custom_bdflex_opts_add"
 	fi
 fi
 
-
-# (Re)save the bd_flex options
-echo $custom_bdflex_opts > $custom_bdflex_opts_file
-
+# (Re)save the bd_flex options 
+# custom_bdflex_opts contains all bdflex options, from -o and -O
+# we turn it thus to -o "OPTS" to be passed to the runner
+if test -n "$custom_bdflex_opts"; then
+	echo $custom_bdflex_opts > $custom_bdflex_opts_file
+fi
 
 # Check for script and set runme
 if test -n "$script"; then
@@ -536,8 +541,14 @@ do
 	# run the BD beast (runme is either a script or )
 	echo
 	echo "Starting/continuing run #$irun:"
-	echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o \"$custom_bdflex_opts\" $cont_opt >> $lbase.cmd
-	$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o "$custom_bdflex_opts" $cont_opt
+	if test -z "$custom_bdflex_opts"; then
+		echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt >> $lbase.cmd
+		$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt
+	else
+		echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o \"$custom_bdflex_opts\" $cont_opt >> $lbase.cmd
+		$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o "$custom_bdflex_opts" $cont_opt
+	fi
+
 	echo "Run #$irun done/queued!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill
