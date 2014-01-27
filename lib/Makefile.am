@@ -6,7 +6,7 @@ libMol_la_SOURCES = point3D.cc point3D.h \
 	bond.h bond.cc \
 	angle.h angle.cc \
 	molecule.h molecule.cc moleculePDB.cc moleculePQR.cc moleculeBonds.cc moleculeAngles.cc moleculeAddAtom.cc\
-	monatomic.h \
+	monatomic.h polymer.h \
 	system.h system.cc
 
 AM_CPPFLAGS= -std=c++0x -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/

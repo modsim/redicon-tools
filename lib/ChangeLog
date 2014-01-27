@@ -1,3 +1,7 @@
+2014-01-27  version 0.2.32  <pradeepburla91@gmail.com>
+	
+	* molecule.{cc,h}: new method setPosition(Atom, Point3D): tests and improvements needed (see FIXME in molecule.cc).
+
 2013-12-18  version 0.2.31  <pradeepburla91@gmail.com>
 	
 	* tests/testMolecules.cc: tests seem ok.

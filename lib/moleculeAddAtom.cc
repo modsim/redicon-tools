@@ -30,7 +30,7 @@
 #include "defines.h"
 
 // Create a bond when adding an atom, as an atom w/o bond in a molecule makes no sense
-// serial is the serial of an atom to bond with -- FIXME: add a comment in molecule.h
+// serial is the serial of an atom to bond with 
 bool Molecule::addAtom (Atom & a, unsigned int s, double blength, double eps, double H)
 {	
 	// Serial number of the head

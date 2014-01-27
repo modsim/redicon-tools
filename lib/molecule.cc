@@ -182,11 +182,52 @@ bool Molecule::setPosition (const Point3D& R)
 		BCPT_WARNING ("Position is set, use Molecule::moveTo() to reset.");
 		return false;
 	}
-
+		
+	
 	BCPT_WARNING ("Virtual method, not implemented for a general molecule.");
 	return false;
 }
 
+
+bool Molecule::setPosition (Atom * b, const Point3D & R)
+{
+	
+	if (!hasAtom (b)) 
+	{
+		BCPT_ERROR ("Molecule '%s' has not atom '%s'", getName(), b->getName());
+		return false;
+	}
+
+	if (b->positionIsSet())
+	{
+		BCPT_ERROR ("Position is set already, use moveTo() [not impl yet]");
+		return false;
+	}
+
+	// FIXME: make Atom::unsetPosition () and unset when overlaping
+	// instead of copying which is expansive
+	Atom bcopy = Atom (*b);
+	bcopy.setPosition (R);
+
+#ifdef HAVE_CXX11 
+	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i);
+#endif
+		if (a->positionIsSet())
+			if (bcopy.overlap (*a))
+			{
+				BCPT_ERROR ("Cannot set position: Atom '%s' (serial %li) overlaps with atom '%s' (serial %li)", 
+					bcopy.getName(), bcopy.getSerial(), a->getName(), a->getSerial());
+				return false;
+			}
+	}
+	b->setPosition (R);
+	return true;
+}
 
 //checks if the molecule has the atom
 

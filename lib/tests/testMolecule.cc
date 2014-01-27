@@ -35,13 +35,19 @@ int main (int argc, char ** argv)
 {
 	Atom A ("A", 1.);
 	Molecule M ("M", A);
-	std::cerr << "Molecule created" << std::endl ;
+	Coord3D P1 (1.,1.5,10.2);
 
-	int natoms = 10;
+	//A.setPosition(P1);
+	//A.printInfo (&std::cout);
+	M.printInfo (&std::cout); 
+	std::cerr << "Molecule created" << std::endl ;
+/*
+	int natoms = 2;
 	for (int iatom = 1; iatom < natoms; iatom++)
 	{
 		try {
-			M.addAtom (A,iatom , 1, 1.5, 0.5);
+			
+			M.addAtom (A,iatom , 1, 1.5, 0.5);		
 			A.printInfo (&std::cout);
 		} catch (const char * msg) {
 			std::cerr << "Error adding atom %i:  " << msg << std::endl;
@@ -51,9 +57,8 @@ int main (int argc, char ** argv)
 	M.printBBStr (&std::cout);
 	
 	// Check reading a Mol fromm the file
-  	Coord3D P1 (10.,10.,10.);
- 	M.setPosition (P1);
-
+  	M.setPosition(P1);
+*/
 	// Read PDB
 	Molecule * MPDB = NULL;
 	try {

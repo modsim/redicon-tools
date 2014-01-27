@@ -69,6 +69,8 @@ class Molecule
                 Atom * getAtom(unsigned int s1) const;
 		// this is initial position set, depends on the molecule type (polymer, one atom
 		virtual bool setPosition (const Point3D & R);	
+		bool setPosition (Atom * a, const Point3D & R);		
+		
 		// move or translate a molecule
 		bool moveTo (const Point3D & R) ;
 		bool translateBy (const Point3D & T);
@@ -106,8 +108,10 @@ class Molecule
 		std::vector<Bond*> Bonds;
 		std::vector<Angle*> Angles;
 
+		//To set position for an atom  
 		bool PositionIsSet;
-
+		//bool setPosition (Atom * a,const Point3D & R);
+		//bool setPosition (unsigned int s1,const Point3D & R);
 		// TODO:
 		//addAtom (Atom &);
 		//bool createBond (i, j) {return true;};
