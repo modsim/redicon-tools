@@ -275,7 +275,7 @@ int main (int argc, char ** argv)
 	
 	if ( (nradii != nN) || (nN != nnames) )
 	{
-		cerr << myname << ": error: number of molecule's names, radii, and their numbers in the system must be the same."  << endl;
+		cerr << myname << ": error: number of molecule's names (" << nnames<< "), radii("<< nradii << "), and their numbers (" << nN << ") in the system must be the same."  << endl;
 		return 1; /* failure */
 	}
 
@@ -366,7 +366,7 @@ int main (int argc, char ** argv)
 		for (int j = 0; j < N[i]; j++)
 		{
 			// "cent" molecule is already in the box, skip
-			if (strstr (types[i], "cent"))
+			if (types && strstr (types[i], "cent"))
 				break;
 
 			Monatomic * M = new Monatomic (names[i], a);
