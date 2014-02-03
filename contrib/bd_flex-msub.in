@@ -21,7 +21,9 @@
 # 
 #msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
 #msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
-msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=16 -M valiska@gmail.com -m abe -V -S /bin/bash"
+nnodes=2
+ncores=24
+msub="ssh judge /opt/moab/bin/msub -l nodes=$nnodes:ppn=$ncores -M valiska@gmail.com -m abe -V -S /bin/bash"
 msub="bash"
 
 # my dear self
@@ -71,7 +73,21 @@ do
 
     p  ) cmd="${cmd} -p $OPTARG";;
 
-    M  ) cmd="${cmd} -M $OPTARG";;
+    M  )
+    	OLD_IFS="$IFS";
+	IFS=","
+	MPI_list=( ${OPTARG} )
+	if test "${#MPI_list[@]}" != 4; then
+	echo "$myname: -M required 4 comma-separated arguments. Use '$myname -h' for help."
+	exit 1;
+	fi
+	mpiproc="${MPI_list[0]}"
+	mpiproc2=$($nnodes * $ncores)
+	if test "$mpiproc" != "$mpiproc2"; then
+		echo "$myname: error: nproc ($nproc) != nnodes x ncores = $nnodes x $ncores"
+		exit 1
+	fi
+    	cmd="${cmd} -M $OPTARG";;
 
     c  ) count="$OPTARG"
          cmd="${cmd} -c $OPTARG";;
