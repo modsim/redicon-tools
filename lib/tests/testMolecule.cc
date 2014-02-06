@@ -35,24 +35,38 @@ int main (int argc, char ** argv)
 {
 	Atom A ("A", 1.);
 	Molecule M ("M", A);
-	Coord3D P1 (1.,1.5,10.2);
-
-	//A.setPosition(P1);
+	Atom A1 ("A1",1.);
+	Coord3D P1 (1.,1.1,1.2);
 	//A.printInfo (&std::cout);
+	//M.printInfo (&std::cout); 
+	std::cerr << "Molecule created" << std::endl ;	
+
+	M.addAtom (A, 1, 1, 1.5, 0.5);
+
+	Atom * a = M.getAtom (1);
+	M.setAtomPosition(a, P1);
+	Coord3D P2 (1,1,1);
+	M.setAtomPosition(M.getAtom(2), P2);
+
 	M.printInfo (&std::cout); 
-	std::cerr << "Molecule created" << std::endl ;
+	M.printBBStr (&std::cout); 
+
 /*
-	int natoms = 2;
+	int natoms = 10;
 	for (int iatom = 1; iatom < natoms; iatom++)
 	{
 		try {
-			
-			M.addAtom (A,iatom , 1, 1.5, 0.5);		
+						
+			M.addAtom (A,iatom , 1, 1.5, 0.5);
+			M.setPosition(&A,P1);						
 			A.printInfo (&std::cout);
+			M.printInfo (&std::cout); 
 		} catch (const char * msg) {
 			std::cerr << "Error adding atom %i:  " << msg << std::endl;
 		} 
- 	}
+	 
+	}
+	
  	M.printInfo (&std::cout); 
 	M.printBBStr (&std::cout);
 	

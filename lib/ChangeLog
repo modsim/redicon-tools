@@ -1,3 +1,9 @@
+2014-02-06  version 0.2.33  <pradeepburla91@gmail.com>
+	
+	* tests/testMolecules.cc: test Molecule::setAtomPosition(): test/valgrinds ok.
+
+	* molecule.{cc,h}: bug fixes, Molecule::setPosition(Atom, Coord3D) renamed to setAtomPosition().
+
 2014-01-27  version 0.2.32  <pradeepburla91@gmail.com>
 	
 	* molecule.{cc,h}: new method setPosition(Atom, Point3D): tests and improvements needed (see FIXME in molecule.cc).

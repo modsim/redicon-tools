@@ -189,9 +189,11 @@ bool Molecule::setPosition (const Point3D& R)
 }
 
 
-bool Molecule::setPosition (Atom * b, const Point3D & R)
+bool Molecule::setAtomPosition (Atom * atom, const Point3D & R)
 {
 	
+	BCPT_RET_VAL_IF_FAIL (atom, false);
+	Atom * b = atom;  // we are lazy 
 	if (!hasAtom (b)) 
 	{
 		BCPT_ERROR ("Molecule '%s' has not atom '%s'", getName(), b->getName());
@@ -221,7 +223,7 @@ bool Molecule::setPosition (Atom * b, const Point3D & R)
 			if (bcopy.overlap (*a))
 			{
 				BCPT_ERROR ("Cannot set position: Atom '%s' (serial %li) overlaps with atom '%s' (serial %li)", 
-					bcopy.getName(), bcopy.getSerial(), a->getName(), a->getSerial());
+					b->getName(), b->getSerial(), a->getName(), a->getSerial());
 				return false;
 			}
 	}

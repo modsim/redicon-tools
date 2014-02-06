@@ -37,6 +37,7 @@ class Molecule
 	public:
 
 		// NOTE: molecules can get more then one head, we consider this as association
+		// Molecule creates a copy of an atom, rather than adds an atom 
 		Molecule (const char * name, Atom head);
 		Molecule (unsigned int ft, const char * file); 
 		~Molecule ();
@@ -45,6 +46,7 @@ class Molecule
 		
 		// add an atom and create a bond. The serial is incremented from 1 (head atom)
 		//serial is the serial of an atom to bond with
+		// NOTE: A molecule creates a copy of an atom, rather than adding an atom 
 		bool addAtom (Atom & a, unsigned int serial, double blength, double eps, double H);
 		
 		// create a bond betwen two Atoms
@@ -69,7 +71,7 @@ class Molecule
                 Atom * getAtom(unsigned int s1) const;
 		// this is initial position set, depends on the molecule type (polymer, one atom
 		virtual bool setPosition (const Point3D & R);	
-		bool setPosition (Atom * a, const Point3D & R);		
+		bool setAtomPosition (Atom * a, const Point3D & R);		
 		
 		// move or translate a molecule
 		bool moveTo (const Point3D & R) ;
