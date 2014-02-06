@@ -1,3 +1,7 @@
+2014-01-22  version 0.2.31  <s.kondrat@fz-juelich.de>
+
+	* bd_flex-msub.in: -o pass bdflex options.
+
 2013-10-18  version 0.2.15  <s.kondrat@fz-juelich.de>
 
 	* bd_flex-msub.in: create/check queue file.

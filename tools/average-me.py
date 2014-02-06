@@ -72,20 +72,20 @@ def coarseGrain (orig, t0, dt):
 	X = [0.0] * orig.length
 
 	for j in range (0, orig.size, 1):
-		printf ('t = %g, interval (%f, %f)\n', orig.data[j][0], t0, t0 + dt)
+#		printf ('t = %g, interval (%f, %f)\n', orig.data[j][0], t0, t0 + dt)
 
 		if orig.data[j][0] >= t0 and orig.data[j][0] <= t0 + dt:
 			N = N + 1
 			for i in range (0, orig.length, 1):
 				X[i] = X[i] + orig.data[j][i]
-			printf ('N=%i:\n', N)
+			#printf ('N=%i:\n', N)
 
 		else:
 			if N != 0:
 				for i in range (0, orig.length, 1):
 					X[i] = X[i] / N
-					printf ('X%i=%f\n', i, X[i])
-				print (X);
+					#printf ('X%i=%f\n', i, X[i])
+				#print (X);
 				CoarseGrained.append (X);
 
 			# reset now
@@ -96,8 +96,8 @@ def coarseGrain (orig, t0, dt):
 		if N != 0:
 			for i in range (0, orig.length, 1):
 				X[i] = X[i] / N
-				printf ('X%i=%f\n', i, X[i])
-			print (X);
+				#printf ('X%i=%f\n', i, X[i])
+			#print (X);
 			self.append (X);
 
 	return CoarseGrained;
@@ -108,9 +108,10 @@ from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option("-f", "--files", help="comma-separated files with data.", metavar="FILE", type="string", dest="files")
-parser.add_option("-k", "--lines", help="comma-separated lines to process.", metavar="VAL", type="string", dest="lines")
-parser.add_option("-w", "--window", help="coarse-grain window, applies to the first line from -k option.", metavar="VAL", type="float", dest="dt")
-parser.add_option("-s", "--start", help="starting point, applies to the first line from -k option.", metavar="VAL", type="float", dest="t0")
+parser.add_option("-F", "--files-file", help="file with the list of data files.", metavar="FILE", type="string", dest="File")
+parser.add_option("-k", "--lines", help="comma-separated list of lines to process.", metavar="VAL", type="string", dest="lines")
+parser.add_option("-w", "--window", help="coarse-grain window (applies to the first line in -k option).", metavar="VAL", type="float", dest="dt")
+parser.add_option("-s", "--start", help="start avereging from this value of the first line from -k option.", metavar="VAL", type="float", dest="t0")
 
 #
 # Grab options
@@ -118,11 +119,25 @@ parser.add_option("-s", "--start", help="starting point, applies to the first li
 (options, args) = parser.parse_args()
 
 # Comma separated files 
+if options.files and options.File:
+	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
+    	sys.exit()
+
+files=[]
 if options.files:
 	files = options.files.split (',')
 
+elif options.File:
+	for line in fileinput.input(options.File):
+		fs = line.split (' ')
+		for f in fs:
+			f1 = f.strip('\r\n')
+			files.append(f1)
+#	for f in files:
+#		printf ("f='%s'\n", f)
+
 else:
-	printf ('The file names are missing (-f/--file)\n')
+	printf ('The file names are missing (-f/--file or -F/--files-file)\n')
     	sys.exit()
 
 # Lines to process
@@ -147,6 +162,7 @@ else:
 
 debug = False
 #debug = True
+#debugRead = True
 debugRead = False
 
 Data = MyData()
@@ -265,8 +281,7 @@ if N != 0:
 	for i in range (0, Data.length, 1):
 		X[i] = X[i] / N
 		printf (' %f ', X[i])
-	printf ('\n')
-
+	printf ('%i \n', N)
 
 # This would be the code if no BUG
 #for j in range (0, len(CoarseGrained.data), 1):

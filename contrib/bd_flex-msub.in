@@ -21,6 +21,9 @@
 # 
 #msub="/opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
 #msub="ssh judge /opt/moab/bin/msub -l nodes=1:ppn=10:gpus=2 -V -S /bin/bash"
+nnodes=2
+ncores=24
+msub="ssh judge /opt/moab/bin/msub -l nodes=$nnodes:ppn=$ncores -M valiska@gmail.com -m abe -V -S /bin/bash"
 msub="bash"
 
 # my dear self
@@ -42,8 +45,9 @@ function usage()
   echo "  -B BD_FLEX              use BD_FLEX binary."
   echo "  -i FILE                 input parameter file."
   echo "  -c COUNT                continue (count to keep track on reruns)."
+  echo "  -o \"OPTS\"               pass bd_flex options to the runner."
   echo "  -p NUM                  number of processes (for OpenMP)."
-  echo "  -M PROC,COL,ROW,BLOCK   number of processes, collons, rows and blocks for MPI."
+  echo "  -M MPIPROCS             number of MPI processes."
 
   echo
   echo "  -v                      print version information and exit."
@@ -55,37 +59,42 @@ function usage()
 #
 # Options
 #
-while getopts "d:B:i:p:M:c:v?:" Option
+while getopts "d:B:i:p:M:c:o:v?:" Option
 do
   case $Option in
 
     d  ) directory="$OPTARG"
          cmd="${cmd} -d $OPTARG";;
 
-    B  ) bdflex="$OPTARG"
-         cmd="${cmd} -B $OPTARG";;
+    B  ) cmd="${cmd} -B $OPTARG";;
 
     i  ) input="$OPTARG"
          cmd="${cmd} -i $OPTARG";;
 
-    p  ) nproc="$OPTARG"
-         cmd="${cmd} -p $OPTARG";;
+    p  ) cmd="${cmd} -p $OPTARG";;
 
-    M  ) mpiopt="$OPTARG"
-         cmd="${cmd} -M $OPTARG";;
+    M  )
+  	mpiproc="$OPTARG"
+	mpiproc2=$(echo "$nnodes * $ncores" | bc -l)
+	if test "$mpiproc" != "$mpiproc2"; then
+		echo "$myname: error: thetotal number of MPI procs ($mpiproc) != nnodes x ncores = $nnodes x $ncores = $mpiproc2"
+		exit 1
+	fi
+    	cmd="${cmd} -M $OPTARG";;
 
     c  ) count="$OPTARG"
          cmd="${cmd} -c $OPTARG";;
 
-    r  ) script="$OPTARG"
-         cmd="${cmd} -k $OPTARG";;
+    o  ) cmd="${cmd} -o \"$OPTARG\"";;
+
+    # FIXME: check if we really need this option
+    r  ) cmd="${cmd} -r $OPTARG";;
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
          exit 1 ;;
 
     v  ) echo "$myname from @PACKAGE@ @VERSION@"
          exit 0;;
-
     
     '?'  |  h) usage ${myname}
 	   exit $OPTERROR;;
@@ -99,6 +108,10 @@ shift $(($OPTIND - 1))
 # Check if already queued
 if test -f "$directory/@QUEUE@"; then
 	echo "$myname: error: job is queued already; if this is not the case, remove '$directory/@QUEUE@' and run again."
+	exit 1;
+fi
+if test -f "$directory/@RUNNING@"; then
+	echo "$myname: error: job seems to be running; if this is not the case, remove '$directory/@RUNNING@' and run again."
 	exit 1;
 fi
 

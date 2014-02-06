@@ -1,3 +1,8 @@
+2013-12-10  version 0.2.29  <s.kondrat@fz-juelich.de>
+
+	* analyze-xyz.py: -F option:file with a list of data files, instead of
+	-f FILE,FILE,.. option to avoid max arguments problem.
+
 2013-11-11  version 0.2.25  <s.kondrat@fz-juelich.de>
 
 	* fit-pow.sh.in: -i (interval) option.

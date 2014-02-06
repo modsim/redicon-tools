@@ -36,11 +36,15 @@ function usage()
   echo "Where options are:"
   echo "  -d DIR                  working directory."
   echo "  -B BD_FLEX              use BD_FLEX binary."
+  echo "  -o \"OPTS\"              add OPTS to existing BD_FLEX options (if any)."
+  echo "  -O \"OPTS\"              pass OPTS to BD_FLEX. Options from "
+  echo "			   control file (if any) will be overwritten."
+
   echo "  -i FILE                 input parameter file for all runs."
   echo "        rand_seed and *_filename options will be skipped."
   echo "  -c                      scan directory DIR for unfinished runs and continue."
   echo "  -s SCRIPT               run/queue each run via custom script."
-  echo "        SCRIPT must accept options -d DIR -B FLEX -i INPUT -p NPROC -c COUNT"
+  echo "        SCRIPT must accept options -d DIR -B FLEX -i INPUT -p NPROC -c COUNT -o OPTS"
   echo "        where COUNT says the continuation number, see '`basename @BDFLEX_RUN@` -h'"
   echo "        For an example see contrib/@BDFLEX_MSUB@"
   echo
@@ -143,7 +147,7 @@ function MPI_save_control ()
 #
 # Options
 #
-while getopts "d:B:i:cs:H:n:r:N:j:q:m:S:T:t:aR:p:M:b:v?:" Option
+while getopts "d:B:o:O:i:cs:H:n:r:N:j:q:m:S:T:t:aR:p:M:b:v?:" Option
 do
   case $Option in
 
@@ -152,6 +156,12 @@ do
 
     B  ) bdbin="-B $OPTARG"
          cmd="${cmd} -B $OPTARG";;
+
+    o  ) custom_bdflex_opts_add="$OPTARG"
+         cmd="${cmd} -o \"$OPTARG\"";;
+
+    O  ) custom_bdflex_opts="$OPTARG"
+         cmd="${cmd} -O \"$OPTARG\"";;
 
     c  ) cont="yes";;
 
@@ -258,6 +268,7 @@ runme_file=$controldir/"runner"
 nrun_file=$controldir/"nruns"
 nproc_file=$controldir/"openmp_cores"
 mpi_file=$controldir/"mpi_data"
+custom_bdflex_opts_file=$controldir/"custom_bdflex_opts"
 
 # PRM and STR files (depends if continue or not)
 if test "x$cont" == "xyes"; then
@@ -319,6 +330,16 @@ if test "x$cont" == "xyes"; then
 		if test -f "$custom_base_file"; then
 			custom_base=$(cat "$custom_base_file")
 		fi
+	fi
+
+	# Check if we stored the custom bdflex options
+	if test -z "$custom_bdflex_opts"; then
+		if test -f "$custom_bdflex_opts_file"; then
+			custom_bdflex_opts=$(cat "$custom_bdflex_opts_file")
+		fi
+	fi
+	if test -n "$custom_bdflex_opts" -o -n "$custom_bdflex_opts_add"; then
+		custom_bdflex_opts="$custom_bdflex_opts $custom_bdflex_opts_add"
 	fi
 
 	# Check for number of runs
@@ -415,6 +436,18 @@ else # We do not continue, check for prm and create str
 		echo "$myname: internal error: OpenMP or MPI? "
 		exit 1
 	fi
+
+	# Check custom bdflex options
+	if test -n "$custom_bdflex_opts" -o -n "$custom_bdflex_opts_add"; then
+		custom_bdflex_opts="$custom_bdflex_opts $custom_bdflex_opts_add"
+	fi
+fi
+
+# (Re)save the bd_flex options 
+# custom_bdflex_opts contains all bdflex options, from -o and -O
+# we turn it thus to -o "OPTS" to be passed to the runner
+if test -n "$custom_bdflex_opts"; then
+	echo $custom_bdflex_opts > $custom_bdflex_opts_file
 fi
 
 # Check for script and set runme
@@ -501,13 +534,21 @@ do
 	if test -f "@ERROR@"; then
 		echo
 		echo "*** Run #$irun finished with error, restarting ***"
+		cat @ERROR@ >> .errors
+		rm @ERROR@
 	fi
 
 	# run the BD beast (runme is either a script or )
 	echo
 	echo "Starting/continuing run #$irun:"
-	echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt >> $lbase.cmd
-	$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt
+	if test -z "$custom_bdflex_opts"; then
+		echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt >> $lbase.cmd
+		$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt $cont_opt
+	else
+		echo $runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o \"$custom_bdflex_opts\" $cont_opt >> $lbase.cmd
+		$runme $bdbin $idir_opt -i $(readlink -f $lbase.prm) $nproc $mpiopt -o "$custom_bdflex_opts" $cont_opt
+	fi
+
 	echo "Run #$irun done/queued!"
 
 	# FIXME: for running in parallel save pid number to know whome to kill
