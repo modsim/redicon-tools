@@ -93,6 +93,7 @@ class Atom
 
 		// public position stuff (FIXME: private?)
 		bool setPosition (const Point3D & R) ;
+		bool unsetPosition();
 		Point3D * positionPtr () { return r;};
 		Point3D * positionCopy () const; // creates Point3D, need delete
 		bool positionIsSet () const { if (r) return true; else return false;};

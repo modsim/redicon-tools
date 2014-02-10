@@ -208,8 +208,8 @@ bool Molecule::setAtomPosition (Atom * atom, const Point3D & R)
 
 	// FIXME: make Atom::unsetPosition () and unset when overlaping
 	// instead of copying which is expansive
-	Atom bcopy = Atom (*b);
-	bcopy.setPosition (R);
+	//Atom bcopy = Atom (*b);
+	b->setPosition (R);
 
 #ifdef HAVE_CXX11 
 	for (auto &a : Atoms) // C++0x
@@ -219,15 +219,18 @@ bool Molecule::setAtomPosition (Atom * atom, const Point3D & R)
 	{
 		Atom * a = Atoms.at (i);
 #endif
-		if (a->positionIsSet())
-			if (bcopy.overlap (*a))
-			{
-				BCPT_ERROR ("Cannot set position: Atom '%s' (serial %li) overlaps with atom '%s' (serial %li)", 
-					b->getName(), b->getSerial(), a->getName(), a->getSerial());
-				return false;
-			}
+		if(a!=b)
+		{
+			if (a->positionIsSet())
+				if (b->overlap (*a))
+				{
+					BCPT_ERROR ("Cannot set position: Atom '%s' (serial %li) overlaps with atom '%s' (serial %li)", 
+						b->getName(), b->getSerial(), a->getName(), a->getSerial());
+					b->unsetPosition();				
+					return false;
+				}
+		}			
 	}
-	b->setPosition (R);
 	return true;
 }
 

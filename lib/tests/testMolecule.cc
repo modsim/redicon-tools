@@ -45,7 +45,7 @@ int main (int argc, char ** argv)
 
 	Atom * a = M.getAtom (1);
 	M.setAtomPosition(a, P1);
-	Coord3D P2 (1,1,1);
+	Coord3D P2 (1.1,1.5,1.2);
 	M.setAtomPosition(M.getAtom(2), P2);
 
 	M.printInfo (&std::cout); 
@@ -137,6 +137,7 @@ int main (int argc, char ** argv)
 	std::cout << std::endl;
 
 	A.printBBStr (&std::cout);
+	std::cout << "Molecyle M"<< std::endl;
 	M.printBBStr (&std::cout);
 	if (MPDB)
 	{
@@ -158,4 +159,3 @@ int main (int argc, char ** argv)
 
 	return 1;
 }
-

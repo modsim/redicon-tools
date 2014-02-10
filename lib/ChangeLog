@@ -1,5 +1,7 @@
-2014-02-06  version 0.2.33  <pradeepburla91@gmail.com>
+2014-02-10  version 0.2.33  <pradeepburla91@gmail.com>
 	
+	* molecule.cc,atom.{cc.h}: new method Atom::unsetPosition(), use in Molecule::setAtomPosition().
+
 	* tests/testMolecules.cc: test Molecule::setAtomPosition(): test/valgrinds ok.
 
 	* molecule.{cc,h}: bug fixes, Molecule::setPosition(Atom, Coord3D) renamed to setAtomPosition().
