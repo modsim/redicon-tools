@@ -31,7 +31,8 @@
 Atom::Atom (const char * name, double radius) 
 	: residue(NULL), molecule (NULL), residue_name (NULL),
 	serial(0), hs_radius(radius), charge(0.0), 
-	LJ (0.5), hd_radius (radius), mass (1.0), r(NULL), 
+	LJ (0.5), hd_radius (radius), mass (1.0), r(NULL),
+	use_HDRadius (false),
 	type (ATOM_FREE), 
 	userData(NULL)
 { 
@@ -45,7 +46,7 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 			double charge, double LJ, double mass)
 	: residue(NULL), molecule (NULL),residue_name (NULL), 
 	serial(serial), hs_radius(hs_radius), charge(charge), 
-	LJ (LJ), hd_radius (hd_radius), mass (mass), 
+	LJ (LJ), hd_radius (hd_radius), mass (mass), use_HDRadius (false),
 	type (ATOM_FREE), 
 	userData(NULL)
 {
@@ -58,7 +59,7 @@ Atom::Atom (const char * name, unsigned int serial, const Point3D & r,
 // construct from the line
 Atom::Atom (unsigned int ft, const std::string & line) 
 	: residue(NULL), molecule (NULL), residue_name (NULL), 
-	hs_radius(1.), LJ (0.5), hd_radius (1.), mass (1.0), 
+	hs_radius(1.), LJ (0.5), hd_radius (1.), mass (1.0), use_HDRadius (false),
 	type (ATOM_FREE), 
 	userData(NULL)
 { 
@@ -91,7 +92,8 @@ Atom::Atom (const Atom & a)
 	: residue(NULL), molecule (NULL), residue_name (NULL),
 	serial(0), hs_radius(a.getHSRadius()), charge(a.getCharge()), 
 	LJ (a.getLJ()), hd_radius (a.getHDRadius()), mass (a.getMass()), 
-	r(NULL), type (ATOM_FREE), 
+	r(NULL), type (ATOM_FREE), use_HDRadius (a.overlap_HDRadius()),
+
 	userData(NULL)
 { 
 	Atom::name = strdup (a.getName());
@@ -207,7 +209,13 @@ bool Atom::overlap (const Atom & a) const
 	if (!r)
 		throw "Atom's position not set";
 
-	double dist_min =hs_radius + a.getHSRadius();
+	double dist_min = 0.;
+	
+	if (use_HDRadius)
+		dist_min = hd_radius + a.getHDRadius();
+	else
+		dist_min = hs_radius + a.getHSRadius();
+
 	Point3D * ra = a.positionCopy();
 
 	if (!ra)

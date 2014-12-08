@@ -52,7 +52,7 @@ System::~System ()
 	for (auto &mt : mol_types) // C++0x
 	{
 #else
-	for (int i = 0; i < mol_types.size(); i++)
+	for (unsigned int i = 0; i < mol_types.size(); i++)
 	{
 		molType * mt = mol_types.at (i);
 #endif
@@ -75,7 +75,13 @@ static bool atomInBox (const Atom &a, void * data)
 		throw "Atom's position not set";
 	}
 
-	double  radius = a.getHSRadius (); 
+	double  radius;
+	
+	if (a.overlap_HDRadius())
+		radius = a.getHDRadius (); 
+	else
+		radius = a.getHSRadius (); 
+
 
 #ifdef DEBUG
 	R0->print (stderr, "Box");

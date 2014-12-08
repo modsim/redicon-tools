@@ -98,6 +98,9 @@ class Atom
 
 		// checks
 		bool overlap (const Atom &) const;
+		void overlap_use_HDRadius (void) {use_HDRadius = true;};
+		bool overlap_HDRadius (void) const { return use_HDRadius;};
+
         	bool inUse () const { if (residue || molecule) return true; else return false;};
 	
 		// print general info
@@ -137,6 +140,8 @@ class Atom
 		double LJ;    // LJ parameter (might not be known, default 0.0)
 		double hd_radius; // hydrodynamic radius
 		double mass;   // might not be known
+
+		bool use_HDRadius;
 
 		// Atom's position (might not ne known or needed)
 		Point3D * r; 

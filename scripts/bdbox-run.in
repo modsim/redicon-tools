@@ -59,6 +59,8 @@ function usage()
   echo "  -q Q1,Q2,..             charges (in e; default 0)."
   echo "  -m M1,M2,..             masses (arbitrary, default 1)."
   echo "  -S R1,R2,..             Stockes radia (in A, default HS radia)."
+  echo "  -U                      Use Stockes radia when packing."
+
   echo "  -T VAL,VAL,..           placement type(rand,cent,lat)."
   echo "  -t VAL                  number of tries for rand placement."
   echo "  -a                      separate STR file for each run (not implemented)."
@@ -147,7 +149,7 @@ function MPI_save_control ()
 #
 # Options
 #
-while getopts "d:B:o:O:i:cs:H:n:r:N:j:q:m:S:T:t:aR:p:M:b:v?:" Option
+while getopts "d:B:o:O:i:cs:H:n:r:N:j:q:m:S:UT:t:aR:p:M:b:v?:" Option
 do
   case $Option in
 
@@ -191,6 +193,9 @@ do
 
     S  ) molsys_opt="$molsys_opt -d$OPTARG"
          cmd="${cmd} -S $OPTARG";;
+
+    U  ) molsys_opt="$molsys_opt -U"
+         cmd="${cmd} -U";;
 
     T  ) molsys_opt="$molsys_opt -T$OPTARG"
          cmd="${cmd} -T $OPTARG";;

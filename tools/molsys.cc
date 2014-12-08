@@ -55,6 +55,8 @@ void usage ()
 	fprintf (stderr, " -q, --charge=VAL,VAL,...   charges (in e).\n");
 	fprintf (stderr, " -m, --masses=VAL,VAL,...   masses (arbitrary units).\n");
 	fprintf (stderr, " -d, --hd-radia=VAL,VAL,... hydrodynamic radia (in A).\n");
+	fprintf (stderr, " -U, --use-hd-radia         use HD radia when packing in a box.\n");
+
 	fprintf (stderr, " -j, --lj=VAL,VAL,...       Lennard-Jones parameters (in kcal/mol).\n");
 	fprintf (stderr, " -T, --type=VAL,VAL,...     placement type (rand, cent, lat).\n");
 	fprintf (stderr, "                  cent can be used once for a single particle.\n");
@@ -118,6 +120,7 @@ int main (int argc, char ** argv)
 
 	double * HDradia = NULL;
 	unsigned int nHDradia = 0;
+	bool useHDRadia = false;
 
 	double * masses = NULL;
 	unsigned int nmasses = 0;
@@ -143,7 +146,7 @@ int main (int argc, char ** argv)
 
 	int c = 0;
 
-#define ARGS    "hvH:R:n:r:N:q:d:j:m:s:T:t:"
+#define ARGS    "hvH:R:n:r:N:q:d:Uj:m:s:T:t:"
 	while (c != EOF)  {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
@@ -164,6 +167,7 @@ int main (int argc, char ** argv)
 
 			{"charges", required_argument, NULL, 'q'},
 			{"hd-radia", required_argument, NULL, 'd'},
+			{"use-hd-radia", no_argument, NULL, 'U'},
 			{"lj", required_argument, NULL, 'j'},
 			{"masses", required_argument, NULL, 'm'},
 			{"type",required_argument, NULL,'T'},
@@ -187,6 +191,9 @@ int main (int argc, char ** argv)
 					  break;
 
 				case 's': str_file = strdup (optarg);
+					  break;
+
+				case 'U': useHDRadia = true;
 					  break;
 
 				case 'H': {
@@ -333,6 +340,9 @@ int main (int argc, char ** argv)
 
 				Atom a (names[i], radii[i]);
 
+				if (useHDRadia)
+					a.overlap_use_HDRadius();
+
 				if (charges) a.setCharge (charges[i]);
 				if (LJ) a.setLJ (LJ[i]);
 				if (HDradia) a.setHDRadius (HDradia[i]);
@@ -358,6 +368,8 @@ int main (int argc, char ** argv)
 	for (unsigned int i = 0; i < nN; i++)
 	{	
 		Atom a (names[i], radii[i]);
+		if (useHDRadia)
+			a.overlap_use_HDRadius();
 		if (charges) a.setCharge (charges[i]);
 		if (LJ) a.setLJ (LJ[i]);
 		if (HDradia) a.setHDRadius (HDradia[i]);
