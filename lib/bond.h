@@ -31,7 +31,8 @@ class Bond
 {
 	public:
 		Bond (Atom * a1, Atom * a2, double eps, double H);
-		Bond (Atom * a1, Atom * a2, double rmin, double rmax, double H);
+		//Bond (Atom * a1, Atom * a2, double rmin, double rmax, double H);
+		Bond (Atom * a, Atom * b, double blength, double eps, double H);
 		~Bond () {};
 		
 		//bool isOwned () {if (owner) return true; else return false;};
@@ -43,7 +44,7 @@ class Bond
 
 		bool hasAtom (const Atom * a) const;
 		Atom * getBondedAtom (const Atom * a) const; // get a bonded atom or NULL if a does not belong to the bond
-
+		
 		// FIXME: do we really need it?
 		bool foreachAtom (AtomFunction, void * user_data) const;
 

@@ -1,30 +1,30 @@
 /*  molecule.cc 2013-07-30 valiska@gmail.com
- *
- * Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * 
+ *  Copyright (C) 2013 Svyatoslav Kondrat (Valiska)
+ * 
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or (at
+ *  your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 #include <stddef.h>
 #include <string.h>
 #include <iostream> 
 
+#include<molecule.h>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-#include<molecule.h>
 
 // for C++11 from autoconf
 #include <config.h>
@@ -37,6 +37,8 @@ Molecule::Molecule (const char * name, Atom a) : owner (NULL)
 	Molecule::name = strdup (name);
 	Atoms.push_back (new Atom(a)); // ignore throw as we check above
 	head = Atoms.at (0);
+
+	PositionIsSet = false;
 
 	charge = head->getCharge();
 	radius[0] = radius[1] = radius[2] = head->getHSRadius();
@@ -175,29 +177,41 @@ Molecule::~Molecule ()
 // set (virtual method, default to check and warn)
 bool Molecule::setPosition (const Point3D& R)
 {
-	if (head->positionPtr()) 
+	if (head->positionPtr() || PositionIsSet) 
 	{
 		BCPT_WARNING ("Position is set, use Molecule::moveTo() to reset.");
 		return false;
 	}
-
+		
+	
 	BCPT_WARNING ("Virtual method, not implemented for a general molecule.");
 	return false;
 }
 
-// translate molecule by a vector
-bool Molecule::translateBy (const Point3D& T) 
+
+bool Molecule::setAtomPosition (Atom * atom, const Point3D & R)
 {
-	Point3D * po = head->positionPtr();
-	if (!po) 
+	
+	BCPT_RET_VAL_IF_FAIL (atom, false);
+	Atom * b = atom;  // we are lazy 
+	if (!hasAtom (b)) 
 	{
-		BCPT_WARNING ("Position not set, cannot translate.");
+		BCPT_ERROR ("Molecule '%s' has not atom '%s'", getName(), b->getName());
 		return false;
 	}
 
-	// if the head position is set, we expect athe other atoms' positions to be set
-	// so throw an exception if this is not so
-#ifdef HAVE_CXX11
+	if (b->positionIsSet())
+	{
+		BCPT_ERROR ("Position is set already, use moveTo() [not impl yet]");
+		return false;
+	}
+
+	// FIXME: make Atom::unsetPosition () and unset when overlaping
+	// instead of copying which is expansive
+	//Atom bcopy = Atom (*b);
+	b->setPosition (R);
+
+#ifdef HAVE_CXX11 
 	for (auto &a : Atoms) // C++0x
 	{
 #else
@@ -205,11 +219,85 @@ bool Molecule::translateBy (const Point3D& T)
 	{
 		Atom * a = Atoms.at (i);
 #endif
-		if (!AtomAttorney::translateBy(*a, T))
-			throw "Translating atom failed in translateBy()";
+		if(a!=b)
+		{
+			if (a->positionIsSet())
+				if (b->overlap (*a))
+				{
+					BCPT_ERROR ("Cannot set position: Atom '%s' (serial %li) overlaps with atom '%s' (serial %li)", 
+						b->getName(), b->getSerial(), a->getName(), a->getSerial());
+					b->unsetPosition();				
+					return false;
+				}
+		}			
 	}
 	return true;
 }
+
+//checks if the molecule has the atom
+
+Atom * Molecule::getAtom (unsigned int s1) const
+{
+#ifdef HAVE_CXX11
+ 	for (auto &a : Atoms) 
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+	{
+		Atom * a = Atoms.at (i); 
+#endif
+		if(a->getSerial()==s1)
+			return a;
+	}
+	return NULL;
+}
+
+bool Molecule::hasAtom (Atom * b) const
+{
+ #ifdef HAVE_CXX11 
+	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+		{
+		Atom * a = Atoms.at (i);
+#endif
+		    if(a==b)
+		    { 
+			return true;
+		    }
+		}
+	return false;	  
+	}
+
+
+// translate molecule by a vector
+bool Molecule::translateBy (const Point3D& T) 
+{
+	Point3D * po = head->positionPtr();
+	if (!po || !PositionIsSet) 
+	{
+		BCPT_WARNING ("Position not set, cannot translate.");
+		return false;
+	}
+
+	// if the head position is set, we expect the other atoms' positions to be set
+	// so throw an exception if this is not so
+#ifdef HAVE_CXX11
+	for (auto &a : Atoms) // C++0x
+	{
+#else
+	for (unsigned int i = 0; i < getNAtoms(); i++)
+		{
+		Atom * a = Atoms.at (i);
+#endif
+		if (!AtomAttorney::translateBy(*a, T))
+			throw "Translating atom failed in translateBy()";
+		}
+	return true;
+	}
+
+
 bool Molecule::moveTo (const Point3D& R) 
 {
 	Point3D * po = head->positionPtr();
@@ -246,12 +334,12 @@ unsigned int Molecule::shiftSerial (unsigned int serial)
 	return serial;
 }
 
-// serial number shift
 double Molecule::getVolume (void) const
 {
 
 	double volume = 0.;
 	//FIXME: this is untrue when atoms overlap!!!
+
 #ifdef HAVE_CXX11
 	for (auto &a : Atoms) // C++0x
 	{
@@ -263,9 +351,9 @@ double Molecule::getVolume (void) const
 		double r = a->getHSRadius ();
 		volume += (4. * M_PI / 3. ) * r * r * r;
 	}
-
 	return volume;
 }
+
 
 // Overlap 
 bool Molecule::overlap (const Atom & ta) const
@@ -391,4 +479,5 @@ void Molecule::printBBStr (std::ostream * stream) const
 
 
 }
+
 

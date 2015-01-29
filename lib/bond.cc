@@ -54,6 +54,22 @@ Bond::Bond (Atom * a, Atom * b, double eps, double H) : a(a), b(b), H(H), userDa
 	AtomAttorney::addBond (*b, *this);
 };
 
+Bond::Bond (Atom * a, Atom * b, double blength, double eps, double H) :  a(a), b(b), r0(blength), H(H), userData (NULL)
+{
+	if (a == b)
+		throw "Cannot create a bond between the same atoms.";
+        
+	rmin = r0 - eps * r0;
+	rmax = r0 + eps * r0;
+
+	AtomAttorney::setType (*a, ATOM_BONDED);
+	AtomAttorney::setType (*b, ATOM_BONDED);
+
+	AtomAttorney::addBond (*a, *this);
+	AtomAttorney::addBond (*b, *this);
+};
+
+
 // For each 'loop'
 bool Bond::foreachAtom (AtomFunction func, void * data) const
 {

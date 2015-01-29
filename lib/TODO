@@ -1,0 +1,19 @@
+1. Update Changelog, and commit what's done: done
+
+2. molecule: addAtom(): done
+
+3. tests/:testMolecule.cc: test AddAtom: done
+
+4. Class Polymer derived from Molecule
+
+
+--------------------
+Not to forget:
+
+- molecule: setPosition(): atom only (in protected)
+
+- createBond(), adAtom() in protected.
+
+- molecule: center of mass as an alternative to head atom.
+
+- when molecule in a system, block adding an atom?

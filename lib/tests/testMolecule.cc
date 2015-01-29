@@ -20,7 +20,6 @@
 #include "molecule.h"
 #include "monatomic.h"
 
-
 bool PrintAtom (const Atom & a, void * data)
 {
 	double x = *((double*) data);
@@ -35,15 +34,45 @@ bool PrintAtom (const Atom & a, void * data)
 int main (int argc, char ** argv) 
 {
 	Atom A ("A", 1.);
-	Monatomic M ("M", A);
+	Molecule M ("M", A);
+	Atom A1 ("A1",1.);
+	Coord3D P1 (1.,1.1,1.2);
+	//A.printInfo (&std::cout);
+	//M.printInfo (&std::cout); 
+	std::cerr << "Molecule created" << std::endl ;	
 
-	Atom A2 ("A2", 1.);
-	A2.printInfo (&std::cout);
-	Monatomic M2 ("M2", A2);
+	M.addAtom (A, 1, 1, 1.5, 0.5);
 
-  	Coord3D P1 (10.,10.,10.);
-	M.setPosition (P1);
+	Atom * a = M.getAtom (1);
+	M.setAtomPosition(a, P1);
+	Coord3D P2 (1.1,1.5,1.2);
+	M.setAtomPosition(M.getAtom(2), P2);
 
+	M.printInfo (&std::cout); 
+	M.printBBStr (&std::cout); 
+
+/*
+	int natoms = 10;
+	for (int iatom = 1; iatom < natoms; iatom++)
+	{
+		try {
+						
+			M.addAtom (A,iatom , 1, 1.5, 0.5);
+			M.setPosition(&A,P1);						
+			A.printInfo (&std::cout);
+			M.printInfo (&std::cout); 
+		} catch (const char * msg) {
+			std::cerr << "Error adding atom %i:  " << msg << std::endl;
+		} 
+	 
+	}
+	
+ 	M.printInfo (&std::cout); 
+	M.printBBStr (&std::cout);
+	
+	// Check reading a Mol fromm the file
+  	M.setPosition(P1);
+*/
 	// Read PDB
 	Molecule * MPDB = NULL;
 	try {
@@ -55,12 +84,12 @@ int main (int argc, char ** argv)
 	    std::cerr << "pointer: " << MPDB << std::endl;
 	}
 
-	// Add bonds and angles
-	MPDB->setBondsLinear (1, 100.);
-	MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
-
 	if (MPDB)
 	{
+		// Add bonds and angles
+		MPDB->setBondsLinear (1, 100.);
+		MPDB->setAnglesLinear (ANGLE_POTTYPE_SQUARE, 100.);
+
 		MPDB->printBBStr (&std::cout); 
 		MPDB->printInfo (&std::cout); 
 		MPDB->moveTo(P1);
@@ -91,7 +120,7 @@ int main (int argc, char ** argv)
 	{
 		std::cerr << "Exception thrown: " << msg << std::endl;
 	}
-
+/*
 	try {
 		if (M.overlap (M2))
 			std::cout << "Atom A overlaps with Molecule M" << std::endl;
@@ -99,7 +128,7 @@ int main (int argc, char ** argv)
 	{
 		std::cerr << "Exception thrown: " << msg << std::endl;
 	}
-
+*/
 	A.printInfo (&std::cout);
 	M.printInfo (&std::cout); 
 	if (MPDB)
@@ -108,6 +137,7 @@ int main (int argc, char ** argv)
 	std::cout << std::endl;
 
 	A.printBBStr (&std::cout);
+	std::cout << "Molecyle M"<< std::endl;
 	M.printBBStr (&std::cout);
 	if (MPDB)
 	{
@@ -129,4 +159,3 @@ int main (int argc, char ** argv)
 
 	return 1;
 }
-

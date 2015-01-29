@@ -1,3 +1,35 @@
+2014-02-10  version 0.2.33  <pradeepburla91@gmail.com>
+	
+	* molecule.cc,atom.{cc.h}: new method Atom::unsetPosition(), use in Molecule::setAtomPosition().
+
+	* tests/testMolecules.cc: test Molecule::setAtomPosition(): test/valgrinds ok.
+
+	* molecule.{cc,h}: bug fixes, Molecule::setPosition(Atom, Coord3D) renamed to setAtomPosition().
+
+2014-01-27  version 0.2.32  <pradeepburla91@gmail.com>
+	
+	* molecule.{cc,h}: new method setPosition(Atom, Point3D): tests and improvements needed (see FIXME in molecule.cc).
+
+2013-12-18  version 0.2.31  <pradeepburla91@gmail.com>
+	
+	* tests/testMolecules.cc: tests seem ok.
+
+	* moleculeAddAtom.cc: addAtom(): bug fix.
+
+	* bond.cc: constructor bug fix.
+
+2013-12-02  version 0.2.30  <pradeepburla91@gmail.com>
+	
+	* moleculeAddAtom.cc: addAtom(). Tests needed.
+
+2013-12-02  version 0.2.29  <pradeepburla91@gmail.com>
+
+	* moleculeAddAtom.cc: createBond(),
+	
+	* molecule.{cc,h}: hasAtom(), getAtom().
+	
+	* bond.{cc,h}: additional constructor.
+
 2013-11-22  version 0.2.28  <s.kondrat@fz-juelich.de>
 
 	* system.cc: printInfo(): save molecule size. 

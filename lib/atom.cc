@@ -179,6 +179,18 @@ bool Atom::setPosition (const Point3D& R)
 		return true;
 };
 
+bool Atom::unsetPosition() 
+{ 
+	if (r)
+	{
+		delete r;
+	}
+	
+	r= NULL;
+	return true;
+};
+
+
 bool Atom::translateBy (const Point3D& R) 
 { 
 	if (!r)
