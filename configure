@@ -15768,7 +15768,7 @@ BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 
 BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
 
-BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
 
 BCPT_FIT=$(echo ${BINDIR}/fit-pow.sh)
 

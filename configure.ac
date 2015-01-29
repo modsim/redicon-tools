@@ -88,7 +88,7 @@ BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 AC_SUBST(BCPT_XYZ)
 BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
 AC_SUBST(BCPT_AVERAGE)
-BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
 AC_SUBST(BCPT_FIT)
 BCPT_FIT=$(echo ${BINDIR}/fit-pow.sh)
 

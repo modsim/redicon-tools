@@ -22,6 +22,7 @@ myname=$(basename $0)
 bdbox=@BDBOX@
 analysexyz=@BCPT_XYZ@
 average=@BCPT_AVERAGE@
+#average=average-me.py
 fitter=@BCPT_FIT@
 
 #
@@ -236,9 +237,9 @@ if test "z$dofit" = "zyes"; then
 	echo "Fitting done."
 fi
 
-if test -f "$files_file"; then
-	rm $files_file
-fi
+#if test -f "$files_file"; then
+#	rm $files_file
+#fi
 
 exit 0;
 
