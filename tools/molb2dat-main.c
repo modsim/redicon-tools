@@ -220,10 +220,11 @@ int main( int argc, char* argv[] )
 	}
 
 	int i = 0;
+	char ofname_size = (strlen (obase) + 12) * sizeof(char);
+	char * ofname = (char*) malloc ( ofname_size );
+
 	for (i = Nm[0]; i < Nm[1]; i += Nm[2])
 	{
-		char ofname_size = (strlen (obase) + 12) * sizeof(char);
-		char * ofname = (char*) malloc ( ofname_size );
 		snprintf (ofname, ofname_size, "%s.mol%d.dat", obase, i);
 		FILE * of = fopen( ofname, "w" );
 		if (!of)
@@ -244,6 +245,9 @@ int main( int argc, char* argv[] )
 		fclose (of);
 	}
 	fclose (molbfile);
+	free (ofname);
+	free (obase);
+	free (molbname);
 
 	return 0;
 }

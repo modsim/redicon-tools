@@ -69,7 +69,10 @@ int molb2mdat (FILE * f, int nr, int isdouble, const double R0[], double H[], FI
 
 	int i;
 	for (i = 0; i < 3; i++)
+	{
 		R00[i] = R0[i];
+		Rprev[i] = R00[i];
+	}
 
 	if (isdouble == 0)
 		size = sizeof(float);
@@ -142,11 +145,14 @@ int molb2mdat (FILE * f, int nr, int isdouble, const double R0[], double H[], FI
 		if (curr_time == 0.0)
 		{
 			for (i = 0; i < 3; i++)
+			{
 				R00[i] = Rcur[i];
+				box[i] = 0.;
+			}
 		}
+		else
+			check_box (Rprev, Rcur, H, box);
 
-
-		check_box (Rprev, Rcur, H, box);
 		double dr2 = 0.;
 		for (i = 0; i < 3; i++)
 		{

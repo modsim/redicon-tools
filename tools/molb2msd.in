@@ -111,7 +111,7 @@ for f in ${molbfiles[*]}; do
 	n=${nmols[0]}
 	while test "$n" -le "${nmols[1]}"; do
 		ff="$datdir/$obase.mol${n}.dat"
-		echo files: $ff
+		echo Adding file $ff
 		if test -f "$ff"; then
 			files="$files $ff";
 		fi
