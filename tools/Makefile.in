@@ -56,7 +56,7 @@ bin_PROGRAMS = pdb2str$(EXEEXT) molsys-create$(EXEEXT) \
 	molb2dat$(EXEEXT)
 subdir = tools
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/fit-pow.sh.in ChangeLog
+	$(srcdir)/fit-pow.sh.in $(srcdir)/molb2msd.in ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -67,7 +67,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = fit-pow.sh
+CONFIG_CLEAN_FILES = fit-pow.sh molb2msd
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -201,6 +201,7 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+MOLB2DAT = @MOLB2DAT@
 MPIRUN = @MPIRUN@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -277,10 +278,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh 
+bin_SCRIPTS = analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh \
+	molb2msd
+
 EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
-AM_LDFLAGS = -pedantic -ansi 
+AM_LDFLAGS = -pedantic -ansi -lm
 pdb2str_SOURCES = pdb2str.cc str.c
 pdb2str_LDADD = $(top_srcdir)/lib/libMol.la
 molsys_create_SOURCES = molsys.cc str.h str.c 
@@ -321,6 +324,8 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 fit-pow.sh: $(top_builddir)/config.status $(srcdir)/fit-pow.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+molb2msd: $(top_builddir)/config.status $(srcdir)/molb2msd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)

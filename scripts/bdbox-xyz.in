@@ -30,7 +30,7 @@ fitter=@BCPT_FIT@
 #
 function usage()
 {
-  echo "Scan for .xyz file in the diven directory,"
+  echo "Scan for .xyz file in the given directory,"
   echo "extract dr2 and average over the given time window."
   echo "Usage: $1 options "
   echo "Where options are:"

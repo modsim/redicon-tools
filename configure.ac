@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.32], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.33], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -88,12 +88,17 @@ BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 AC_SUBST(BCPT_XYZ)
 BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
 AC_SUBST(BCPT_AVERAGE)
-BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
+#BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
+BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+
 AC_SUBST(BCPT_FIT)
 BCPT_FIT=$(echo ${BINDIR}/fit-pow.sh)
 
 AC_SUBST(BDFLEX_RUN)
 BDFLEX_RUN=$(echo ${BINDIR}/bd_flex-run)
+
+AC_SUBST(MOLB2DAT)
+MOLB2DAT=$(echo ${BINDIR}/molb2dat)
 
 
 # SUBST DONE, INTERRUPT and RUNNING
@@ -113,6 +118,7 @@ AC_CONFIG_FILES([Makefile
                  lib/tests/Makefile
                  tools/Makefile
                  tools/fit-pow.sh
+                 tools/molb2msd
 		 scripts/Makefile
 		 scripts/bd_flex-run
 		 scripts/bdbox-run

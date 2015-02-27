@@ -1,10 +1,12 @@
 bin_PROGRAMS = pdb2str molsys-create molb2dat
 
-bin_SCRIPTS= analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh 
+bin_SCRIPTS= analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh \
+	molb2msd
+
 EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py
 
 AM_CPPFLAGS= -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
-AM_LDFLAGS = -pedantic -ansi 
+AM_LDFLAGS = -pedantic -ansi -lm
 
 pdb2str_SOURCES = pdb2str.cc str.c
 pdb2str_LDADD = $(top_srcdir)/lib/libMol.la
