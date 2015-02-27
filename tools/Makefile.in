@@ -52,7 +52,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = pdb2str$(EXEEXT) molsys-create$(EXEEXT)
+bin_PROGRAMS = pdb2str$(EXEEXT) molsys-create$(EXEEXT) \
+	molb2dat$(EXEEXT)
 subdir = tools
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/fit-pow.sh.in ChangeLog
@@ -70,6 +71,10 @@ CONFIG_CLEAN_FILES = fit-pow.sh
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am_molb2dat_OBJECTS = molb2dat-main.$(OBJEXT) molb2dat.$(OBJEXT) \
+	str.$(OBJEXT)
+molb2dat_OBJECTS = $(am_molb2dat_OBJECTS)
+molb2dat_LDADD = $(LDADD)
 am_molsys_create_OBJECTS = molsys.$(OBJEXT) str.$(OBJEXT)
 molsys_create_OBJECTS = $(am_molsys_create_OBJECTS)
 molsys_create_DEPENDENCIES = $(top_srcdir)/lib/libMol.la
@@ -126,8 +131,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(molsys_create_SOURCES) $(pdb2str_SOURCES)
-DIST_SOURCES = $(molsys_create_SOURCES) $(pdb2str_SOURCES)
+SOURCES = $(molb2dat_SOURCES) $(molsys_create_SOURCES) \
+	$(pdb2str_SOURCES)
+DIST_SOURCES = $(molb2dat_SOURCES) $(molsys_create_SOURCES) \
+	$(pdb2str_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -278,6 +285,7 @@ pdb2str_SOURCES = pdb2str.cc str.c
 pdb2str_LDADD = $(top_srcdir)/lib/libMol.la
 molsys_create_SOURCES = molsys.cc str.h str.c 
 molsys_create_LDADD = $(top_srcdir)/lib/libMol.la
+molb2dat_SOURCES = molb2dat-main.c molb2dat.c str.c
 all: all-am
 
 .SUFFIXES:
@@ -360,6 +368,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+molb2dat$(EXEEXT): $(molb2dat_OBJECTS) $(molb2dat_DEPENDENCIES) $(EXTRA_molb2dat_DEPENDENCIES) 
+	@rm -f molb2dat$(EXEEXT)
+	$(LINK) $(molb2dat_OBJECTS) $(molb2dat_LDADD) $(LIBS)
 molsys-create$(EXEEXT): $(molsys_create_OBJECTS) $(molsys_create_DEPENDENCIES) $(EXTRA_molsys_create_DEPENDENCIES) 
 	@rm -f molsys-create$(EXEEXT)
 	$(CXXLINK) $(molsys_create_OBJECTS) $(molsys_create_LDADD) $(LIBS)
@@ -408,6 +419,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molb2dat-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molb2dat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/molsys.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdb2str.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str.Po@am__quote@

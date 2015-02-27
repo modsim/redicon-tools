@@ -33,7 +33,9 @@
 
 __BEGIN_DECLS
 
+/* FIXME: make 'C templates' ala as in GSL */
 unsigned int str2dlist (char ** string, const char * sep, double ** list);
+unsigned int str2intlist (char ** string, const char * sep, int ** list);
 char ** str2strlist (char ** string, const char * sep, unsigned int * n) ;
 
 __END_DECLS

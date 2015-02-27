@@ -62,6 +62,45 @@ unsigned int str2dlist (char ** string, const char * sep, double ** list) {
   return i;
 
 }
+/* FIXME: make str2TYPElist template */
+unsigned int str2intlist (char ** string, const char * sep, int ** list) {
+
+  int i = 0;
+  char * str = (char*) NULL;
+
+  char * orig_string = *string;
+
+  DPRINT ("str2intlist(): string=\"%s\"   sep=\"%s\"\n", *string, sep);
+
+  while (1)  {
+
+#ifdef HAVE_STRSEP
+    str = strsep (string, sep);
+#else
+    str = *string;
+    str = strtok_r (str, sep, string);
+#endif  /* HAVE_STRSEP */
+
+    DPRINT ("str2intlist(): parsed: \"%s\"\n", str);
+
+    if (str == NULL) 
+      break;
+    else {
+      *list = (int*) realloc (*list, (i+1) * sizeof (int));
+      (*list)[i] = atof (str);
+    }
+    DPRINT ("str2intlist(): value: %g\n", (*list)[i]);
+    i++;
+
+  }
+
+  DPRINT ("str2intlist(): n=%i\n", i);
+
+  *string = orig_string;
+
+  return i;
+
+}
 
 char ** str2strlist (char ** string, const char * sep, unsigned int * n) {
 
