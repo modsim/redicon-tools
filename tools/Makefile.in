@@ -278,7 +278,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh \
+bin_SCRIPTS = analyze-xyz.py analyze-xyzp.py \
+	average-mexp.py  average-me.py \
+	fit-pow.sh \
 	molb2msd
 
 EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py

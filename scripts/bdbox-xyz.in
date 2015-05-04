@@ -40,11 +40,15 @@ function usage()
   echo "                    atoms/beads of tracking molecules (for `basename $analysexyz`)."
   echo "                    Example -k [1-10],15,20 -- this is obviously for unimolecular only."
   echo "  -n VAL                  size of a molecule (number of atoms in series)."
+
   echo "  -H Hx,Hy,Hz             periodic box size (default no box = 0,0,0)."
 
   echo "  -w VAL                  time window for averaging."
   echo "  -O                      Overwrite .dat files (created by analyze-xyz.py) "
   echo "                          in subdirectories with .xyz files (default no)."
+  echo "  -a                      create data files for all atoms (to save time on multiple IOs)."
+  echo "                          Nota that this works ONLY for single atom molecules (ie -n1)."
+
   echo "  -f                      linear fit using `basename $fitter` to get diff.coeff."
   echo "  -p                      create PS comparing data with fitting function."
   echo "  -i INTERVAL             fir on the INTERVAL (gnuplot syntax)."
@@ -79,6 +83,76 @@ function expand_regex ()
 	done
 
 	echo "$list"
+}
+
+# Scan directory for .xyz files and run analyze-xyz
+# first and th eonly argument is direcotry name
+function scan_directory_all ()
+{
+	local dir=$1
+	echo "Scanning directory $dir:"
+	
+	local dirs=
+	if test -d $dir; then
+#		dirs=$(ls $dir)
+		dirs=$(find $dir/* -type d)
+	fi
+
+	for d in $dirs; do
+		if test -d $dir/$d; then
+			scan_directory_all $dir/$d
+		fi
+	done
+
+	xyzfiles=$(ls $dir | grep .xyz)
+	for ff in $xyzfiles; do
+
+		local moldat=$dir/moldat
+		mkdir -p $moldat
+		
+		echo ff=$ff
+		local f=$(readlink -f $dir/$ff)
+		echo f=$f
+	
+		obase=$(basename $f .xyz)
+		xyz_mod=$(stat -c %Y $f)
+		echo "mols=$mols"
+
+		redo="no"
+		local cdir=$(pwd)
+		cd $moldat
+
+		# check if we need to recalculate .dat files
+		for imol in $mols; do
+			#ofile=$dir/moldat/$(basename $f .xyz).mol$imol
+			ofile=${obase}.mol${imol}.dat
+			if test -f $ofile; then
+			 	dat_mod=$(stat -c %Y $ofile)
+				if test "$dat_mod" -lt "$xyz_mod"; then
+					redo="yes"
+					break;
+				fi
+			else
+				redo="yes"
+				break;
+			fi
+		done
+
+		# create .dat files using analyzexyz
+		if test "$redo" == "yes" -o "x$overwrite" == "xyes"; then
+			echo "Extracting data from '$dir/$f'"
+			echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol -a"
+			echo "$analysexyz $analysexyz_opt -f $dir/$f -k$imol -a" > $ofile.cmd
+			$analysexyz $analysexyz_opt -f $f -k$imol -a
+		fi
+
+		# add to file list
+		for imol in $mols; do
+			files="$files $moldat/${obase}.mol$imol.dat"
+			nfiles=$[$nfiles+1]
+		done
+		cd $cdir
+	done
 }
 
 # Scan directory for .xyz files and run analyze-xyz
@@ -134,7 +208,9 @@ function scan_directory ()
 #
 # Options
 #
-while getopts "d:o:k:n:w:H:fpi:Ov?:" Option
+# default size of a molecule (-n option)
+molsize=1
+while getopts "d:o:k:n:aw:H:fpi:Ov?:" Option
 do
   case $Option in
 
@@ -145,11 +221,15 @@ do
          cmd="${cmd} -o $OPTARG";;
 
     n  ) analysexyz_opt="$analysexyz_opt -n$OPTARG"
+    	 molsize=$OPTARG;
          cmd="${cmd} -n $OPTARG";;
 
     k  ) mols=$(expand_regex $OPTARG)
     	echo "mols=$mols"
          cmd="${cmd} -k $OPTARG";;
+
+    a  ) doall="yes"
+         cmd="${cmd} -a";;
 
     H  ) OLD_IFS="$IFS";
 	 IFS=","
@@ -204,8 +284,24 @@ if test ! -d "$directory"; then
 	exit 1;
 fi
 
+if test -z "$output"; then
+	echo "$myname: no output file name, use $myname -o FILE"
+	exit 1;
+fi
+
+
+if test "z$doall" == "zyes" -a "$molsize" != "1"; then
+	echo "$myname: error: cannot use -a (do all) for many-atom molecules."
+	exit 1;
+fi
+
 nfiles=0
-cd $directory && scan_directory .
+cd $directory
+if test "z$doall" == "zyes"; then
+	scan_directory_all .
+else
+	scan_directory .
+fi
 
 files_file=`mktemp $myname-XXXXXX`
 if test -n "$files_file"; then
@@ -237,9 +333,9 @@ if test "z$dofit" = "zyes"; then
 	echo "Fitting done."
 fi
 
-#if test -f "$files_file"; then
-#	rm $files_file
-#fi
+if test -f "$files_file"; then
+	rm $files_file
+fi
 
 exit 0;
 

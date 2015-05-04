@@ -15767,7 +15767,7 @@ BINDIR=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 
 
-BCPT_XYZ=$(echo ${BINDIR}/analyze-xyz.py)
+BCPT_XYZ=$(echo ${BINDIR}/analyze-xyzp.py)
 
 #BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
 BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)

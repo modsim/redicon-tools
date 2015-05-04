@@ -73,7 +73,7 @@ do
     H  ) molb2dat_opts="$molb2dat_opts -H$OPTARG"
          cmd="${cmd} -H $OPTARG";;
 
-    w  ) window=" -w$OPTARG"
+    w  ) window="$OPTARG"
          cmd="${cmd} -w $OPTARG";;
 
     :  ) echo "$myname: option -$OPTARG requires an argument." >&2
@@ -105,7 +105,7 @@ if test -z "$obase"; then
 fi
 
 for f in ${molbfiles[*]}; do
-	datdir=$(basename $f .molb)
+	datdir=$(dirname $f)/$(basename $f .molb)
 	mkdir -p $datdir
 	$molb2dat -i $f $molb2dat_opts -o $datdir/$obase
 	n=${nmols[0]}
@@ -119,24 +119,15 @@ for f in ${molbfiles[*]}; do
 	done
 done
 
-files_file=`mktemp $myname-XXXXXX`
-if test -n "$files_file"; then
-    echo $files > $files_file
-    average_files=" -F $files_file"
-else
-    echo "$myname: cannot create a temporary file, I am sorry to give up..."
-    exit 1
-fi
+files_file=${obase}.lst
+echo $files > $files_file
+average_files=" -F $files_file"
 
 echo
 echo "Avereging:"
-echo $average $average_files -k 0,5 $window
-$average $average_files -k 0,5 $window > $obase.dat
+echo $average $average_files -k 0,5 -w $window
+$average $average_files -k 0,5 -w $window > ${obase}_w${window}.dat
 echo "Avereging done."
-
-if test -f "$files_file"; then
-	rm $files_file
-fi
 
 exit 0;
 

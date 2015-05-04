@@ -1,6 +1,8 @@
 bin_PROGRAMS = pdb2str molsys-create molb2dat
 
-bin_SCRIPTS= analyze-xyz.py average-mexp.py  average-me.py fit-pow.sh \
+bin_SCRIPTS= analyze-xyz.py analyze-xyzp.py \
+	average-mexp.py  average-me.py \
+	fit-pow.sh \
 	molb2msd
 
 EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py
