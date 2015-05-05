@@ -1,0 +1,2 @@
+average-mexp.py: when averaging window too small, there are errors from
+warnings.warn("Mean of empty slice.", RuntimeWarning)

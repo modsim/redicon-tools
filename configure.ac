@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([bcp-tools], [0.2.34], [s.kondrat@fz-juelich.de])
+AC_INIT([bcp-tools], [0.2.35], [s.kondrat@fz-juelich.de])
 
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -87,9 +87,13 @@ BCPT_MOLSYS=$(echo ${BINDIR}/molsys-create)
 
 AC_SUBST(BCPT_XYZ)
 BCPT_XYZ=$(echo ${BINDIR}/analyze-xyzp.py)
+
 AC_SUBST(BCPT_AVERAGE)
-#BCPT_AVERAGE=$(echo ${BINDIR}/average-mexp.py)
 BCPT_AVERAGE=$(echo ${BINDIR}/average-me.py)
+
+AC_SUBST(BCPT_AVERAGEXP)
+BCPT_AVERAGEXP=$(echo ${BINDIR}/average-mexp.py)
+
 
 AC_SUBST(BCPT_FIT)
 BCPT_FIT=$(echo ${BINDIR}/fit-pow.sh)

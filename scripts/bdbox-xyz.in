@@ -21,8 +21,8 @@ myname=$(basename $0)
 # others
 bdbox=@BDBOX@
 analysexyz=@BCPT_XYZ@
-average=@BCPT_AVERAGE@
-#average=average-me.py
+average="python2 @BCPT_AVERAGE@"
+averagexp="python2 @BCPT_AVERAGEXP@"
 fitter=@BCPT_FIT@
 
 #
@@ -48,7 +48,7 @@ function usage()
   echo "                          in subdirectories with .xyz files (default no)."
   echo "  -a                      create data files for all atoms (to save time on multiple IOs)."
   echo "                          Nota that this works ONLY for single atom molecules (ie -n1)."
-
+  echo "  -x                      Use extended averaged (requires pandas) for averaging (recommended)."
   echo "  -f                      linear fit using `basename $fitter` to get diff.coeff."
   echo "  -p                      create PS comparing data with fitting function."
   echo "  -i INTERVAL             fir on the INTERVAL (gnuplot syntax)."
@@ -210,7 +210,7 @@ function scan_directory ()
 #
 # default size of a molecule (-n option)
 molsize=1
-while getopts "d:o:k:n:aw:H:fpi:Ov?:" Option
+while getopts "d:o:k:n:aw:H:fpi:Oxv?:" Option
 do
   case $Option in
 
@@ -230,6 +230,9 @@ do
 
     a  ) doall="yes"
          cmd="${cmd} -a";;
+
+    x  ) average=$averagexp;
+         cmd="${cmd} -x";;
 
     H  ) OLD_IFS="$IFS";
 	 IFS=","
@@ -333,9 +336,9 @@ if test "z$dofit" = "zyes"; then
 	echo "Fitting done."
 fi
 
-if test -f "$files_file"; then
-	rm $files_file
-fi
+#if test -f "$files_file"; then
+#	rm $files_file
+#fi
 
 exit 0;
 

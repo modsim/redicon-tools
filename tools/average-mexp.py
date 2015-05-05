@@ -20,6 +20,10 @@ import string
 import time
 import datetime
 
+import warnings
+
+warnings.simplefilter("error")
+
 def printf(str, *args):
     print(str % args, end='')
 
