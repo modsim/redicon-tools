@@ -284,7 +284,7 @@ bin_SCRIPTS = analyze-xyz.py analyze-xyzp.py \
 	fit-pow.sh \
 	molb2msd
 
-EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py
+EXTRA_DIST = $(bin_SCRIPTS) taulex.py taux.py taux-2comp.py BUGS
 AM_CPPFLAGS = -Wall -DBCPT_MAINTAINER=\"@BCPT_MAINTAINER@\" -I$(top_srcdir)/lib/
 AM_LDFLAGS = -pedantic -ansi -lm
 pdb2str_SOURCES = pdb2str.cc str.c
