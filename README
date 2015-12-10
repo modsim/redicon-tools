@@ -1,0 +1,17 @@
+BCP Tool is a set of tools for running and analysing Brownian Dynamics Simulations with BD_BOX. What means BCP has been forgotten.
+
+This library is a part of REDICON, REaction DIffusion systems via DIscrete-CONtinuous modelling (Olav Zimmermann)
+
+BCP Tools consist of 
+
+1. A library that can read PDB files, create molecules etc. 
+
+Examples of its use can be found in test files in the corresponding tests/ directories and in tools/ directory.
+
+2. A few programs (molb2dat, pdb2str, molsys-create) which use this library. Run these programs with --help option to see a help message and usage information.
+
+3. A few python scripts (in tools/) and a bash script (scripts/bdbox-xyz) to analyse the simulations results. Use --help option for help/usage messages.
+
+4. A few bash scripts for running/queueing BD_BOX software on a cluster (scripts/). Use --help option to get help.
+
+
